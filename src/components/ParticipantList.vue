@@ -77,7 +77,7 @@ Licensed under the Elastic License 2.0. */
     {
       field: 'alias',
       header: t('participants.props.alias'),
-      editable: true,
+      editable: (col) => actionsVisible || (props.statusStatus !== StudyStatus.Closed && (col as Participant)?.status === 'new'),
       sortable: true,
       filterable: { showFilterMatchModes: false },
       columnWidth: '15vw',

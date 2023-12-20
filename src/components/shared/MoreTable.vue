@@ -385,21 +385,26 @@ Licensed under the Elastic License 2.0. */
     }
   }
 
-  function isEditableColumn(editable: any, column: any) {
-    if (typeof editable === 'function') {
-      return editable(column);
-    } else return editable;
+  function isEditableColumn(column: any, data: any) {
+    if (typeof column.editable === 'function') {
+      return column.editable(data);
+    } else return column.editable;
   }
 
-  function isEditableWithValues(column: any): MoreTableChoice[] {
+  function isEditableWithValues(column: any, data: any): MoreTableChoice[] {
     let editable = column.editable;
     if (typeof editable !== 'undefined' && typeof editable !== 'boolean') {
       if (typeof editable === 'function') {
-        editable = editable(column);
-      }
+        editable = editable(data);
+        console.log("Dif in act and pause - data: ", data);
 
+      }
+      console.log("column: ",column);
+      console.log("data: ", data);
       if (Object.prototype.hasOwnProperty.call(editable, 'values')) {
+        console.log("Test editable 2: ", editable);
         const editableWithValues = editable as MoreTableChoiceOptions;
+        console.log("editable with values",editableWithValues);
         return editableWithValues.values as MoreTableChoice[];
       }
     }
@@ -610,9 +615,9 @@ Licensed under the Elastic License 2.0. */
         "
       >
         <template
-          v-if="isEditableColumn(column.editable, column)"
           #editor="{ data, field }"
         >
+          <template v-if="isEditableColumn(column, data)">
           <InputText
             v-if="
               column.type === MoreTableFieldType.string ||
@@ -635,7 +640,7 @@ Licensed under the Elastic License 2.0. */
             v-if="column.type === MoreTableFieldType.choice"
             v-model="data[field]"
             class="w-full"
-            :options="isEditableWithValues(column)"
+            :options="isEditableWithValues(column, data)"
             option-label="label"
             option-value="value"
             :class="data[field] ? 'dropdown-has-value' : ''"
@@ -656,7 +661,7 @@ Licensed under the Elastic License 2.0. */
               column.type === MoreTableFieldType.singleselect
             "
             v-model="data[field]"
-            :options="isEditableWithValues(column)"
+            :options="isEditableWithValues(column, data)"
             option-label="label"
             :selection-limit="
               column.type === MoreTableFieldType.singleselect ? 1 : undefined
@@ -685,6 +690,100 @@ Licensed under the Elastic License 2.0. */
               <span v-else class="pi pi-eye color-approved" />
             </div>
           </div>
+          </template>
+
+          <!-- From Here -->
+
+          <template v-else>
+            <div v-if="column.type === MoreTableFieldType.nested">
+              {{ getNestedField(data, field) }}
+            </div>
+            <div v-if="column.type === MoreTableFieldType.nestedDatetime">
+              {{ dayjs(getNestedField(data, field)).format('DD/MM/YYYY, HH:mm') }}
+            </div>
+            <div
+              v-if="data[field] === null"
+              v-tooltip.bottom="rowTooltipMsg ? rowTooltipMsg : undefined"
+              class="placeholder"
+            >
+              {{ column.placeholder || $t('global.labels.no-value') }}
+            </div>
+            <div
+              v-else
+              v-tooltip.bottom="rowTooltipMsg ? rowTooltipMsg : undefined"
+            >
+            <span
+              v-if="column.type === MoreTableFieldType.string || !column.type"
+              :class="
+                'table-value table-value-' +
+                field +
+                '-' +
+                toClassName(data[field])
+              "
+            >
+              <span v-if="column.arrayLabels">
+                <span
+                  v-for="(value, index) in getLabelForMultiSelectValue(
+                    data[field],
+                    column.arrayLabels
+                  )"
+                  :key="index"
+                  class="multiselect-item"
+                >{{ value }}</span
+                >
+              </span>
+              <span v-else>{{ data[field] }}</span>
+            </span>
+              <span v-if="column.type === MoreTableFieldType.statusString">
+              {{ $t('study.statusStrings.' + data[field]) }}
+            </span>
+              <span v-if="column.type === MoreTableFieldType.choice">{{
+                  getLabelForChoiceValue(data[field], isEditableWithValues(column, data))
+                }}</span>
+              <span v-if="column.type === MoreTableFieldType.calendar">
+              {{ dayjs(data['__internalValue_' + field]).format('DD/MM/YYYY') }}
+            </span>
+              <span v-if="column.type === MoreTableFieldType.datetime">
+              <span v-if="data[field] !== '-'">
+                {{ dayjs(data[field]).format('DD/MM/YYYY, HH:mm') }}
+              </span>
+              <span v-else>
+                {{ data[field] }}
+              </span>
+            </span>
+              <span v-if="column.type === MoreTableFieldType.longtext"
+              >{{ shortenFieldText(data[field]) }}
+            </span>
+              <span
+                v-if="
+                column.type === MoreTableFieldType.multiselect ||
+                column.type === MoreTableFieldType.singleselect
+              "
+              >
+              <span
+                v-for="(value, index) in getLabelForMultiSelectValue(
+                  data[field]
+                )"
+                :key="index"
+                class="multiselect-item"
+              >{{ value }}</span
+              >
+            </span>
+              <span
+                v-if="column.type === MoreTableFieldType.showIcon"
+                class="icon-box eye"
+              >
+              <span
+                v-if="data[field]"
+                class="pi pi-eye-slash color-important"
+              />
+              <span v-else class="pi pi-eye color-approved" />
+            </span>
+            </div>
+          </template>
+
+          <!-- Till Here -->
+
         </template>
         <template
           v-if="column.filterable"
@@ -700,7 +799,10 @@ Licensed under the Elastic License 2.0. */
             @keydown.enter="filterCallback()"
           />
         </template>
-        <template #body="{ data, field }">
+
+        <!-- From Here -->
+
+        <template #body="{data, field}">
           <div v-if="column.type === MoreTableFieldType.nested">
             {{ getNestedField(data, field) }}
           </div>
@@ -735,7 +837,7 @@ Licensed under the Elastic License 2.0. */
                   )"
                   :key="index"
                   class="multiselect-item"
-                  >{{ value }}</span
+                >{{ value }}</span
                 >
               </span>
               <span v-else>{{ data[field] }}</span>
@@ -744,8 +846,8 @@ Licensed under the Elastic License 2.0. */
               {{ $t('study.statusStrings.' + data[field]) }}
             </span>
             <span v-if="column.type === MoreTableFieldType.choice">{{
-              getLabelForChoiceValue(data[field], isEditableWithValues(column))
-            }}</span>
+                getLabelForChoiceValue(data[field], isEditableWithValues(column, data))
+              }}</span>
             <span v-if="column.type === MoreTableFieldType.calendar">
               {{ dayjs(data['__internalValue_' + field]).format('DD/MM/YYYY') }}
             </span>
@@ -758,7 +860,7 @@ Licensed under the Elastic License 2.0. */
               </span>
             </span>
             <span v-if="column.type === MoreTableFieldType.longtext"
-              >{{ shortenFieldText(data[field]) }}
+            >{{ shortenFieldText(data[field]) }}
             </span>
             <span
               v-if="
@@ -772,7 +874,7 @@ Licensed under the Elastic License 2.0. */
                 )"
                 :key="index"
                 class="multiselect-item"
-                >{{ value }}</span
+              >{{ value }}</span
               >
             </span>
             <span
@@ -787,6 +889,9 @@ Licensed under the Elastic License 2.0. */
             </span>
           </div>
         </template>
+
+        <!-- Till Here -->
+
       </Column>
 
       <Column
@@ -874,7 +979,7 @@ Licensed under the Elastic License 2.0. */
       </Column>
       <template #empty>
         {{ emptyMessage }}
-      </template>
+      </template>ist
       <template #loading> </template>
     </DataTable>
   </div>
