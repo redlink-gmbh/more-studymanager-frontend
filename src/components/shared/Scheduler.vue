@@ -65,7 +65,7 @@ Licensed under the Elastic License 2.0. */
   }
 
   const singleDayEventCheckbox: Ref<boolean> = ref(
-    calendarStart.value.getDay() === calendarEnd.value.getDay() ? true : false
+    calendarStart.value.getTime() === calendarEnd.value.getTime()
   ); // Individual Observation Checkbox
   const hasRruleValue: Ref<boolean> = ref(
     !returnSchedule.value.rrule ? false : true
