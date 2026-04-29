@@ -34,7 +34,7 @@ export default defineConfig(({ mode }) => {
       __KEYCLOAK_URL__: JSON.stringify(
         env.KEYCLOAK_URL ||
           env.VITE_KEYCLOAK_URL ||
-          'https://auth.more.redlink.io',
+          'https://auth.umm.redlink.io',
       ),
       __KEYCLOAK_REALM__: JSON.stringify(
         env.KEYCLOAK_REALM || env.VITE_KEYCLOAK_REALM || 'Auth-Client-Test',
@@ -58,7 +58,7 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: process.env.VITE_LOCAL_BACKEND
             ? 'http://localhost:8080/api'
-            : env.BACKEND_URL || env.VITE_MORE_BACKEND_URL,
+            : 'https://studymanager.platform-test.more.redlink.io/api',
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/api/, ''),
