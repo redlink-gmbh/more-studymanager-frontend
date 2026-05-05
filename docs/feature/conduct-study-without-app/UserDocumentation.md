@@ -40,7 +40,7 @@ Repository: https://github.com/MORE-Platform/more-participant-portal
 > ![enable-participant-prtal.jpg](images/study-manager/enable-participant-portal.jpg)
 
 ### Configure Limesurvey Questionnaires
-1. Go to the [More Limesurvey Survey](https://lime.platform-test.more.redlink.io/admin/)
+1. Go to the [More Limesurvey Survey](https://lime.platform-test.umm.redlink.io/admin/)
 2. Login to the Limesurvey Survey
 
 #### 3. Adapt Limesurvey-Specific Settings (Depending on Your Use Case)

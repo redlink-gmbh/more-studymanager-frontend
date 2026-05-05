@@ -41,8 +41,8 @@ Fill in the following metadata with the values for your test during Phase 1.
 | Parameter                                 | Value                                                                       |
 |-------------------------------------------|-----------------------------------------------------------------------------|
 | Environment                               | Redlink MORE Test Instance                                                  |
-| StudyManager URL                          | https://studymanager.platform-test.more.redlink.io/ (update for local test) |
-| Lime Survey URL                            | https://lime.platform-test.more.redlink.io/admin/  (update for local test)  |
+| StudyManager URL                          | https://studymanager.platform-test.umm.redlink.io/ (update for local test) |
+| Lime Survey URL                            | https://lime.platform-test.umm.redlink.io/admin/  (update for local test)  |
 | Tester                                    |                                                                             |
 | Test date                                 |                                                                             |
 | Study ID                                  |                                                                             |
@@ -58,7 +58,7 @@ Fill in the following metadata with the values for your test during Phase 1.
 ## <span style="color: #6E8FAC">1. Create a new study</span>
 
 ### Action
-Open the [MORE StudyManager Frontend](https://studymanager.platform-test.more.redlink.io/) and create a new study with the following information (updated values marked like `this`):
+Open the [MORE StudyManager Frontend](https://studymanager.platform-test.umm.redlink.io/) and create a new study with the following information (updated values marked like `this`):
 
 | Field                     | Value                                                                                                                                                                                                                                                                                                                                                                        |
 |---------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -103,7 +103,7 @@ Open the [MORE StudyManager Frontend](https://studymanager.platform-test.more.re
 
 ## <span style="color: #6E8FAC">3. Configure Lime Surveys</span>
 
-1. Go to the [MORE Lime Survey Server](https://lime.platform-test.more.redlink.io/admin/) and log in to your account (log in credentials to local setup: admin / admin).
+1. Go to the [MORE Lime Survey Server](https://lime.platform-test.umm.redlink.io/admin/) and log in to your account (log in credentials to local setup: admin / admin).
 2. Configure the Setup based on the [Lime Survey Documentation](https://github.com/MORE-Platform/more-limesurvey)
 3. Go to **Surveys** and click **+ Create Survey**
 > ![lime-survey.jpg](../images/end-to-end-test/lime-survey.jpg)
@@ -318,7 +318,7 @@ Note: The data can take a little bit to be saved into our system (max. 5 minutes
 ## <span style="color: #6E8FAC">13. Verify invalid URLs</span>
 
 ### Action
-1. Enter any invalid participant portal URL. (e.g.: https://participant-portal.platform-test.more.redlink.io/{any value})
+1. Enter any invalid participant portal URL. (e.g.: https://participant-portal.platform-test.umm.redlink.io/{any value})
 
 ### Expected Result
 - An error page is shown.

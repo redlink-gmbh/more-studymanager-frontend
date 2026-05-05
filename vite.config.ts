@@ -58,7 +58,7 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: process.env.VITE_LOCAL_BACKEND
             ? 'http://localhost:8080/api'
-            : 'https://studymanager.platform-test.more.redlink.io/api',
+            : 'https://studymanager.platform-test.umm.redlink.io/api',
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/api/, ''),
