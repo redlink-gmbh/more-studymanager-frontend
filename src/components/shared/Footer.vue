@@ -45,7 +45,7 @@ Licensed under the Elastic License 2.0. */
         {{ uiConfig.title }}
       </div>
       <a
-        :href="`https://dhp.lbg.ac.at/more/${locale === 'en' ? '?lang=en' : ''}`"
+        :href="`https://more-platform.at/${locale === 'en' ? '?lang=en' : ''}`"
         target="_blank"
         class="link text-base uppercase"
         >{{ $t('global.footer.aboutMore') }}</a
@@ -54,7 +54,7 @@ Licensed under the Elastic License 2.0. */
   </footer>
 </template>
 
-<style scoped lang="postcss">
+<style scoped>
   .footer {
     z-index: 1000;
     position: fixed;

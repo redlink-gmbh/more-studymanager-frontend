@@ -43,9 +43,9 @@
 | Check ICal export after creating several observations                    | see background info                              | <ul><li>WHEN I have configered all in background listed observations</li><li>AND click on the Ical export of the study</li></ul>                                             | THEN a Ical export data is downloaded, that shows (after import into outlook) all the observations in correct order.                                                            | <s>21.11.2023: BUG</s><br/><br/>22.11.2023: ✅ | <s>21.11.2023:<br/><ul><li>BUG: Absolute Scheduler shows in Observation List End, the start time</li><li>BUG: Time of relative schedule has a offset of 1 hour</li></ul></s>2022.11.2023: Bug was fixed. |
 | Check if App Observations are scheduled the same way as the ICal export. | see background info<br>Ical was already exported | <ul><li>WHEN I have configered all in background listed observations</li><li>AND have checked the ICal exprt</li><li>AND have logged into the study as participant</li></ul> | THEN the active observations are scheduled and shown based on the observation settings. The scheduled observations on the app have the same dates and times as the Ical export. | <s>22.11.2023: BUG</s><br/><br/> 23.11.2023: ✅ | <s>21.11.2023: BUG If you log in for the first time the schedule is empty. After study is paused and resumed on the study manager the schedules are shown.</s><br/><br/>23.11.2023: Bug was fixed        |
 
-Download ical without button: https://data.platform-test.more.redlink.io/api/v1/calendar/studies/[STUDY-ID]/calendar.ics
+Download ical without button: https://data.platform-test.umm.redlink.io/api/v1/calendar/studies/[STUDY-ID]/calendar.ics
 
-Studymanager App Backend-Test - Study-Endpoint: https://data.platform-test.more.redlink.io/api/v1
+Studymanager App Backend-Test - Study-Endpoint: https://data.platform-test.umm.redlink.io/api/v1
 
 ### More App: Additional Observation examples
 

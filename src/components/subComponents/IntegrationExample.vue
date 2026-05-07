@@ -45,7 +45,7 @@ Licensed under the Elastic License 2.0. */
       <code>
         <small>
           curl -X POST
-          https://data.platform-test.more.redlink.io/api/v1/external/bulk \
+          https://data.platform-test.umm.redlink.io/api/v1/external/bulk \
           <br />
           -H "Content-Type: application/json" \ <br />
           -H "More-Api-Token: {{ props.token }}" \ <br />
@@ -77,7 +77,7 @@ Licensed under the Elastic License 2.0. */
       <code>
         <small>
           curl -X GET
-          https://data.platform-test.more.redlink.io/api/v1/external/participants
+          https://data.platform-test.umm.redlink.io/api/v1/external/participants
           \ <br />
           -H "More-Api-Token: {{ props.token }}"
         </small>
@@ -86,7 +86,7 @@ Licensed under the Elastic License 2.0. */
   </div>
 </template>
 
-<style scoped lang="postcss">
+<style scoped>
   .integration-example .example-box {
     border: 1px solid var(--surface-50);
     border-radius: 6px;

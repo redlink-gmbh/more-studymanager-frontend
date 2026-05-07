@@ -4,24 +4,25 @@
   import Button from 'primevue/button';
   import InputNumber from 'primevue/inputnumber';
   import Dropdown from 'primevue/dropdown';
-  import CustomCheckbox from './CustomCheckbox.vue';
-  import { Duration, UnitEnum, RelativeEvent } from '@gs';
+  import Checkbox from 'primevue/checkbox';
+  import { DurationUnitEnum, RelativeEvent, StudyDurationUnitEnum } from '@gs';
+  import { Duration } from '@gs/models/duration';
   import { useI18n } from 'vue-i18n';
-  import { ScheduleType } from '../../models/Scheduler';
+  import { ScheduleType } from '@/models/Scheduler';
   import { DateTime } from 'luxon';
-  import { createLuxonDateTime, timeFromString } from '../../utils/dateUtils';
-  import { useStudyStore } from '../../stores/studyStore';
+  import { createLuxonDateTime, timeFromString } from '@/utils/dateUtils';
+  import { useStudyStore } from '@/stores/studyStore';
   import { storeToRefs } from 'pinia';
   import {
     correctEvent,
     correctEventRepetition,
-  } from '../../utils/relativeScheduleUtils';
-  import { calcStudyDurationFromStudy } from '../../utils/studyUtils';
+  } from '@/utils/relativeScheduleUtils';
+  import { calcStudyDurationFromStudy } from '@/utils/studyUtils';
   import ErrorLabel from '../forms/ErrorLabel.vue';
-  import { useErrorQueue } from '../../composable/useErrorHandling';
-  import { valueToMinutes } from '../../utils/durationUtils';
-  import { scrollToFirstError } from '../../utils/componentUtils';
-  import { ONE_DAY_IN_MINUTES } from '../../constants';
+  import { useErrorQueue } from '@/composable/useErrorHandling';
+  import { valueToMinutes } from '@/utils/durationUtils';
+  import { scrollToFirstError } from '@/utils/componentUtils';
+  import { ONE_DAY_IN_MINUTES } from '@/constants';
   import RandomizationView from '../subComponents/RandomizationView.vue';
   import { useToast } from 'primevue/usetoast';
 
@@ -39,7 +40,7 @@
 
   const startOffset = ref<Duration>({
     value: schedule.dtstart?.offset?.value ?? 1,
-    unit: UnitEnum.Day,
+    unit: DurationUnitEnum.Day,
   });
   const startTime = ref<DateTime>(
     DateTime.now().set({ hour: 10, minute: 30, second: 0 }),
@@ -47,7 +48,7 @@
 
   const endOffset = ref<Duration>({
     value: schedule.dtend?.offset?.value ?? 1,
-    unit: UnitEnum.Day,
+    unit: DurationUnitEnum.Day,
   });
   const endTime = ref<DateTime>(
     DateTime.now().set({ hour: 18, minute: 30, second: 0 }),
@@ -98,13 +99,13 @@
   });
 
   const frequency = ref<number>(schedule.rrrule?.frequency?.value || 1);
-  const frequencyUnit = ref<UnitEnum>(
-    schedule.rrrule?.frequency?.unit ?? UnitEnum.Day,
+  const frequencyUnit = ref<DurationUnitEnum>(
+    schedule.rrrule?.frequency?.unit ?? DurationUnitEnum.Day,
   );
 
   const endRep = ref<number>(schedule.rrrule?.endAfter?.value || 4);
-  const endRepUnit = ref<UnitEnum>(
-    schedule.rrrule?.endAfter?.unit ?? UnitEnum.Day,
+  const endRepUnit = ref<DurationUnitEnum>(
+    schedule.rrrule?.endAfter?.unit ?? DurationUnitEnum.Day,
   );
 
   const repeatChecked: Ref<boolean> = ref(!!schedule.rrrule?.frequency);
@@ -116,19 +117,19 @@
   const repetitionUnit = [
     {
       label: t('scheduler.frequency.minute'),
-      value: UnitEnum.Minute,
-      unit: UnitEnum.Minute,
+      value: DurationUnitEnum.Minute,
+      unit: DurationUnitEnum.Minute,
     },
     {
       label: t('scheduler.frequency.hour'),
-      value: UnitEnum.Hour,
-      unit: UnitEnum.Hour,
+      value: DurationUnitEnum.Hour,
+      unit: DurationUnitEnum.Hour,
     },
     {
       label: t('scheduler.frequency.day'),
-      value: UnitEnum.Day,
+      value: DurationUnitEnum.Day,
       active: true,
-      unit: UnitEnum.Day,
+      unit: DurationUnitEnum.Day,
     },
   ];
 
@@ -230,11 +231,11 @@
   const offsetToMinutes = (offset: Duration): number => {
     const v = Number(offset.value ?? 0);
     switch (offset.unit) {
-      case UnitEnum.Minute:
+      case StudyDurationUnitEnum.Minute:
         return v;
-      case UnitEnum.Hour:
+      case StudyDurationUnitEnum.Hour:
         return v * 60;
-      case UnitEnum.Day:
+      case StudyDurationUnitEnum.Day:
         return v * 24 * 60;
       default:
         return v * 24 * 60;
@@ -414,8 +415,10 @@
         {{ $t('scheduler.dialog.singleEventTitle') }}
       </h6>
 
-      <div class="col-span-6 grid grid-cols-6 items-center border-b-2">
-        <div class="col-span-2 col-start-2 border-l-2 pl-3">
+      <div
+        class="col-span-6 grid grid-cols-6 items-center border-b-2 border-gray-300"
+      >
+        <div class="col-span-2 col-start-2 border-l-2 border-gray-300 pl-3">
           {{ $t('scheduler.preview.unit.date') }}&nbsp;({{
             $t('scheduler.frequency.day')
           }})
@@ -429,16 +432,22 @@
         <div class="col-span-1">
           {{ $t('scheduler.dialog.relativeSchedule.startValue') }}
         </div>
-        <div class="col-span-2 border-l-2 py-3 pl-3">
+        <div class="col-span-2 border-l-2 border-gray-300 py-3 pl-3">
           <InputNumber
             v-model="startOffset.value"
             :placeholder="
               $t('scheduler.dialog.relativeSchedule.placeholder.dtstartOffset')
             "
             :min="1"
-            @input="
-              clearError(['dtstart', 'scheduleTooLong', 'startTimeBeforeEnd']);
-              startOffset.value = ($event?.value || 1) as number;
+            @update:model-value="
+              (val) => {
+                clearError([
+                  'dtstart',
+                  'scheduleTooLong',
+                  'startTimeBeforeEnd',
+                ]);
+                startOffset.value = (val || 1) as number;
+              }
             "
           />
         </div>
@@ -462,23 +471,25 @@
       </div>
       <ErrorLabel
         :error="getError('dtstart')"
-        class="col-span-5 col-start-2 border-l-2 pl-3"
+        class="col-span-5 col-start-2 border-l-2 border-gray-300 pl-3"
       />
 
       <div class="col-span-6 grid grid-cols-6 items-center">
         <div class="col-span-1">
           {{ $t('scheduler.dialog.relativeSchedule.endValue') }}
         </div>
-        <div class="col-span-2 border-l-2 py-3 pl-3">
+        <div class="border-gray-300 col-span-2 border-l-2 py-3 pl-3">
           <InputNumber
             v-model="endOffset.value"
             :placeholder="
               $t('scheduler.dialog.relativeSchedule.placeholder.dtendOffset')
             "
             :min="1"
-            @input="
-              clearError(['dtend', 'startTimeBeforeEnd', 'offsetCorrection']);
-              endOffset.value = ($event?.value || 1) as number;
+            @update:model-value="
+              (val) => {
+                clearError(['dtend', 'startTimeBeforeEnd', 'offsetCorrection']);
+                endOffset.value = (val || 1) as number;
+              }
             "
           />
         </div>
@@ -502,7 +513,7 @@
       </div>
       <ErrorLabel
         :error="getError(['dtend', 'offsetCorrection'])"
-        class="col-span-5 col-start-2 border-l-2 pl-3"
+        class="col-span-5 col-start-2 border-l-2 border-gray-300 pl-3"
       />
     </div>
 
@@ -519,18 +530,18 @@
       ]"
       @click="repeatChecked = !repeatChecked"
     >
-      <CustomCheckbox
+      <Checkbox
         v-model="repeatChecked"
         :disabled="!repetitionEnabled"
         binary
-        @input="calcRepetition()"
+        @update:model-value="calcRepetition()"
         @click.stop
       />
       <span class="ms-2">{{ $t('scheduler.dialog.repeatEvent') }}</span>
     </div>
     <div class="flex flex-row items-center justify-start">
       <span>{{ $t('scheduler.randomization.label') }}:</span>
-      <CustomCheckbox
+      <Checkbox
         :model-value="!!returnSchedule.random?.state"
         class="ml-2"
         binary
@@ -545,16 +556,18 @@
         <div class="col-span-1">
           {{ $t('scheduler.dialog.repeatEvery') }}
         </div>
-        <div class="col-span-5 flex border-l-2 py-3 pl-3">
+        <div class="col-span-5 flex border-l-2 border-gray-300 py-3 pl-3">
           <InputNumber
             v-model="frequency"
             :placeholder="
               $t('scheduler.dialog.relativeSchedule.placeholder.enterNumber')
             "
             :min="1"
-            @input="
-              clearError(['rrruleFreq', 'frequencyError']);
-              frequency = ($event?.value || 1) as number;
+            @update:model-value="
+              (val) => {
+                clearError(['rrruleFreq', 'frequencyError']);
+                frequency = (val || 1) as number;
+              }
             "
           />
           <Dropdown
@@ -563,18 +576,18 @@
             :option-label="'label'"
             :option-value="'value'"
             class="col-span-3 ml-4"
-            @input="clearError(['rrruleFreq', 'frequencyError'])"
+            @update:model-value="clearError(['rrruleFreq', 'frequencyError'])"
           />
         </div>
         <ErrorLabel
           :error="getError(['rrruleFreq', 'frequencyError'])"
-          class="col-span-5 col-start-2 border-l-2 pl-3"
+          class="col-span-5 col-start-2 border-l-2 border-gray-300 pl-3"
         />
 
         <div class="col-span-1">
           {{ $t('scheduler.dialog.endAfter') }}
         </div>
-        <div class="col-span-5 flex border-l-2 py-3 pl-3">
+        <div class="col-span-5 flex border-l-2 border-gray-300 py-3 pl-3">
           <InputNumber
             v-model="endRep"
             :placeholder="
@@ -582,9 +595,11 @@
             "
             class="z-10"
             :min="1"
-            @input="
-              clearError(['rrruleEndAfter', 'frequencyEndError']);
-              endRep = ($event?.value || 1) as number;
+            @update:model-value="
+              (val) => {
+                clearError(['rrruleEndAfter', 'frequencyEndError']);
+                endRep = (val || 1) as number;
+              }
             "
           />
           <Dropdown
@@ -593,12 +608,14 @@
             option-label="label"
             option-value="value"
             class="z-10 col-span-3 ml-4"
-            @input="clearError(['rrruleEndAfter', 'frequencyEndError'])"
+            @update:model-value="
+              clearError(['rrruleEndAfter', 'frequencyEndError'])
+            "
           />
         </div>
         <ErrorLabel
           :error="getError(['rrruleEndAfter', 'frequencyEndError'])"
-          class="col-span-5 col-start-2 border-l-2 pl-3"
+          class="col-span-5 col-start-2 border-l-2 border-gray-300 pl-3"
         />
       </div>
       <div class="col-span-6 pt-6">
@@ -627,10 +644,10 @@
 
     <div class="grid w-full grid-cols-6">
       <div
-        class="col-start-0 col-span-6 mt-8 flex flex-row items-center justify-end text-right"
+        class="col-span-6 col-start-0 mt-8 flex flex-row items-center justify-end text-right"
       >
         <Button
-          class="btn-gray !mr-3"
+          class="btn-gray mr-3"
           :label="$t('global.labels.cancel')"
           @click="cancel()"
         />
@@ -644,9 +661,9 @@
   </div>
 </template>
 
-<style scoped lang="postcss">
+<style scoped>
   :deep(.highlight input) {
-    background-color: var(--red-200) !important;
+    background-color: var(--red-200);
   }
 
   .scheduler {
