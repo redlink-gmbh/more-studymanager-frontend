@@ -9,8 +9,8 @@ ARG VITE_GIT_BRANCH
 ARG VITE_GIT_REVISION
 ARG BACKEND_URL=https://studymanager.platform-test.umm.redlink.io/
 ARG KEYCLOAK_URL=https://auth.more.redlink.io
-ARG KEYCLOAK_REALM=Auth-Client-Test
-ARG KEYCLOAK_CLIENTID=oauth2-pkce-client
+ARG KEYCLOAK_REALM=UMM
+ARG KEYCLOAK_CLIENTID=oauth2-umm-client
 RUN npm run package:quick
 
 # production stage
@@ -23,9 +23,9 @@ ARG BACKEND_URL=https://studymanager.platform-test.umm.redlink.io/
 ENV BACKEND_URL=$BACKEND_URL
 ARG KEYCLOAK_URL=https://auth.more.redlink.io
 ENV KEYCLOAK_URL=$KEYCLOAK_URL
-ARG KEYCLOAK_REALM=Auth-Client-Test
+ARG KEYCLOAK_REALM=UMM
 ENV KEYCLOAK_REALM=$KEYCLOAK_REALM
-ARG KEYCLOAK_CLIENTID=oauth2-pkce-client
+ARG KEYCLOAK_CLIENTID=oauth2-umm-client
 ENV KEYCLOAK_CLIENTID=$KEYCLOAK_CLIENTID
 
 CMD ["nginx", "-g", "daemon off;"]
