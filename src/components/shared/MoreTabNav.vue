@@ -62,6 +62,12 @@ Licensed under the Elastic License 2.0. */
       access: [StudyRole.StudyAdmin, StudyRole.StudyOperator],
     },
     {
+      title: t('studyNavigation.tabs.goals'),
+      name: 'Goals',
+      params: { studyId: props.studyId },
+      access: [StudyRole.StudyAdmin, StudyRole.StudyOperator],
+    },
+    {
       title: t('studyNavigation.tabs.integration'),
       name: 'Integrations',
       params: { studyId: props.studyId },

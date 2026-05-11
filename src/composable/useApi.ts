@@ -23,7 +23,8 @@ import {
   AuditLogApi,
   OccurredObservationsApi,
   ObservationGroupsApi,
-  ApplicationsApi
+  ApplicationsApi,
+  GoalsApi
 } from '@gs';
 
 const apiConfig = {
@@ -49,6 +50,7 @@ let auditLogApi: AuditLogApi;
 let occurredObservationsApi: OccurredObservationsApi;
 let observationGroupsApi: ObservationGroupsApi;
 let applicationsApi: ApplicationsApi;
+let goalsApi: GoalsApi
 
 export function useStudiesApi(): {
   studiesApi: StudiesApi;
@@ -191,5 +193,14 @@ export function useApplicationsApi(): {
   applicationsApi = applicationsApi || new ApplicationsApi(apiConfig);
   return {
     applicationsApi,
+  };
+}
+
+export function useGoalsApi(): {
+  goalsApi: GoalsApi;
+} {
+  goalsApi = goalsApi || new GoalsApi(apiConfig);
+  return {
+    goalsApi,
   };
 }

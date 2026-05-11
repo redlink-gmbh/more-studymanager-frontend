@@ -563,6 +563,101 @@
     },
     "singular": "Aufzeichnung"
   },
+  "goal": {
+    "dialog": {
+      "deleteMsg": {
+        "confirm": "Möchten Sie dieses Zieltemplate wirklich löschen?",
+        "intro": "Sie sind kurz davor folgendes Zieltemplate zu löschen:",
+        "warning": "Ein gelöschtes Zieltemplate kann nicht wiederhergestellt werden. Wenn Sie das Zieltemplate löschen, gehen alle Konfigurationen verloren."
+      },
+      "header": {
+        "clone": "Zieltemplate klonen",
+        "create": "Zieltemplate hinzufügen",
+        "delete": "Zieltemplate löschen",
+        "edit": "Zieltemplate bearbeiten",
+        "view": "Details eines Zieltemplates"
+      },
+      "label": {
+        "goalTemplateTitle": "Template-Titel"
+      },
+      "msg": {
+        "delete": "Ein gelöschtes Zieltemplate kann nicht mehr wiederhergestellt werden! Möchten Sie das Zieltemplate wirklich löschen?"
+      }
+    },
+    "error": {
+      "addParticipantInfo": "Die Teilnehmerinformationen sind ein erforderliches Feld. Bitte fügen Sie eine Beschreibung hinzu.",
+      "addTitle": "Der Titel des Zieltemplates ist ein erforderliches Feld. Bitte fügen Sie einen Titel hinzu.",
+      "noValidField": "Fehler im Wert {key}: {message}"
+    },
+    "factory": {
+      "liquidity": {
+        "description": "Dieses Ziel legt die tägliche Flüssigkeitsaufnahme fest. Es unterstützt dabei, eine gesunde Trinkgewohnheit aufzubauen und regelmäßig ausreichend zu trinken.",
+        "title": "Flüssigkeitsaufnahme"
+      },
+      "smoking": {
+        "description": "Dieses Ziel hilft dabei, den Zigarettenkonsum zu reduzieren und schrittweise eine geringere Rauchmenge im Alltag zu erreichen.",
+        "title": "Rauchen minimieren"
+      },
+      "type": {
+        "behavioralGoal": "Verhaltensziel",
+        "outcomeGoal": "Ergebnisziel"
+      },
+      "category": {
+        "nutrition": "Ernährung",
+        "smoking": "Rauchen"
+      }
+    },
+    "goalTemplateList": {
+      "action": {
+        "add": "Zieltemplate hinzufügen"
+      },
+      "description": "Ein Zieltemplate wird aus einem Zieltypen erstellt und für die Studie und Teilnehmer:innen kontkretisiert. Es besteht aus Zieldefinition, personalisierbaren Werten und einer Messbaren Komponente. Diese Templates werden auf der App dafür verwendet, der:dem Teilnehmer:in die konfiguration und Erstellung eines persönlichen Ziels zu ermöglichen.",
+      "emptyListMsg": "Verwalten oder fügen Sie ein Zieltemplate hinzu. Diese werden hier angezeigt.",
+      "title": "Zielvorlagen",
+      "configuration": "Globale Vorlagen-Konfiguration",
+      "meassurementTimes": {
+        "title": "Mess- und Reminder-Zeite",
+        "description": "Hier definierte Zeiten werden dafür verwendet die gesammelten Daten für die Zielerreichung an einem bestimmten Zeitpunkt gegenzuchekcne. Dies kann ein Vergleich mit verknüpften Daten wie z.B. Garmin Schrittdaten sein, oder aber auch die Ausschickung eines Reminders zum Eintragen von einfachen Zielen wie z.B. Wasserkonsum pro Tag.",
+        "notSet": "Es wurden noch keine Mess- und Reminder-Zeiten festgelegt.",
+        "adaptMeassurment": "Messungszeiten anpassen",
+        "meassurements": "Messzeiten",
+        "meassurementsDescription": "Zudiesen Zieten werden mit Zielen zusammenhängende Messungen kontrolliert, um die Erreichung eines Ziels abzugleichen.",
+        "times": {
+          "morning": "Morgens",
+          "noon": "Mittags",
+          "evening": "Abends"
+        }
+      },
+      "categories": {
+        "title": "Vorlagen-Kategorien",
+        "description": "Vorlagen-Kategorien werden auf der App als Gruppen für die Ziele angezeigt. Sie können diese verwenden um Ihre Ziele zu organisieren und zu gruppieren.",
+        "edit": "Kategorien bearbeiten",
+        "add": "Kategorie hinzufügen",
+        "delete": "Kategorie löschen"
+      }
+
+    },
+    "placeholder": {
+      "chooseTemplateType": "Zieltemplatetyp auswählen",
+      "enterMainPurpose": "Fügen Sie die Ziele der Studie hinzu."
+    },
+    "plural": "Zieltemplates",
+    "props": {
+      "goalType": "Zieltyp",
+      "goalCategory": "Zielkategorie",
+      "reminder": {
+        "false": "Keine Erinnerung",
+        "true": "Erinnerung"
+      },
+      "goalTemplateType": {
+        "liquidity": "Flüssigkeitsaufnahme",
+        "smoking": "Rauchen abgewöhnen"
+      },
+      "type": "Typ",
+      "dataHealth": "Status"
+    },
+    "singular": "Zieltemplate"
+  },
   "participants": {
     "applicationAccess": {
       "title": "Anwendungszugriff",
@@ -1261,6 +1356,7 @@
       "interventions": "Interventionen",
       "monitoringAndData": "Monitoring & Data",
       "observations": "Datenerhebungen",
+      "goals": "Ziele",
       "overview": "Studie",
       "participants": "Teilnehmer:innen",
       "timeline": "Kalender"
@@ -1292,11 +1388,13 @@
       "cloneIntegration": "Integration klonen",
       "cloneIntervention": "Intervention klonen",
       "cloneObservation": "Datenerhebung klonen",
+      "cloneGoalTemplate": "Zielvorlage klonen",
       "copyStudyUrl": "Studie teilen",
       "deleteCollaborator": "Studien-Mitarbeiter löschen",
       "deleteIntegration": "Integration löschen",
       "deleteIntervention": "Intervention löschen",
       "deleteObservation": "Datenerhebung löschen",
+      "deleteGoalTemplate": "Zielvorlage löschen",
       "deleteParticipantBtn": "Teilnehmer:in löschen",
       "deleteStudyBtn": "Studie löschen",
       "deleteStudyGroupBtn": "Studiengruppe löschen",

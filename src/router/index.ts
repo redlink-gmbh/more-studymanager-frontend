@@ -14,6 +14,7 @@ import NotFound from '../views/NotFound.vue';
 import Interventions from '../views/Interventions.vue';
 import Participants from '../views/Participants.vue';
 import Observations from '../views/Observations.vue';
+import Goals from '../views/Goals.vue';
 import MonitoringData from '../views/MonitoringData.vue';
 import StudyOverview from '../views/StudyOverview.vue';
 import { useStudyStore } from '../stores/studyStore';
@@ -63,6 +64,12 @@ const routes = [
         meta: { title: 'Observations' },
         name: 'Observations',
         component: Observations,
+      },
+      {
+        path: 'goals',
+        meta: { title: 'Goals' },
+        name: 'Goals',
+        component: Goals,
       },
       {
         path: 'integrations',

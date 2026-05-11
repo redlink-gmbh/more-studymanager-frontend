@@ -332,6 +332,7 @@ Licensed under the Elastic License 2.0. */
           <!-- eslint-disable vue/no-v-html -->
           <span v-html="subtitle" />
         </h4>
+        <slot name="subTitleSection"/>
       </div>
       <div
         class="actions table-actions ml-2.5 flex flex-row items-center justify-end gap-2"
