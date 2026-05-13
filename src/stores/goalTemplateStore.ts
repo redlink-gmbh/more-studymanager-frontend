@@ -16,7 +16,8 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
 
   // State
   const goalTemplates: Ref<GoalTemplate[]> = ref([]);
-  const goalConfig: Ref<StudyGoalConfigData | null> = ref(null);
+  const goalConfig: Ref<StudyGoalConfigData | undefined> = ref();
+  const goalTopics: Ref<GoalTopic[]> = ref([]);
 
   //ToDo get goalTypeStatuses and goalCategoryStatuses from api and store
   const goalTypes = [
@@ -30,12 +31,16 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
 
   // Actions
   async function listGoalTemplates(studyId: number): Promise<void> {
+    console.info('listGoalTemplates from goalTemplateStore');
     goalTemplates.value = await goalsApi
       .listGoalTemplates(studyId)
-      .then((response) => response.data)
+      .then((response) => {
+        console.info('listGoalTemplates response', response.data);
+        return response.data;
+      })
       .catch((e: AxiosError) => {
         handleIndividualError(e, 'cannot list goal templates');
-        return goalTemplates.value;
+        return [];
       });
   }
 
@@ -94,10 +99,14 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
   }
 
   async function getGoalConfig(studyId: number): Promise<void> {
+    console.info('template store, getGoalConfig');
     await goalsApi
       .getGoalConfig(studyId)
       .then((response) => {
         goalConfig.value = response.data;
+        if (response.data.topics) {
+          goalTopics.value = response.data.topics;
+        }
       })
       .catch((e: AxiosError) => {
         handleIndividualError(e, 'cannot get goal configuration');
@@ -108,28 +117,32 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
     studyId: number,
     config: StudyGoalConfig,
   ): Promise<void> {
+    console.info('template store, setGoalConfig', config, studyId);
     await goalsApi
       .setGoalConfig(studyId, config)
       .then((response) => {
         goalConfig.value = response.data;
+        if (response.data?.topics) {
+          goalTopics.value = response.data.topics;
+        }
       })
       .catch((e: AxiosError) => {
         handleIndividualError(e, 'cannot update goal configuration');
       });
   }
 
-  // --- Actions für Goal Topics (goals/config/categories/topic) ---
+  // goal category/topic rud
+
   async function createGoalTopic(
     studyId: number,
     topic: GoalTopic,
   ): Promise<void> {
+    console.info('createGoalTopic:', studyId, topic);
     await goalsApi
       .createGoalTopic(studyId, topic)
-      .then((response) => {
-        // Nach dem Hinzufügen Config neu laden oder lokal pushen
-        if (goalConfig.value) {
-          goalConfig.value.goalTopics.push(response.data);
-        }
+      .then(async (response) => {
+        goalTopics.value.push(response.data);
+        await getGoalConfig(studyId);
       })
       .catch((e: AxiosError) => {
         handleIndividualError(e, 'cannot create goal topic');
@@ -141,16 +154,13 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
     key: string,
     topic: GoalTopic,
   ): Promise<void> {
+    console.info('updateGoalTopic: ', studyId, key, topic);
     await goalsApi
       .updateGoalTopic(studyId, key, topic)
       .then((response) => {
-        if (goalConfig.value) {
-          const index = goalConfig.value.goalTopics.findIndex(
-            (t) => t.key === key,
-          );
-          if (index > -1) {
-            goalConfig.value.goalTopics.splice(index, 1, response.data);
-          }
+        const index = goalTopics.value.findIndex((t) => t.key === key);
+        if (index > -1) {
+          goalTopics.value.splice(index, 1, response.data);
         }
       })
       .catch((e: AxiosError) => {
@@ -159,16 +169,13 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
   }
 
   async function deleteGoalTopic(studyId: number, key: string): Promise<void> {
+    console.info('deleteGoalTopic: ', studyId, key);
     await goalsApi
       .deleteGoalTopic(studyId, key)
       .then(() => {
-        if (goalConfig.value) {
-          const index = goalConfig.value.goalTopics.findIndex(
-            (t) => t.key === key,
-          );
-          if (index > -1) {
-            goalConfig.value.goalTopics.splice(index, 1);
-          }
+        const index = goalTopics.value.findIndex((t) => t.key === key);
+        if (index > -1) {
+          goalTopics.value.splice(index, 1);
         }
       })
       .catch((e: AxiosError) => {
@@ -181,6 +188,7 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
     goalTypes,
     goalTemplates,
     goalConfig,
+    goalTopics,
     listGoalTemplates,
     addGoalTemplate,
     updateGoalTemplate,
