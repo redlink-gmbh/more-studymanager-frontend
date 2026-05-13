@@ -66,7 +66,15 @@ Licensed under the Elastic License 2.0. */
   const participantInfo = ref(observation.participantInfo);
   const properties: Ref<Property<any>[]> = ref(
     factory.properties
-      .map((json: any) => Property.fromJson(json))
+      .map((json: any) => {
+        try {
+          return Property.fromJson(json);
+        } catch {
+          console.warn('Skipping unknown property type in dialog:', json.type, json);
+          return null;
+        }
+      })
+      .filter((p: any) => p !== null)
       .map((p: Property<any>) => p.setValue(observation.properties?.[p.id])),
   );
   const selectedObservationGroups = ref(

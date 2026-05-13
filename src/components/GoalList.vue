@@ -4,7 +4,7 @@ Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Elastic License 2.0. */
 <script setup lang="ts">
-  import { computed, ComputedRef, PropType, Ref, ref } from 'vue';
+  import { computed, ComputedRef, PropType, ref } from 'vue';
   import { useComponentsApi } from '../composable/useApi';
   import {
     ComponentFactory,
@@ -31,19 +31,21 @@ Licensed under the Elastic License 2.0. */
   import useLoader from '../composable/useLoader';
   import { useI18n } from 'vue-i18n';
   import DeleteMoreTableRowDialog from './dialog/DeleteMoreTableRowDialog.vue';
-  import DropdownPanelWithSearch from '@/components/shared/DropdownPanelWithSearch.vue';
   import { useGoalTemplateStore } from '@/stores/goalTemplateStore';
   import GoalTemplateMessurementDropdown from '@/components/subComponents/GoalTemplateMessurementDropdown.vue';
+  import GoalTemplateCategoryHandling from '@/components/subComponents/GoalTemplateCategoryHandling.vue';
+  import { extractCurrentLimeDomain } from '@/utils/limeSurveyUtils';
+  import DropdownPanelWithSearch from '@/components/shared/DropdownPanelWithSearch.vue';
 
   const loader = useLoader();
   const { componentsApi } = useComponentsApi();
   const { t } = useI18n();
   const goalTemplateStore = useGoalTemplateStore();
 
-  const goalTemplatesList: Ref<GoalTemplate[]> = computed(
-    () => goalTemplateStore.goalTemplates,
+  const goalTemplatesList: ComputedRef<GoalTemplate[]> = computed(
+    () => goalTemplateStore.goalTemplates ?? [],
   );
-  const goalTemplateSchedule: ComputedRef = computed(
+  const goalTemplateSchedule: ComputedRef<any[]> = computed(
     () => goalTemplateStore.goalConfig?.schedule ?? [],
   );
 
@@ -77,35 +79,39 @@ Licensed under the Elastic License 2.0. */
     value: null,
   } as MoreTableChoice);
 
-  async function getFactories(): Promise<ComponentFactory[]> {
-    return componentsApi
-      .listComponents('observation')
-      .then((response: any) => response.data);
-  }
-
   const factories = ref<ComponentFactory[]>([]);
 
-getFactories().then((data) => {
-  factories.value = data;
-});
+  async function getGoalFactories(): Promise<ComponentFactory[]> {
+    factories.value = await componentsApi
+      .listComponents('goalTemplate')
+      .then((response) => {
+        console.info('GOAL FACTORIES:', JSON.stringify(response.data, null, 2));
+        return response.data ?? [];
+      });
+  }
 
   // ToDo: use groupTemplateTypes from factory
-  const goalTemplateTypes: MoreTableChoice[] = computed(() =>
-    goalTemplateStore.goalTypes
-      .map(
-        (goalType) =>
-          ({
-            label: t(`goal.factory.type.${goalType}`),
-            value: goalType,
-          }) as MoreTableChoice,
-      )
+  const goalTemplateTypes: any[] = computed(() =>
+    factories.value
+      .map((cf: ComponentFactory) => ({
+        label: cf.title ? t(cf.title) : '',
+        value: cf.componentId,
+        description: cf.description
+          ? t(cf.description, { link: extractCurrentLimeDomain() })
+          : '',
+        command: (): void => {
+          openGoalTemplateDialog(t('observation.dialog.header.create'), {
+            type: cf.componentId,
+          });
+        },
+      }))
       .sort((a, b) => a.label.localeCompare(b.label)),
   );
 
   const goalTemplateCategories: MoreTableChoice[] = computed(() =>
     goalTemplateStore.goalCategories.map((goalCategory) => ({
-      label: t(`goal.factory.${goalCategory}.title`),
-      description: t(`goal.factory.${goalCategory}.description`),
+      label: t(`goaltemplate.factory.${goalCategory}.title`),
+      description: t(`goaltemplate.factory.${goalCategory}.description`),
       value: goalCategory,
       command: (): void => {
         openGoalTemplateDialog(t('observation.dialog.header.create'), {
@@ -140,7 +146,7 @@ getFactories().then((data) => {
     },
     {
       field: 'goalTypeId',
-      header: t('goal.props.goalType'),
+      header: t('goaltemplate.props.goalType'),
       type: MoreTableFieldType.choice,
       editable: { enabled: true, values: goalTemplateTypes },
       sortable: true,
@@ -149,7 +155,7 @@ getFactories().then((data) => {
     },
     {
       field: 'goalCategoryId',
-      header: t('goal.props.goalCategory'),
+      header: t('goaltemplate.props.goalCategory'),
       type: MoreTableFieldType.choice,
       editable: {
         enabled: true,
@@ -185,23 +191,23 @@ getFactories().then((data) => {
       tooltip: t('tooltips.moreTable.deleteGoalTemplate'),
       visible: () => actionsVisible,
       confirmDeleteDialog: {
-        header: t('goal.dialog.header.delete'),
-        message: t('goal.dialog.msg.delete'),
+        header: t('goaltemplate.dialog.header.delete'),
+        message: t('goaltemplate.dialog.msg.delete'),
         dialog: (row: any) =>
           dialog.open(DeleteMoreTableRowDialog, {
             data: {
-              introMsg: t('goal.dialog.deleteMsg.intro'),
-              warningMsg: t('goal.dialog.deleteMsg.warning'),
-              confirmMsg: t('goal.dialog.deleteMsg.confirm'),
+              introMsg: t('goaltemplate.dialog.deleteMsg.intro'),
+              warningMsg: t('goaltemplate.dialog.deleteMsg.warning'),
+              confirmMsg: t('goaltemplate.dialog.deleteMsg.confirm'),
               row: row,
               /*elTitle: getObservationTypeString(row.type)
-                ? `${row.title} (${getObservationTypeString(row.type)})`
-                : row.title,*/
+                    ? `${row.title} (${getObservationTypeString(row.type)})`
+                    : row.title,*/
               elInfoTitle: t('study.props.purpose'),
               elInfoDesc: row.purpose,
             },
             props: {
-              header: t('goal.dialog.header.delete'),
+              header: t('goaltemplate.dialog.header.delete'),
               style: {
                 width: '50vw',
               },
@@ -337,27 +343,34 @@ getFactories().then((data) => {
     }
   }
 
-  listGoalTemplates();
-
   const goalTemplateQuery = ref('');
-
   const filteredGoalTemplateTypes = computed(() => {
     const q = goalTemplateQuery.value.trim().toLowerCase();
-    if (!q) return goalTemplateTypes;
-    return goalTemplateTypes.value.filter((i) => i.label.toLowerCase().includes(q))
+    if (!q) return goalTemplateTypes.value;
+    return goalTemplateTypes.value.filter((i: any) =>
+      i.label.toLowerCase().includes(q),
+    );
   });
 
   function selectedGoalTemplateTypes(item: any): any {
     item.command();
   }
+
+  async function getGoalConfig(): Promise<void> {
+    await goalTemplateStore.getGoalConfig(props.studyId);
+  }
+
+  listGoalTemplates();
+  getGoalConfig();
+  getGoalFactories();
 </script>
 
 <template>
   <div class="goalTemplateList">
     <MoreTable
       row-id="templateId"
-      :title="$t('goal.goalTemplateList.title')"
-      :subtitle="$t('goal.goalTemplateList.description')"
+      :title="$t('goaltemplate.goalTemplateList.title')"
+      :subtitle="$t('goaltemplate.goalTemplateList.description')"
       :columns="goalColumns"
       :rows="goalTemplatesList"
       :row-actions="rowActions"
@@ -366,7 +379,7 @@ getFactories().then((data) => {
       :editable-access="actionsVisible"
       :loading="loader.isLoading.value"
       :editable-user-roles="[StudyRole.StudyAdmin, StudyRole.StudyOperator]"
-      :empty-message="$t('goal.goalTemplateList.emptyListMsg')"
+      :empty-message="$t('goaltemplate.goalTemplateList.emptyListMsg')"
       :component-factory="factories"
       :enable-row-selection="RowSelectionMode.Single"
       class="table-title-width"
@@ -375,27 +388,36 @@ getFactories().then((data) => {
       @on-change="updateGoalTemplate($event)"
     >
       <template #subTitleSection>
-        <h3 class="mt-4 font-bold">
-          {{ t('goal.goalTemplateList.meassurementTimes.title') }}
-        </h3>
-        <div>
-          {{ t('goal.goalTemplateList.meassurementTimes.description') }}
+        <div class="mt-4 mb-1 flex items-center justify-between">
+          <h4 class="text-lg font-bold">
+            {{ t('goaltemplate.goalTemplateList.meassurementTimes.title') }}
+          </h4>
+          <GoalTemplateMessurementDropdown :study-id="studyId" />
         </div>
-        <div class="mt-2 flex gap-2 items-center">
-          <span v-if="goalTemplateSchedule.length === 0">
-            {{ t('goal.goalTemplateList.meassurementTimes.notSet') }}
-          </span>
+        <div class="mb-4 text-sm text-gray-600">
+          {{ t('goaltemplate.goalTemplateList.meassurementTimes.description') }}
+        </div>
+        <div
+          class="mb-6 flex items-center gap-2 rounded border-gray-500 bg-gray-100 px-2"
+        >
+          <div
+            v-if="goalTemplateSchedule.length === 0"
+            class="py-2 text-sm text-gray-500 italic"
+          >
+            {{ t('goaltemplate.goalTemplateList.meassurementTimes.notSet') }}
+          </div>
           <span v-else>{{
-            t('goal.goalTemplateList.meassurementTimes.set')
+            t('goaltemplate.goalTemplateList.meassurementTimes.set')
           }}</span>
-          <GoalTemplateMessurementDropdown />
         </div>
+
+        <GoalTemplateCategoryHandling class="mt-4" :study-id="studyId" />
       </template>
       <template #tableActions="{ isInEditMode }">
         <div>
           <dropdown-panel-with-search
             :dropdown-list="filteredGoalTemplateTypes"
-            :button-label="t('observation.observationList.action.add')"
+            :button-label="t('goaltemplate.goalTemplateList.action.add')"
             :is-button-disabled="isInEditMode ? true : !actionsVisible"
             :button-icon="'pi pi-plus'"
             @on-query-change="goalTemplateQuery = $event"
@@ -408,11 +430,3 @@ getFactories().then((data) => {
     <DynamicDialog />
   </div>
 </template>
-
-<style scoped>
-  :deep(.table-title-width) {
-    .title {
-      max-width: 80%;
-    }
-  }
-</style>

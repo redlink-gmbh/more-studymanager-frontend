@@ -47,6 +47,7 @@ export abstract class Property<T> {
       case 'OBSERVATION':
         return ObservationProperty.fromJson(value);
       default:
+        console.info('Unknown property type:', value.type, value);
         throw new Error('cannot case property');
     }
   }

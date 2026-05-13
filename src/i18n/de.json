@@ -563,7 +563,7 @@
     },
     "singular": "Aufzeichnung"
   },
-  "goal": {
+  "goaltemplate": {
     "dialog": {
       "deleteMsg": {
         "confirm": "Möchten Sie dieses Zieltemplate wirklich löschen?",
@@ -590,9 +590,17 @@
       "noValidField": "Fehler im Wert {key}: {message}"
     },
     "factory": {
-      "liquidity": {
+      "trink-amount-of": {
         "description": "Dieses Ziel legt die tägliche Flüssigkeitsaufnahme fest. Es unterstützt dabei, eine gesunde Trinkgewohnheit aufzubauen und regelmäßig ausreichend zu trinken.",
-        "title": "Flüssigkeitsaufnahme"
+        "name": "Flüssigkeitsaufnahme"
+      },
+      "eat-amount-of": {
+        "description": "Dieses Ziel legt die tägliche Essensaufnahme eines Produktes fest. Es unterstützt dabei, ein gesundes Essverhalten aufzubauen.",
+        "name": "Essensaufnahme"
+      },
+      "reduce-amount-of": {
+        "description": "Dieses Ziel hilft bei der Limitierung eines ungesunden Konsums (z.B. Rauchen, Alkohol).",
+        "name": "Konsum reduzieren"
       },
       "smoking": {
         "description": "Dieses Ziel hilft dabei, den Zigarettenkonsum zu reduzieren und schrittweise eine geringere Rauchmenge im Alltag zu erreichen.",
@@ -625,7 +633,9 @@
         "times": {
           "morning": "Morgens",
           "noon": "Mittags",
-          "evening": "Abends"
+          "afternoon": "Nachmittags",
+          "evening": "Abends",
+          "night": "Nachts"
         }
       },
       "categories": {
@@ -633,7 +643,9 @@
         "description": "Vorlagen-Kategorien werden auf der App als Gruppen für die Ziele angezeigt. Sie können diese verwenden um Ihre Ziele zu organisieren und zu gruppieren.",
         "edit": "Kategorien bearbeiten",
         "add": "Kategorie hinzufügen",
-        "delete": "Kategorie löschen"
+        "delete": "Kategorie löschen",
+        "namePlaceholder": "Name der Kategorie",
+        "descriptionPlaceholder": "Optionale Beschreibung"
       }
 
     },

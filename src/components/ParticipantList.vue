@@ -613,9 +613,3 @@ Licensed under the Elastic License 2.0. */
     <DynamicDialog />
   </div>
 </template>
-
-<style scoped>
-  :deep(.width-50 .title) {
-    width: 50%;
-  }
-</style>

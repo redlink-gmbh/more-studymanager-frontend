@@ -2628,9 +2628,6 @@ components:
         - schedule
         - topics
 
-
-
-
     AdherenceCheckScheduleEnum:
       type: string
       enum:
@@ -2639,7 +2636,6 @@ components:
         - afternoon
         - evening
         - night
-
 
     GoalTopic:
       type: object

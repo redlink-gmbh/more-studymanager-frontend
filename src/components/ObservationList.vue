@@ -561,11 +561,3 @@ Licensed under the Elastic License 2.0. */
     <DynamicDialog />
   </div>
 </template>
-
-<style scoped>
-  :deep(.table-title-width) {
-    .title {
-      max-width: 80%;
-    }
-  }
-</style>
