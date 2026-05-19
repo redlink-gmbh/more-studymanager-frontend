@@ -584,12 +584,17 @@
             "description": "Erlaubt den Teilnehmer:innen bei der Personalisierung auf der App den Zieltitel anzupassen.",
             "placeholder": "Überschreiben erlauben"
           },
+        "days-of-week": {
+          "name": "Wochentage",
+          "description": "Die Wochentage, an denen das Ziel erfüllt werden soll. Die Teilnehmer:innen können sich aus dem Range-Bereich einen Wert auf der App konfigurieren."
+        },
           "self-report-time": {
             "name": "Sendungs Zeitpunkt",
             "description": "Dies ist der Zeitpunkt, zu dem die Benachricthigung an die Teilnehmer:innen gesendet wird."
           }
       },
       "amountOfGoal": {
+        "partOfTemplate": "Teil der Vorschau",
         "section": {
           "configuration": {
             "name": "Zielkonfiguration",
@@ -610,7 +615,8 @@
         },
         "goal-preview": {
           "name": "Ziel Vorschau",
-          "description": "Das Ziel wird auf der App folgendermaßen angezeigt:"
+          "description": "Das Ziel wird auf der App folgendermaßen angezeigt:",
+          "partOfTemplate": "Teil der Vorschau"
         },
         "goal": {
           "name": "Ziel-Einstellungen",
@@ -622,10 +628,6 @@
           "unit": {
             "name": "Einheit",
             "description": "Die Einheit, in der die Zielwerte angegeben werden (z.B. Glas Wasser)"
-          },
-          "days-of-week": {
-            "name": "Wochentage",
-            "description": "Die Wochentage, an denen das Ziel erfüllt werden soll. Die Teilnehmer:innen können sich aus dem Range-Bereich einen Wert auf der App konfigurieren."
           }
         },
         "status-100-reached": {

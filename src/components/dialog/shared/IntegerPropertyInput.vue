@@ -7,11 +7,16 @@ Licensed under the Elastic License 2.0. */
   import { IntegerProperty } from '../../../models/InputModels';
   import { PropType, watch } from 'vue';
   import InputNumber from 'primevue/inputnumber';
+  import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
 
   const props = defineProps({
     property: {
       type: Object as PropType<IntegerProperty>,
       required: true,
+    },
+    isPartOfTemplate: {
+      type: Boolean,
+      default: false,
     },
     editable: {
       type: Boolean,
@@ -23,17 +28,23 @@ Licensed under the Elastic License 2.0. */
     (e: 'onInputChange', integerInput: IntegerProperty): void;
   }>();
 
-  watch(props.property, () => {
-    emit('onInputChange', props.property);
-  });
+  watch(
+    () => props.property.value,
+    () => {
+      if (props.isPartOfTemplate) {
+        emit('onInputChange', props.property);
+      }
+    },
+  );
 </script>
 
 <template>
   <div class="gap-1">
-    <h5 class="font-bold">
+    <h5 class="flex items-center font-bold">
       <label :for="property.id">
         {{ $t(property.name) }}<span v-if="property.required">*</span>
       </label>
+      <PartOfTemplateBadge :visible="isPartOfTemplate" />
     </h5>
 
     <div v-if="props.property.description" :id="`${property.id}-help`">

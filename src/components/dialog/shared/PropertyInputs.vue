@@ -4,7 +4,7 @@ Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Elastic License 2.0. */
 <script setup lang="ts">
-  import { PropType } from 'vue';
+  import { PropType, computed } from 'vue';
   import {
     BooleanProperty,
     CronProperty,
@@ -16,10 +16,12 @@ Licensed under the Elastic License 2.0. */
     Property,
     StringListProperty,
     StringProperty,
+    StringTemplateProperty,
     StringTextProperty,
     UnknownProperty,
   } from '../../../models/InputModels';
   import StringPropertyInput from './StringPropertyInput.vue';
+  import StringTemplatePropertyInput from './StringTemplatePropertyInput.vue';
   import StringTextPropertyInput from './StringTextPropertyInput.vue';
   import StringListPropertyInput from './StringListPropertyInput.vue';
   import IntegerPropertyInput from './IntegerPropertyInput.vue';
@@ -36,7 +38,7 @@ Licensed under the Elastic License 2.0. */
   import { Context } from '../../../models/ContextModel';
   import UnknownPropertyElement from '@/components/dialog/shared/UnknownPropertyElement.vue';
 
-  defineProps({
+  const props = defineProps({
     propertyList: {
       type: Array as PropType<Property<any>[]>,
       required: true,
@@ -59,6 +61,26 @@ Licensed under the Elastic License 2.0. */
     (e: 'onPropertyChange', item: PropertyEmit): void;
     (e: 'onError', item: StringEmit): void;
   }>();
+
+  const usedInTemplate = computed(() => {
+    const ids = new Set<string>();
+    props.propertyList.forEach((p) => {
+      if (p instanceof StringTemplateProperty) {
+        const template = p.value || p.defaultValue || '';
+        const matches = template.match(/<([^>]+)>/g);
+        if (matches) {
+          matches.forEach((m) => {
+            ids.add(m.slice(1, -1));
+          });
+        }
+      }
+    });
+    return ids;
+  });
+
+  const isPartOfTemplate = (property: Property<any>): boolean => {
+    return usedInTemplate.value.has(property.id) || usedInTemplate.value.has(property.name || '');
+  };
 </script>
 
 <template>
@@ -67,6 +89,18 @@ Licensed under the Elastic License 2.0. */
       <StringPropertyInput
         v-if="property instanceof StringProperty"
         :property="property"
+        :class="{ 'mb-4': index < propertyList.length - 1 }"
+        :editable="editable"
+        :is-part-of-template="isPartOfTemplate(property)"
+        @on-input-change="
+          emit('onPropertyChange', { value: $event.value, index: index })
+        "
+      />
+
+      <StringTemplatePropertyInput
+        v-if="property instanceof StringTemplateProperty"
+        :property="property"
+        :all-properties="propertyList"
         :class="{ 'mb-4': index < propertyList.length - 1 }"
         :editable="editable"
         @on-input-change="
@@ -78,6 +112,7 @@ Licensed under the Elastic License 2.0. */
         v-if="property instanceof StringTextProperty"
         :property="property"
         :editable="editable"
+        :is-part-of-template="isPartOfTemplate(property)"
         :class="{ 'mb-4': index < propertyList.length - 1 }"
         @on-input-change="
           emit('onPropertyChange', { value: $event.value, index: index })
@@ -89,6 +124,7 @@ Licensed under the Elastic License 2.0. */
         :property="property"
         :class="{ 'mb-4': index < propertyList.length - 1 }"
         :editable="editable"
+        :is-part-of-template="isPartOfTemplate(property)"
         @on-input-change="
           emit('onPropertyChange', { value: $event.value, index: index })
         "
@@ -99,6 +135,7 @@ Licensed under the Elastic License 2.0. */
         :property="property"
         :class="{ 'mb-4': index < propertyList.length - 1 }"
         :editable="editable"
+        :is-part-of-template="isPartOfTemplate(property)"
         @on-input-change="
           emit('onPropertyChange', { value: $event.value, index: index })
         "
@@ -109,6 +146,7 @@ Licensed under the Elastic License 2.0. */
         :class="{ 'mb-4': index < propertyList.length - 1 }"
         :property="property"
         :editable="editable"
+        :is-part-of-template="isPartOfTemplate(property)"
         @on-input-change="
           emit('onPropertyChange', { value: $event.value, index: index })
         "
@@ -119,6 +157,7 @@ Licensed under the Elastic License 2.0. */
         :class="{ 'mb-4': index < propertyList.length - 1 }"
         :property="property"
         :editable="editable"
+        :is-part-of-template="isPartOfTemplate(property)"
         @on-boolean-change="
           emit('onPropertyChange', { value: $event, index: index })
         "

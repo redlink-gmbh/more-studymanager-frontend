@@ -87,7 +87,6 @@ Licensed under the Elastic License 2.0. */
       });
   }
 
-  // ToDo: use groupTemplateTypes from factory
   const goalTemplateTypes: any[] = computed(() =>
     factories.value
       .map((cf: ComponentFactory) => ({
@@ -197,9 +196,6 @@ Licensed under the Elastic License 2.0. */
               warningMsg: t('goaltemplate.dialog.deleteMsg.warning'),
               confirmMsg: t('goaltemplate.dialog.deleteMsg.confirm'),
               row: row,
-              /*elTitle: getObservationTypeString(row.type)
-                    ? `${row.title} (${getObservationTypeString(row.type)})`
-                    : row.title,*/
               elInfoTitle: t('study.props.purpose'),
               elInfoDesc: row.purpose,
             },
@@ -298,8 +294,8 @@ Licensed under the Elastic License 2.0. */
       props: {
         header: headerText,
         style: {
-          width: '50vw',
-          maxHeight: '92vh',
+          width: '70vw',
+          maxHeight: '90vh',
         },
         breakpoints: {
           '960px': '75vw',

@@ -7,11 +7,16 @@ Licensed under the Elastic License 2.0. */
   import { StringProperty } from '../../../models/InputModels';
   import { PropType, watch } from 'vue';
   import InputText from 'primevue/inputtext';
+  import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
 
   const props = defineProps({
     property: {
       type: Object as PropType<StringProperty>,
       required: true,
+    },
+    isPartOfTemplate: {
+      type: Boolean,
+      default: false,
     },
     editable: {
       type: Boolean,
@@ -23,9 +28,14 @@ Licensed under the Elastic License 2.0. */
     (e: 'onInputChange', stringProperty: StringProperty): void;
   }>();
 
-  watch(props.property, () => {
-    emit('onInputChange', props.property);
-  });
+  watch(
+    () => props.property.value,
+    () => {
+      if (props.isPartOfTemplate) {
+        emit('onInputChange', props.property);
+      }
+    },
+  );
 </script>
 
 <template>
@@ -34,6 +44,7 @@ Licensed under the Elastic License 2.0. */
       <label v-if="property.name" :for="property.id">
         {{ $t(property.name) }}<span v-if="property.required">*</span>
       </label>
+      <PartOfTemplateBadge :visible="isPartOfTemplate" />
     </h6>
     <div v-if="props.property.description" :id="`${property.id}-help`">
       {{ $t(props.property.description) }}

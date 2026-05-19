@@ -50,6 +50,8 @@ export abstract class Property<T> {
         return ObservationProperty.fromJson(value);
       case 'GROUPING':
         return GroupingProperty.fromJson(value);
+      case 'STRINGTEMPLATE':
+        return StringTemplateProperty.fromJson(value);
       default:
         return UnknownProperty.fromJson(value);
     }
@@ -63,6 +65,7 @@ export abstract class Property<T> {
     | 'Boolean'
     | 'Double'
     | 'StringText'
+    | 'StringTemplate'
     | 'Grouping'
     | 'IntegerRange';
 
@@ -734,6 +737,51 @@ export class GroupingProperty extends Property<any> {
 
   static fromJson(json: any): GroupingProperty {
     return new GroupingProperty(
+      json.defaultValue,
+      json.description,
+      json.id,
+      json.immutable,
+      json.name,
+      json.required,
+    );
+  }
+}
+
+export class StringTemplateProperty extends Property<string> {
+  constructor(
+    defaultValue: string,
+    description: string,
+    id: string,
+    immutable: boolean,
+    name: string,
+    required: boolean,
+  ) {
+    super(defaultValue, description, id, immutable, name, required);
+  }
+
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'StringTemplate'
+    | 'Grouping'
+    | 'IntegerRange' {
+    return 'StringTemplate';
+  }
+
+  validate(): string | undefined {
+    if (this.required && !this.value) {
+      return 'Value is required';
+    }
+    return undefined;
+  }
+
+  static fromJson(json: any): StringTemplateProperty {
+    return new StringTemplateProperty(
       json.defaultValue,
       json.description,
       json.id,

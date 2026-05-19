@@ -7,11 +7,16 @@ Licensed under the Elastic License 2.0. */
   import { IntegerRangeProperty } from '../../../models/InputModels';
   import { PropType, watch } from 'vue';
   import InputNumber from 'primevue/inputnumber';
+  import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
 
   const props = defineProps({
     property: {
       type: Object as PropType<IntegerRangeProperty>,
       required: true,
+    },
+    isPartOfTemplate: {
+      type: Boolean,
+      default: false,
     },
     editable: {
       type: Boolean,
@@ -23,17 +28,54 @@ Licensed under the Elastic License 2.0. */
     (e: 'onInputChange', rangeInput: IntegerRangeProperty): void;
   }>();
 
-  watch(props.property.value, () => {
-    emit('onInputChange', props.property);
-  });
+  watch(
+    () => props.property.value?.min,
+    (newMin) => {
+      if (
+        newMin !== undefined &&
+        newMin !== null &&
+        props.property.value?.max !== undefined &&
+        props.property.value.max !== null
+      ) {
+        if (newMin > props.property.value.max) {
+          props.property.value.max = newMin;
+        }
+      }
+      if (props.isPartOfTemplate) {
+        emit('onInputChange', props.property);
+      }
+    },
+  );
+
+  watch(
+    () => props.property.value?.max,
+    (newMax) => {
+      if (
+        newMax !== undefined &&
+        newMax !== null &&
+        props.property.value?.min !== undefined &&
+        props.property.value.min !== null
+      ) {
+        if (newMax < props.property.value.min) {
+          props.property.value.min = newMax;
+        }
+      }
+      if (props.isPartOfTemplate) {
+        emit('onInputChange', props.property);
+      }
+    },
+  );
 </script>
 
 <template>
   <div>
     <div class="mb-1">
-      <label :for="`${property.id}-min`" class="font-bold">{{
-        $t(property.name)
-      }}</label>
+      <div class="flex items-center">
+        <label :for="`${property.id}-min`" class="font-bold">{{
+          $t(property.name)
+        }}</label>
+        <PartOfTemplateBadge :visible="isPartOfTemplate" />
+      </div>
       <h6
         v-if="
           property.description &&
@@ -56,6 +98,8 @@ Licensed under the Elastic License 2.0. */
           :min-fraction-digits="0"
           :max-fraction-digits="0"
           :disabled="!editable || property.immutable"
+          :min="property.minLimit"
+          :max="property.maxLimit"
         />
       </div>
       <div class="flex flex-col">
@@ -69,6 +113,8 @@ Licensed under the Elastic License 2.0. */
           :min-fraction-digits="0"
           :max-fraction-digits="0"
           :disabled="!editable || property.immutable"
+          :min="property.minLimit"
+          :max="property.maxLimit"
         />
       </div>
     </div>

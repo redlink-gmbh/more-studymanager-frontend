@@ -5,13 +5,18 @@ Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Elastic License 2.0. */
 <script setup lang="ts">
   import { BooleanProperty } from '../../../models/InputModels';
-  import { PropType, ref, Ref } from 'vue';
+  import { PropType, watch } from 'vue';
   import Checkbox from 'primevue/checkbox';
+  import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
 
   const props = defineProps({
     property: {
       type: Object as PropType<BooleanProperty>,
       required: true,
+    },
+    isPartOfTemplate: {
+      type: Boolean,
+      default: false,
     },
     editable: {
       type: Boolean,
@@ -19,13 +24,18 @@ Licensed under the Elastic License 2.0. */
     },
   });
 
-  const booleanChecked: Ref<boolean> = ref(
-    props.property.value ?? props.property.defaultValue ?? false,
-  );
-
   const emit = defineEmits<{
-    (e: 'onBooleanChange', boolean: boolean): void;
+    (e: 'onBooleanChange', boolean: boolean | undefined): void;
   }>();
+
+  watch(
+    () => props.property.value,
+    () => {
+      if (props.isPartOfTemplate) {
+        emit('onBooleanChange', props.property.value);
+      }
+    },
+  );
 </script>
 
 <template>
@@ -34,6 +44,7 @@ Licensed under the Elastic License 2.0. */
       <label v-if="property.name" :for="property.id">
         {{ $t(property.name) }}<span v-if="property.required">*</span>
       </label>
+      <PartOfTemplateBadge :visible="isPartOfTemplate" />
     </h5>
     <div v-if="props.property.description" :id="`${property.id}-help`">
       {{ $t(props.property.description) }}
@@ -41,12 +52,11 @@ Licensed under the Elastic License 2.0. */
 
     <div class="flex items-center">
       <Checkbox
-        v-model="booleanChecked"
+        v-model="props.property.value"
         :label="property.name"
         class="mr-2"
         :required="property.required"
         :binary="true"
-        @update:model-value="emit('onBooleanChange', booleanChecked)"
       />
       {{ $t(property.name) }}
     </div>
