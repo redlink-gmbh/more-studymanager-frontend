@@ -80,7 +80,8 @@
         "error": "Fehler",
         "info": "Info",
         "warning": "Warnung"
-      }
+      },
+      "unknownPropertyType": "Unbekannter Typ"
     },
     "footer": {
       "aboutMore": "Über More"
@@ -109,6 +110,8 @@
       "isRequired": "Erforderlich",
       "lastCollected": "Zuletzt geschickt",
       "lastDataReceived": "Letzte Daten erhalten",
+      "min": "Minimum",
+      "max": "Maximum",
       "lastEdited": "Zuletzt bearbeitet",
       "message": "Nachricht",
       "modules": "Module",
@@ -564,6 +567,85 @@
     "singular": "Aufzeichnung"
   },
   "goaltemplate": {
+    "property": {
+      "global": {
+          "appTitle": {
+            "name": "App Ziel Titel",
+            "description": "Der Default-Name des Ziels, welcher auf der Teilnehmer:innen App angezeigt wird.",
+            "placeholder": "App Titel eingeben"
+          },
+          "appDescription": {
+            "name": "App Ziel Beschreibung",
+            "description": "Die Beschreibung des Ziels, welche auf der App den Teilnehmer:innen angezeigt wird. Halten Sie die Beschreibung so kurz wie möglich, da diese sonst zu viel Platz einnimmt.",
+            "placeholder": "Füge Kurzbeschreibung des Ziels hinzu"
+          },
+          "goalTitleState": {
+            "name": "Überschreiben des Titels",
+            "description": "Erlaubt den Teilnehmer:innen bei der Personalisierung auf der App den Zieltitel anzupassen.",
+            "placeholder": "Überschreiben erlauben"
+          },
+          "self-report-time": {
+            "name": "Sendungs Zeitpunkt",
+            "description": "Dies ist der Zeitpunkt, zu dem die Benachricthigung an die Teilnehmer:innen gesendet wird."
+          }
+      },
+      "amountOfGoal": {
+        "section": {
+          "configuration": {
+            "name": "Zielkonfiguration",
+            "description": "Hier können Sie das ZIeltemplate konfigurieren. Die konfigurierten Werte ermöglichen es Teilnehmer:innen, das Ziel auf der App zu personalisieren."
+          },
+          "goal": {
+            "name": "Ziel-Einstellungen konfigurieren",
+            "description": "Die folgenden Zieleinstellungen legen fest, welche Werte die Teilnehmer:innen zur Personalisierung des Ziels zur Verfügung haben."
+          },
+          "status-texts": {
+            "name": "Status Texte",
+            "description": "Diese Texte werden basierend auf einen Algorythmus in der App angezeigt. Dies sollen motivierende Texte sein, die die Teilnehmer:innen anspornen."
+          },
+          "self-report": {
+            "name": "Selbstbericht Benachrichigung",
+            "description": "Hier können Sie zu einer bestimmten Zeit eine Benachrichtigung an die Teilnehmer:innen senden, um die Zielerreichung zu verifizieren."
+          }
+        },
+        "goal-preview": {
+          "name": "Ziel Vorschau",
+          "description": "Das Ziel wird auf der App folgendermaßen angezeigt:"
+        },
+        "goal": {
+          "name": "Ziel-Einstellungen",
+          "description": "Dies sind die Optionen für die Ziel-Einstellungen, mit dem die Teilnehmer:innen ihr persönliches Ziel anpassen können.",
+          "amount": {
+            "name": "Anzahl",
+            "description": "Bereich für die Anzahl des Zielwertes. Die Teilnehmer:innen können sich aus dem Range-Bereich einen Wert auf der App konfigurieren."
+          },
+          "unit": {
+            "name": "Einheit",
+            "description": "Die Einheit, in der die Zielwerte angegeben werden (z.B. Glas Wasser)"
+          },
+          "days-of-week": {
+            "name": "Wochentage",
+            "description": "Die Wochentage, an denen das Ziel erfüllt werden soll. Die Teilnehmer:innen können sich aus dem Range-Bereich einen Wert auf der App konfigurieren."
+          }
+        },
+        "status-100-reached": {
+          "name": "100% erreicht",
+          "description": "Text der bei 100% Zielerreichung angezeigt wird."
+        },
+        "status-75-reached": {
+          "name": "75% erreicht",
+          "description": "Text der bei 75%+ Zielerreichung angezeigt wird."
+        },
+        "status-not-reached": {
+          "name": "Noch nicht erreicht",
+          "description": "Text der zwischen 0 und 75% Zielerreichung angezeigt wird."
+        },
+        "self-report-question": {
+          "name": "Fargetext",
+          "description": "Dies ist die Nachricht, die an die Teilnehmer:innen gesendet wird."
+        }
+      }
+    },
     "dialog": {
       "deleteMsg": {
         "confirm": "Möchten Sie dieses Zieltemplate wirklich löschen?",
@@ -587,7 +669,10 @@
     "error": {
       "addParticipantInfo": "Die Teilnehmerinformationen sind ein erforderliches Feld. Bitte fügen Sie eine Beschreibung hinzu.",
       "addTitle": "Der Titel des Zieltemplates ist ein erforderliches Feld. Bitte fügen Sie einen Titel hinzu.",
-      "noValidField": "Fehler im Wert {key}: {message}"
+      "noValidField": "Fehler im Wert {key}: {message}",
+      "integerRange": "Der Minimum-Wert darf nicht größer als der Maximum-Wert sein.",
+      "integerRangeMinLimit": "Der Wert darf nicht kleiner als {min} sein.",
+      "integerRangeMaxLimit": "Der Wert darf nicht größer als {max} sein."
     },
     "factory": {
       "trink-amount-of": {

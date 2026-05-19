@@ -56,6 +56,7 @@ Licensed under the Elastic License 2.0. */
         }) as MoreTableChoice,
     );
   const factory = dialogRef.value.data.factory;
+  const componentType = dialogRef.value.data.componentType || 'observation';
   const editable =
     studyStore.study.status === StudyStatus.Draft ||
     studyStore.study.status === StudyStatus.Paused ||
@@ -67,14 +68,8 @@ Licensed under the Elastic License 2.0. */
   const properties: Ref<Property<any>[]> = ref(
     factory.properties
       .map((json: any) => {
-        try {
-          return Property.fromJson(json);
-        } catch {
-          console.warn('Skipping unknown property type in dialog:', json.type, json);
-          return null;
-        }
+        return Property.fromJson(json);
       })
-      .filter((p: any) => p !== null)
       .map((p: Property<any>) => p.setValue(observation.properties?.[p.id])),
   );
   const selectedObservationGroups = ref(
@@ -84,7 +79,7 @@ Licensed under the Elastic License 2.0. */
   const hidden: Ref<boolean> = ref(
     observation.hidden !== undefined
       ? observation.hidden
-      : factory.visibility.hiddenByDefault,
+      : factory.visibility?.hiddenByDefault ?? false,
   );
 
   const reminder: Ref<boolean> = ref(
@@ -146,7 +141,7 @@ Licensed under the Elastic License 2.0. */
       parsedProps = Property.toJson(properties.value);
       componentsApi
         .validateProperties(
-          'observation',
+          componentType,
           observation.type as string,
           parsedProps,
         )
@@ -257,7 +252,7 @@ Licensed under the Elastic License 2.0. */
 <template>
   <div class="dialog" :class="{ 'dialog-disabled': !editable }">
     <div class="mb-4" :class="{ 'pb-4': !editable }">
-      <h5 class="mb-1">{{ $t(factory.title) }}</h5>
+      <h5 class="mb-1">{{ factory.title ? $t(factory.title) : '' }}</h5>
       <!-- eslint-disable vue/no-v-html -->
       <h6
         v-if="factory.description"
@@ -413,7 +408,7 @@ Licensed under the Elastic License 2.0. */
           <ObservationToggle
             v-model="hidden"
             :editable="editable"
-            :changeable="factory.visibility.changeable"
+            :changeable="factory.visibility?.changeable ?? false"
             :info-text="$t('observation.dialog.msg.hiddenInfo')"
             :label="$t(`observation.props.hidden.${hidden}`)"
             enabled-icon="pi-eye-slash"

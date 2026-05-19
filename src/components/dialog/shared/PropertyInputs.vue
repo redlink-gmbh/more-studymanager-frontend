@@ -9,17 +9,22 @@ Licensed under the Elastic License 2.0. */
     BooleanProperty,
     CronProperty,
     DataCheckProperty,
+    GroupingProperty,
     IntegerProperty,
+    IntegerRangeProperty,
     ObservationProperty,
     Property,
     StringListProperty,
     StringProperty,
     StringTextProperty,
+    UnknownProperty,
   } from '../../../models/InputModels';
   import StringPropertyInput from './StringPropertyInput.vue';
   import StringTextPropertyInput from './StringTextPropertyInput.vue';
   import StringListPropertyInput from './StringListPropertyInput.vue';
   import IntegerPropertyInput from './IntegerPropertyInput.vue';
+  import IntegerRangePropertyInput from './IntegerRangePropertyInput.vue';
+  import GroupingPropertyInput from './GroupingPropertyInput.vue';
   import {
     PropertyEmit,
     StringEmit,
@@ -29,6 +34,7 @@ Licensed under the Elastic License 2.0. */
   import BooleanPropertyInput from './BooleanPropertyInput.vue';
   import ObservationPropertyInput from './ObservationPropertyInput.vue';
   import { Context } from '../../../models/ContextModel';
+  import UnknownPropertyElement from '@/components/dialog/shared/UnknownPropertyElement.vue';
 
   defineProps({
     propertyList: {
@@ -80,6 +86,16 @@ Licensed under the Elastic License 2.0. */
 
       <IntegerPropertyInput
         v-if="property instanceof IntegerProperty"
+        :property="property"
+        :class="{ 'mb-4': index < propertyList.length - 1 }"
+        :editable="editable"
+        @on-input-change="
+          emit('onPropertyChange', { value: $event.value, index: index })
+        "
+      />
+
+      <IntegerRangePropertyInput
+        v-if="property instanceof IntegerRangeProperty"
         :property="property"
         :class="{ 'mb-4': index < propertyList.length - 1 }"
         :editable="editable"
@@ -144,6 +160,15 @@ Licensed under the Elastic License 2.0. */
           emit('onError', { value: $event ? $event : '', index: index })
         "
       />
+
+      <GroupingPropertyInput
+        v-if="property instanceof GroupingProperty"
+        :property="property"
+      />
+
+      <div v-if="property instanceof UnknownProperty">
+        <UnknownPropertyElement :property="property" />
+      </div>
     </div>
   </div>
 </template>

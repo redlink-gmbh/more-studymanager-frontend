@@ -183,7 +183,7 @@
       :editable-access="actionsVisible"
       :row-actions="rowActions"
       :edit-access-roles="editableRoles"
-      :empty-message="$t('goalTemplate.goalTemplateTopicList.emptyListMessage')"
+      :empty-message="$t('goaltemplate.goalTemplateTopicList.emptyListMessage')"
       class="table-title-width"
       @on-action="executeAction($event)"
       @on-change="changeValueInPlace($event)"

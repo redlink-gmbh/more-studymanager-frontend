@@ -292,6 +292,7 @@ Licensed under the Elastic License 2.0. */
         groupStates: groupStatuses,
         observation: observation,
         factory: factoryForType(observation?.type),
+        componentType: 'goalTemplate',
         closeWithEscape: false,
       },
       props: {

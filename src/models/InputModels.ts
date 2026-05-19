@@ -32,6 +32,8 @@ export abstract class Property<T> {
     switch (value.type) {
       case 'INTEGER':
         return IntegerProperty.fromJson(value);
+      case 'INTEGER_RANGE':
+        return IntegerRangeProperty.fromJson(value);
       case 'STRING':
         return StringProperty.fromJson(value);
       case 'STRINGTEXT':
@@ -46,9 +48,10 @@ export abstract class Property<T> {
         return DataCheckProperty.fromJson(value);
       case 'OBSERVATION':
         return ObservationProperty.fromJson(value);
+      case 'GROUPING':
+        return GroupingProperty.fromJson(value);
       default:
-        console.info('Unknown property type:', value.type, value);
-        throw new Error('cannot case property');
+        return UnknownProperty.fromJson(value);
     }
   }
 
@@ -58,7 +61,10 @@ export abstract class Property<T> {
     | 'Array'
     | 'String'
     | 'Boolean'
-    | 'Double';
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange';
 
   static toJson(props: Property<any>[]): any {
     const result: any = {};
@@ -66,6 +72,12 @@ export abstract class Property<T> {
       //TODO kind of workaround
       if (item.getType() === 'Integer') {
         result[item.id] = parseInt(item.getValue());
+      } else if (item.getType() === 'IntegerRange') {
+        const val = item.getValue();
+        result[item.id] = {
+          min: val && val.min !== undefined ? parseInt(val.min.toString()) : 0,
+          max: val && val.max !== undefined ? parseInt(val.max.toString()) : 0,
+        };
       } else {
         result[item.id] = item.getValue();
       }
@@ -126,7 +138,16 @@ export class StringProperty extends Property<string> {
     this.regex = regex;
   }
 
-  getType(): 'Integer' | 'Object' | 'String' | 'Boolean' | 'Double' {
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
     return 'String';
   }
 
@@ -172,8 +193,17 @@ export class StringTextProperty extends Property<string> {
     this.regex = regex;
   }
 
-  getType(): 'Integer' | 'Object' | 'String' | 'Boolean' | 'Double' {
-    return 'String';
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
+    return 'StringText';
   }
 
   validate(): string | undefined {
@@ -242,7 +272,16 @@ export class StringListProperty extends Property<string[]> {
     return this.value?.filter((v) => v !== undefined && v.trim() !== '');
   }
 
-  getType(): 'Integer' | 'Object' | 'Array' | 'String' | 'Boolean' | 'Double' {
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
     return 'Array';
   }
 
@@ -284,7 +323,16 @@ export class IntegerProperty extends Property<number> {
     this.max = max;
   }
 
-  getType(): 'Integer' | 'Object' | 'String' | 'Boolean' | 'Double' {
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
     return 'Integer';
   }
 
@@ -310,6 +358,106 @@ export class IntegerProperty extends Property<number> {
       json.min,
       json.max,
     );
+  }
+}
+
+export class IntegerRangeProperty extends Property<{ min: number; max: number }> {
+  minLimit?: number;
+  maxLimit?: number;
+
+  constructor(
+    defaultValue: { min: number; max: number },
+    description: string,
+    id: string,
+    immutable: boolean,
+    name: string,
+    required: boolean,
+  ) {
+    super(defaultValue, description, id, immutable, name, required);
+    if (!this.value) {
+      this.value = { min: 0, max: 0 };
+    }
+  }
+
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
+    return 'IntegerRange';
+  }
+
+  setValue(v: { min: number; max: number }): Property<{ min: number; max: number }> {
+    if (v) {
+      this.value = { ...v };
+      // Map lower/upper to min/max if necessary
+      if ((this.value as any).lower !== undefined) {
+        this.value.min = (this.value as any).lower;
+      }
+      if ((this.value as any).upper !== undefined) {
+        this.value.max = (this.value as any).upper;
+      }
+    } else {
+      this.value = this.defaultValue;
+    }
+    return this;
+  }
+
+  validate(): string | undefined {
+    if (this.required && (this.value === undefined || this.value === null)) {
+      return 'Value is required';
+    }
+    if (this.value) {
+      if (this.value.min > this.value.max) {
+        return 'goaltemplate.error.integerRange';
+      }
+      if (this.minLimit !== undefined && this.value.min < this.minLimit) {
+        return `goaltemplate.error.integerRangeMinLimit`;
+      }
+      if (this.maxLimit !== undefined && this.value.max > this.maxLimit) {
+        return `goaltemplate.error.integerRangeMaxLimit`;
+      }
+    }
+    return undefined;
+  }
+
+  static fromJson(json: any): IntegerRangeProperty {
+    let defaultValue = { min: 0, max: 0 };
+    if (json.defaultValue) {
+      if (typeof json.defaultValue === 'string') {
+        try {
+          defaultValue = JSON.parse(json.defaultValue);
+        } catch (e) {
+          console.error('Error parsing IntegerRange defaultValue', e);
+        }
+      } else if (typeof json.defaultValue === 'object') {
+        defaultValue = json.defaultValue;
+      }
+
+      // Map lower/upper to min/max if necessary
+      if ((defaultValue as any).lower !== undefined) {
+        defaultValue.min = (defaultValue as any).lower;
+      }
+      if ((defaultValue as any).upper !== undefined) {
+        defaultValue.max = (defaultValue as any).upper;
+      }
+    }
+    const property = new IntegerRangeProperty(
+      defaultValue,
+      json.description,
+      json.id,
+      json.immutable,
+      json.name,
+      json.required,
+    );
+    if (json.min !== undefined) property.minLimit = json.min;
+    if (json.max !== undefined) property.maxLimit = json.max;
+    return property;
   }
 }
 
@@ -367,7 +515,16 @@ export class ObservationProperty extends Property<ObservationPropertyValue> {
     super(defaultValue, description, id, immutable, name, required);
   }
 
-  getType(): 'Integer' | 'Object' | 'Array' | 'String' | 'Boolean' | 'Double' {
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
     return 'Object';
   }
 
@@ -409,7 +566,16 @@ export class CronProperty extends Property<string> {
     );
   }
 
-  getType(): 'Integer' | 'Object' | 'String' | 'Boolean' | 'Double' {
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
     return 'String';
   }
 
@@ -534,5 +700,92 @@ export class QueryObject {
 
   static fromJson(json: any): QueryObject {
     return new QueryObject(json.nextGroupCondition, json.parameter);
+  }
+}
+
+export class GroupingProperty extends Property<any> {
+  constructor(
+    defaultValue: any,
+    description: string,
+    id: string,
+    immutable: boolean,
+    name: string,
+    required: boolean,
+  ) {
+    super(defaultValue, description, id, immutable, name, required);
+  }
+
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
+    return 'Grouping';
+  }
+
+  validate(): string | undefined {
+    return undefined;
+  }
+
+  static fromJson(json: any): GroupingProperty {
+    return new GroupingProperty(
+      json.defaultValue,
+      json.description,
+      json.id,
+      json.immutable,
+      json.name,
+      json.required,
+    );
+  }
+}
+
+export class UnknownProperty extends Property<any> {
+  rawJson: any;
+
+  constructor(
+    defaultValue: any,
+    description: string,
+    id: string,
+    immutable: boolean,
+    name: string,
+    required: boolean,
+    rawJson: any,
+  ) {
+    super(defaultValue, description, id, immutable, name, required);
+    this.rawJson = rawJson;
+  }
+
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
+    return 'Object';
+  }
+
+  validate(): string | undefined {
+    return undefined;
+  }
+
+  static fromJson(json: any): UnknownProperty {
+    return new UnknownProperty(
+      json.defaultValue,
+      json.description,
+      json.id,
+      json.immutable,
+      json.name,
+      json.required,
+      json,
+    );
   }
 }
