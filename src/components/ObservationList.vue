@@ -32,7 +32,7 @@ Licensed under the Elastic License 2.0. */
   import MoreTable from '../components/shared/MoreTable.vue';
   import { AxiosError, AxiosResponse } from 'axios';
   import { useDialog } from 'primevue/usedialog';
-  import ObservationDialog from '../components/dialog/ObservationDialog.vue';
+  import ComponentDialog from '../components/dialog/ComponentDialog.vue';
   import useLoader from '../composable/useLoader';
   import { useI18n } from 'vue-i18n';
   import { useErrorHandling } from '../composable/useErrorHandling';
@@ -107,7 +107,7 @@ Licensed under the Elastic License 2.0. */
         ? t(cf.description, { link: extractCurrentLimeDomain() })
         : '',
       command: (): void => {
-        openObservationDialog(t('observation.dialog.header.create'), {
+        openComponentDialog(t('observation.dialog.header.create'), {
           type: cf.componentId,
         });
       },
@@ -381,7 +381,7 @@ Licensed under the Elastic License 2.0. */
         deleteObservation(row);
         break;
       case 'clone':
-        openObservationDialog(t('observation.dialog.header.clone'), row, true);
+        openComponentDialog(t('observation.dialog.header.clone'), row, true);
         break;
       case 'edit':
         openEditObservation(row.observationId);
@@ -440,23 +440,23 @@ Licensed under the Elastic License 2.0. */
     return factories.find((f) => f.componentId === type);
   }
 
-  function openObservationDialog(
+  function openComponentDialog(
     headerText: string,
-    observation?: Observation,
+    component?: Observation,
     clone?: boolean,
   ): void {
-    dialog.open(ObservationDialog, {
+    dialog.open(ComponentDialog, {
       data: {
         groupStates: groupStatuses,
-        observation: observation,
-        factory: factoryForType(observation?.type),
+        component: component,
+        factory: factoryForType(component?.type),
         componentType: 'observation',
         closeWithEscape: false,
       },
       props: {
         header: headerText,
         style: {
-          width: '50vw',
+          width: '80vw',
           maxHeight: '92vh',
         },
         breakpoints: {
@@ -504,7 +504,7 @@ Licensed under the Elastic License 2.0. */
       ) {
         dialogTitle = t('observation.dialog.header.view');
       }
-      openObservationDialog(dialogTitle, observation);
+      openComponentDialog(dialogTitle, observation);
     }
   }
 

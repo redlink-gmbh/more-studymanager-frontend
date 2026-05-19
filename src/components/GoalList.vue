@@ -27,7 +27,7 @@ Licensed under the Elastic License 2.0. */
   import DynamicDialog from 'primevue/dynamicdialog';
   import MoreTable from '../components/shared/MoreTable.vue';
   import { useDialog } from 'primevue/usedialog';
-  import ObservationDialog from '../components/dialog/ObservationDialog.vue';
+  import ComponentDialog from './dialog/ComponentDialog.vue';
   import useLoader from '../composable/useLoader';
   import { useI18n } from 'vue-i18n';
   import DeleteMoreTableRowDialog from './dialog/DeleteMoreTableRowDialog.vue';
@@ -96,7 +96,7 @@ Licensed under the Elastic License 2.0. */
           ? t(cf.description, { link: extractCurrentLimeDomain() })
           : '',
         command: (): void => {
-          openGoalTemplateDialog(t('observation.dialog.header.create'), {
+          openComponentDialog(t('goaltemplate.dialog.header.create'), {
             type: cf.componentId,
           });
         },
@@ -110,7 +110,7 @@ Licensed under the Elastic License 2.0. */
       description: t(`goaltemplate.factory.${goalCategory}.description`),
       value: goalCategory,
       command: (): void => {
-        openGoalTemplateDialog(t('observation.dialog.header.create'), {
+        openComponentDialog(t('goaltemplate.dialog.header.create'), {
           type: goalCategory,
         });
       },
@@ -244,7 +244,7 @@ Licensed under the Elastic License 2.0. */
         deleteGoalTemplate(row);
         break;
       case 'clone':
-        openGoalTemplateDialog(t('observation.dialog.header.clone'), row, true);
+        openComponentDialog(t('goaltemplate.dialog.header.clone'), row, true);
         break;
       case 'edit':
         openEditGoalTemplate(row.observationId);
@@ -278,16 +278,16 @@ Licensed under the Elastic License 2.0. */
     return factories.value.find((f) => f.componentId === type);
   }
 
-  function openGoalTemplateDialog(
+  function openComponentDialog(
     headerText: string,
-    observation?: Observation,
+    component?: Observation,
     clone?: boolean,
   ): void {
-    dialog.open(ObservationDialog, {
+    dialog.open(ComponentDialog, {
       data: {
         groupStates: groupStatuses,
-        observation: observation,
-        factory: factoryForType(observation?.type),
+        component: component,
+        factory: factoryForType(component?.type),
         componentType: 'goalTemplate',
         closeWithEscape: false,
       },
@@ -333,7 +333,7 @@ Licensed under the Elastic License 2.0. */
       ) {
         dialogTitle = t('observation.dialog.header.view');
       }
-      openGoalTemplateDialog(dialogTitle, goalTemplate);
+      openComponentDialog(dialogTitle, goalTemplate);
     }
   }
 

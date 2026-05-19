@@ -662,7 +662,8 @@
         "view": "Details eines Zieltemplates"
       },
       "label": {
-        "goalTemplateTitle": "Template-Titel"
+        "goalTemplateTitle": "Template-Titel",
+        "goalTitle": "Ziel Titel"
       },
       "msg": {
         "delete": "Ein gelöschtes Zieltemplate kann nicht mehr wiederhergestellt werden! Möchten Sie das Zieltemplate wirklich löschen?"

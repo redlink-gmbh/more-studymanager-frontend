@@ -45,7 +45,7 @@ Licensed under the Elastic License 2.0. */
   const { t } = useI18n();
 
   const dialogRef: any = inject('dialogRef');
-  const observation = dialogRef.value.data.observation as Observation;
+  const component = dialogRef.value.data.component as Observation;
   const groupStates = dialogRef.value.data.groupStates || [];
   const observationGroupStates: MoreTableChoice[] =
     observationGroupStore.observationGroups.map(
@@ -61,36 +61,48 @@ Licensed under the Elastic License 2.0. */
     studyStore.study.status === StudyStatus.Draft ||
     studyStore.study.status === StudyStatus.Paused ||
     studyStore.study.status === StudyStatus.PausedPreview;
+  const isGoal = componentType === 'goalTemplate';
 
-  const title = ref(observation.title);
-  const purpose = ref(observation.purpose);
-  const participantInfo = ref(observation.participantInfo);
+  const title = ref(component.title);
+  const purpose = ref(component.purpose);
+  const participantInfo = ref(component.participantInfo);
   const properties: Ref<Property<any>[]> = ref(
     factory.properties
-      .map((json: any) => {
-        return Property.fromJson(json);
+      ?.map((json: any) => {
+        try {
+          return Property.fromJson(json);
+        } catch (e) {
+          console.warn(
+            'Skipping unknown property type in dialog:',
+            json.type,
+            json,
+            e,
+          );
+          return null;
+        }
       })
-      .map((p: Property<any>) => p.setValue(observation.properties?.[p.id])),
+      .filter((p: any) => p !== null)
+      .map((p: Property<any>) => p.setValue(component.properties?.[p.id])) ?? [],
   );
   const selectedObservationGroups = ref(
-    observation.observationGroupIds?.map((id: number) => id.toString()) ?? [],
+    component.observationGroupIds?.map((id: number) => id.toString()) ?? [],
   );
 
   const hidden: Ref<boolean> = ref(
-    observation.hidden !== undefined
-      ? observation.hidden
+    component.hidden !== undefined
+      ? component.hidden
       : factory.visibility?.hiddenByDefault ?? false,
   );
 
   const reminder: Ref<boolean> = ref(
-    observation.reminder !== undefined ? observation.reminder : false,
+    component.reminder !== undefined ? component.reminder : false,
   );
 
   const scheduler: Ref<ObservationSchedule> = ref(
-    observation.schedule ? observation.schedule : {},
+    component.schedule ? component.schedule : {},
   );
 
-  const studyGroupId = ref(observation.studyGroupId);
+  const studyGroupId = ref(component.studyGroupId);
 
   function getLabelForChoiceValue(
     value: any,
@@ -142,7 +154,7 @@ Licensed under the Elastic License 2.0. */
       componentsApi
         .validateProperties(
           componentType,
-          observation.type as string,
+          component.type as string,
           parsedProps,
         )
         .then((response: any) => response.data)
@@ -191,15 +203,15 @@ Licensed under the Elastic License 2.0. */
       }
     }
 
-    const returnObservation = {
-      observationId: observation.observationId,
+    const returnComponent = {
+      observationId: component.observationId,
       title: title.value,
       purpose: purpose.value,
       participantInfo: participantInfo.value,
       observationGroupIds: selectedObservationGroups.value?.length
         ? selectedObservationGroups.value.map((id: string) => parseInt(id))
         : [],
-      type: observation.type,
+      type: component.type,
       properties: props,
       schedule: scheduler.value,
       studyGroupId: studyGroupId.value,
@@ -208,7 +220,7 @@ Licensed under the Elastic License 2.0. */
     } as Observation;
 
     if (!isObjectEmpty(scheduler.value)) {
-      dialogRef.value.close(returnObservation);
+      dialogRef.value.close(returnComponent);
     }
   }
 
@@ -261,13 +273,17 @@ Licensed under the Elastic License 2.0. */
     </div>
 
     <form
-      id="observationDialogForm"
+      id="componentDialogForm"
       class="grid grid-cols-8 items-center gap-4"
       @submit.prevent="validate()"
     >
       <div class="col-span-8 col-start-0" :class="{ 'pb-4': !editable }">
         <h5 class="mb-1">
-          {{ $t('observation.dialog.label.observationTitle') }}*
+          {{
+            isGoal
+              ? $t('goaltemplate.dialog.label.goalTitle')
+              : $t('observation.dialog.label.observationTitle')
+          }}*
         </h5>
         <div v-if="getError('title')" class="error mb-4">
           {{ getError('title') }}
@@ -347,7 +363,9 @@ Licensed under the Elastic License 2.0. */
           <div v-if="editable" class="mb-2">
             {{
               $t('study.dialog.description.howToCreateGroups', {
-                for: $t('studyNavigation.tabs.observations'),
+                for: isGoal
+                  ? $t('studyNavigation.tabs.goals')
+                  : $t('studyNavigation.tabs.observations'),
               })
             }}
           </div>
