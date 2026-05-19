@@ -57,6 +57,7 @@ Licensed under the Elastic License 2.0. */
         class="mr-2"
         :required="property.required"
         :binary="true"
+        :disabled="!editable || property.immutable"
       />
       {{ $t(property.name) }}
     </div>

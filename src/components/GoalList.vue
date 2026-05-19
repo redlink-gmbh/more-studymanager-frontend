@@ -289,6 +289,13 @@ Licensed under the Elastic License 2.0. */
         component: component,
         factory: factoryForType(component?.type),
         componentType: 'goalTemplate',
+        hasSimpleScheduler: goalTemplateStore.goalConfig?.schedule.map((item) => {
+          return {
+            key: item.key,
+            label: t(`goaltemplate.goalTemplateList.meassurementTimes.times.${item.key}`),
+            time: item.time
+          }
+        }),
         closeWithEscape: false,
       },
       props: {
@@ -375,7 +382,11 @@ Licensed under the Elastic License 2.0. */
       </div>
       <div class="global-goal-settings">
         <GoalTemplateMessurementSection :study-id="studyId" />
-        <GoalTemplateCategorySection class="mt-4" :study-id="studyId" :study-status="studyStatus" />
+        <GoalTemplateCategorySection
+          class="mt-4"
+          :study-id="studyId"
+          :study-status="studyStatus"
+        />
       </div>
     </div>
     <MoreTable

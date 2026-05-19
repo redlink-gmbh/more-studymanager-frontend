@@ -58,7 +58,7 @@ Licensed under the Elastic License 2.0. */
       :required="property.required"
       :max="property.max"
       :min="property.min"
-      :disabled="!editable"
+      :disabled="!editable || property.immutable"
       class="mt-1 w-full"
       :aria-describedby="`${property.id}-help`"
     />

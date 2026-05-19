@@ -66,7 +66,7 @@ Licensed under the Elastic License 2.0. */
         :value="property.value?.[index - 1]"
         type="text"
         :required="property.required"
-        :disabled="!editable"
+        :disabled="!editable || property.immutable"
         :placeholder="t('global.labels.option', { value: index })"
         style="display: block"
         @keyup="update($event, index - 1)"

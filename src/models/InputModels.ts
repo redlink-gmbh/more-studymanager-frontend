@@ -395,18 +395,14 @@ export class IntegerRangeProperty extends Property<{ min: number; max: number }>
     return 'IntegerRange';
   }
 
-  setValue(v: { min: number; max: number }): Property<{ min: number; max: number }> {
-    if (v) {
-      this.value = { ...v };
-      // Map lower/upper to min/max if necessary
-      if ((this.value as any).lower !== undefined) {
-        this.value.min = (this.value as any).lower;
-      }
-      if ((this.value as any).upper !== undefined) {
-        this.value.max = (this.value as any).upper;
-      }
-    } else {
-      this.value = this.defaultValue;
+  setValue(v: any): Property<{ min: number; max: number }> {
+    if (v && typeof v === 'object') {
+      this.value = {
+        min: v.min !== undefined ? v.min : v.lower !== undefined ? v.lower : (this.value?.min ?? 0),
+        max: v.max !== undefined ? v.max : v.upper !== undefined ? v.upper : (this.value?.max ?? 0),
+      } as { min: number; max: number };
+    } else if (v === undefined || v === null) {
+      this.value = this.defaultValue ? { ...this.defaultValue } : { min: 0, max: 0 };
     }
     return this;
   }
@@ -432,22 +428,30 @@ export class IntegerRangeProperty extends Property<{ min: number; max: number }>
   static fromJson(json: any): IntegerRangeProperty {
     let defaultValue = { min: 0, max: 0 };
     if (json.defaultValue) {
+      let rawDefault = json.defaultValue;
       if (typeof json.defaultValue === 'string') {
         try {
-          defaultValue = JSON.parse(json.defaultValue);
+          rawDefault = JSON.parse(json.defaultValue);
         } catch (e) {
           console.error('Error parsing IntegerRange defaultValue', e);
         }
-      } else if (typeof json.defaultValue === 'object') {
-        defaultValue = json.defaultValue;
       }
 
-      // Map lower/upper to min/max if necessary
-      if ((defaultValue as any).lower !== undefined) {
-        defaultValue.min = (defaultValue as any).lower;
-      }
-      if ((defaultValue as any).upper !== undefined) {
-        defaultValue.max = (defaultValue as any).upper;
+      if (typeof rawDefault === 'object' && rawDefault !== null) {
+        defaultValue = {
+          min:
+            rawDefault.min !== undefined
+              ? rawDefault.min
+              : rawDefault.lower !== undefined
+                ? rawDefault.lower
+                : 0,
+          max:
+            rawDefault.max !== undefined
+              ? rawDefault.max
+              : rawDefault.upper !== undefined
+                ? rawDefault.upper
+                : 0,
+        };
       }
     }
     const property = new IntegerRangeProperty(

@@ -57,6 +57,9 @@ Licensed under the Elastic License 2.0. */
     );
   const factory = dialogRef.value.data.factory;
   const componentType = dialogRef.value.data.componentType || 'observation';
+  const hasSimpleScheduler = dialogRef.value.data.hasSimpleScheduler as
+    | { key: string; label: string; time: string }[]
+    | undefined;
   const editable =
     studyStore.study.status === StudyStatus.Draft ||
     studyStore.study.status === StudyStatus.Paused ||
@@ -82,7 +85,8 @@ Licensed under the Elastic License 2.0. */
         }
       })
       .filter((p: any) => p !== null)
-      .map((p: Property<any>) => p.setValue(component.properties?.[p.id])) ?? [],
+      .map((p: Property<any>) => p.setValue(component.properties?.[p.id])) ??
+      [],
   );
   const selectedObservationGroups = ref(
     component.observationGroupIds?.map((id: number) => id.toString()) ?? [],
@@ -91,7 +95,7 @@ Licensed under the Elastic License 2.0. */
   const hidden: Ref<boolean> = ref(
     component.hidden !== undefined
       ? component.hidden
-      : factory.visibility?.hiddenByDefault ?? false,
+      : (factory.visibility?.hiddenByDefault ?? false),
   );
 
   const reminder: Ref<boolean> = ref(
@@ -100,6 +104,12 @@ Licensed under the Elastic License 2.0. */
 
   const scheduler: Ref<ObservationSchedule> = ref(
     component.schedule ? component.schedule : {},
+  );
+
+  const simpleSchedulerSelection = ref(
+    Array.isArray(component.schedule)
+      ? component.schedule.map((s: any) => s.key)
+      : [],
   );
 
   const studyGroupId = ref(component.studyGroupId);
@@ -148,6 +158,11 @@ Licensed under the Elastic License 2.0. */
   }
 
   function validate(): void {
+    checkRequiredFields();
+    if (errors.length > 0) {
+      return;
+    }
+
     let parsedProps: any;
     try {
       parsedProps = Property.toJson(properties.value);
@@ -185,7 +200,7 @@ Licensed under the Elastic License 2.0. */
   };
 
   function save(props: any): void {
-    if (isObjectEmpty(scheduler.value)) {
+    if (!hasSimpleScheduler && isObjectEmpty(scheduler.value)) {
       if (studyStore.study.plannedStart && studyStore.study.plannedEnd) {
         scheduler.value = {
           type: ScheduleType.Event,
@@ -213,13 +228,17 @@ Licensed under the Elastic License 2.0. */
         : [],
       type: component.type,
       properties: props,
-      schedule: scheduler.value,
+      schedule: hasSimpleScheduler
+        ? hasSimpleScheduler.filter((s) =>
+            simpleSchedulerSelection.value.includes(s.key),
+          )
+        : scheduler.value,
       studyGroupId: studyGroupId.value,
       hidden: hidden.value,
       reminder: reminder.value,
     } as Observation;
 
-    if (!isObjectEmpty(scheduler.value)) {
+    if (hasSimpleScheduler || !isObjectEmpty(scheduler.value)) {
       dialogRef.value.close(returnComponent);
     }
   }
@@ -242,6 +261,12 @@ Licensed under the Elastic License 2.0. */
         value: isGoal
           ? t('goaltemplate.error.addParticipantInfo')
           : t('observation.error.addParticipantInfo'),
+      } as MoreTableChoice);
+    }
+    if (hasSimpleScheduler && simpleSchedulerSelection.value.length === 0) {
+      errors.push({
+        label: 'scheduler',
+        value: t('goaltemplate.error.addSchedule'),
       } as MoreTableChoice);
     }
   }
@@ -303,7 +328,61 @@ Licensed under the Elastic License 2.0. */
           ></InputText>
         </div>
       </div>
+      <div v-if="hasSimpleScheduler" class="col-span-8 col-start-0">
+        <h5 class="mb-1">{{ $t('scheduler.singular') }}*</h5>
+        <div v-if="getError('scheduler')" class="error mb-4">
+          {{ getError('scheduler') }}
+        </div>
+        <div v-if="hasSimpleScheduler.length > 0">
+          <div class="mb-2">
+            {{ $t('goaltemplate.goalTemplateList.meassurementTimes.planer') }}
+          </div>
+          <MultiSelect
+            v-model="simpleSchedulerSelection"
+            :options="hasSimpleScheduler"
+            :show-toggle-all="false"
+            option-label="label"
+            option-value="key"
+            class="w-full"
+            :disabled="!editable"
+            :placeholder="$t('global.placeholder.chooseDropdownOptionDefault')"
+            :show-select-all="false"
+          >
+            <template #option="slotProps">
+              <div class="flex items-center">
+                <div>
+                  {{ slotProps.option.label }}
+                  ({{ slotProps.option.time.slice(0, 5) }})
+                </div>
+              </div>
+            </template>
+            <template #value="slotProps">
+              <div v-if="slotProps.value && slotProps.value.length > 0">
+                {{
+                  hasSimpleScheduler
+                    .filter((s) => slotProps.value.includes(s.key))
+                    .map((s) => s.label)
+                    .join(', ')
+                }}
+              </div>
+              <span v-else>
+                {{ slotProps.placeholder }}
+              </span>
+            </template>
+          </MultiSelect>
+        </div>
+        <div v-else class="rounded border border-yellow-400 bg-yellow-50 p-4">
+          <div class="flex items-center gap-2 text-yellow-700">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span class="font-bold">{{ $t('global.labels.warning') }}</span>
+          </div>
+          <div class="mt-2 text-yellow-700">
+            {{ $t('goaltemplate.error.noSimpleSchedulerOptions') }}
+          </div>
+        </div>
+      </div>
       <SchedulerInfoBlock
+        v-else
         :scheduler="scheduler"
         :editable="editable"
         :error="getError('scheduler') ? (getError('scheduler') as string) : ''"
@@ -464,37 +543,37 @@ Licensed under the Elastic License 2.0. */
 </template>
 
 <style scoped>
-@import '../../styles/components/moreTable-dialogs.css';
-@import '../../styles/components/eye-checkbox.css';
+  @import '../../styles/components/moreTable-dialogs.css';
+  @import '../../styles/components/eye-checkbox.css';
 
-.dialog {
-  :deep(.dropdown-has-value .p-select-label) {
-    color: var(--text-color);
-  }
-
-  .day {
-    &:after {
-      content: ', ';
+  .dialog {
+    :deep(.dropdown-has-value .p-select-label) {
+      color: var(--text-color);
     }
 
-    &:last-of-type:after {
-      content: '';
-    }
-  }
+    .day {
+      &:after {
+        content: ', ';
+      }
 
-  .info-box {
-    &-hidden {
-      width: 20vw;
-      border: 1px solid var(--bluegray-200);
-      transition: ease-in-out opacity 0.25s;
-      box-shadow: 1px 1px 5px var(--bluegray-200);
+      &:last-of-type:after {
+        content: '';
+      }
     }
 
-    &:hover {
-      .info-box-hidden {
-        opacity: 1;
+    .info-box {
+      &-hidden {
+        width: 20vw;
+        border: 1px solid var(--bluegray-200);
+        transition: ease-in-out opacity 0.25s;
+        box-shadow: 1px 1px 5px var(--bluegray-200);
+      }
+
+      &:hover {
+        .info-box-hidden {
+          opacity: 1;
+        }
       }
     }
   }
-}
 </style>
