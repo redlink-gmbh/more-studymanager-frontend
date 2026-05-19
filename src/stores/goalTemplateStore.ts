@@ -1,4 +1,4 @@
-import { ref, Ref } from 'vue';
+import { ref, Ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import {
   GoalTemplate,
@@ -14,19 +14,13 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
   const { goalsApi } = useGoalsApi();
   const { handleIndividualError } = useErrorHandling();
 
-  // State
   const goalTemplates: Ref<GoalTemplate[]> = ref([]);
   const goalConfig: Ref<StudyGoalConfigData | undefined> = ref();
   const goalTopics: Ref<GoalTopic[]> = ref([]);
 
-  //ToDo get goalTypeStatuses and goalCategoryStatuses from api and store
   const goalTypes = [
    'behavioralGoal',
    'outcomeGoal'
-  ];
-  const goalCategories = [
-    'nutrition',
-    'smoking'
   ];
 
   // Actions
@@ -50,10 +44,12 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
   ): Promise<void> {
     await goalsApi
       .addGoalTemplate(studyId, goalTemplate)
-      .then((response) => goalTemplates.value.push(response.data))
-      .catch((e: AxiosError) =>
-        handleIndividualError(e, 'cannot add goal template'),
-      );
+      .then((response) => {
+        return goalTemplates.value.push(response.data);
+      })
+      .catch((e: AxiosError) => {
+        handleIndividualError(e, 'cannot add goal template');
+      });
   }
 
   async function updateGoalTemplate(
@@ -182,6 +178,13 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
         handleIndividualError(e, 'cannot delete goal topic');
       });
   }
+
+  const goalCategories = computed(() => {
+    return goalTopics.value.map((topic) => ({
+      label: topic.title,
+      value: topic.key,
+    }));
+  });
 
   return {
     goalCategories,

@@ -202,7 +202,7 @@ Licensed under the Elastic License 2.0. */
           </div>
         </div>
         <Button
-          v-if="editable && !property.immutable"
+          v-if="editable"
           icon="pi pi-pencil"
           class="p-button-rounded p-button-text p-button-sm z-10"
           @click="startEditing"

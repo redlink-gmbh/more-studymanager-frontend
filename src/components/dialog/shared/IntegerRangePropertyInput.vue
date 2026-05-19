@@ -29,16 +29,16 @@ Licensed under the Elastic License 2.0. */
   }>();
 
   watch(
-    () => props.property.value?.min,
-    (newMin) => {
+    () => props.property.value?.lower,
+    (newLower) => {
       if (
-        newMin !== undefined &&
-        newMin !== null &&
-        props.property.value?.max !== undefined &&
-        props.property.value.max !== null
+        newLower !== undefined &&
+        newLower !== null &&
+        props.property.value?.upper !== undefined &&
+        props.property.value.upper !== null
       ) {
-        if (newMin > props.property.value.max) {
-          props.property.value.max = newMin;
+        if (newLower > props.property.value.upper) {
+          props.property.value.upper = newLower;
         }
       }
       if (props.isPartOfTemplate) {
@@ -48,16 +48,16 @@ Licensed under the Elastic License 2.0. */
   );
 
   watch(
-    () => props.property.value?.max,
-    (newMax) => {
+    () => props.property.value?.upper,
+    (newUpper) => {
       if (
-        newMax !== undefined &&
-        newMax !== null &&
-        props.property.value?.min !== undefined &&
-        props.property.value.min !== null
+        newUpper !== undefined &&
+        newUpper !== null &&
+        props.property.value?.lower !== undefined &&
+        props.property.value.lower !== null
       ) {
-        if (newMax < props.property.value.min) {
-          props.property.value.min = newMax;
+        if (newUpper < props.property.value.lower) {
+          props.property.value.lower = newUpper;
         }
       }
       if (props.isPartOfTemplate) {
@@ -71,7 +71,7 @@ Licensed under the Elastic License 2.0. */
   <div>
     <div class="mb-1">
       <div class="flex items-center">
-        <label :for="`${property.id}-min`" class="font-bold">{{
+        <label :for="`${property.id}-lower`" class="font-bold">{{
           $t(property.name)
         }}</label>
         <PartOfTemplateBadge :visible="isPartOfTemplate" />
@@ -88,12 +88,12 @@ Licensed under the Elastic License 2.0. */
     </div>
     <div class="grid grid-cols-2 gap-4">
       <div class="flex flex-col">
-        <label :for="`${property.id}-min`" class="text-xs text-gray-400">{{
+        <label :for="`${property.id}-lower`" class="text-xs text-gray-400">{{
           $t('global.labels.min')
         }}</label>
         <InputNumber
-          :id="`${property.id}-min`"
-          v-model="property.value.min"
+          :id="`${property.id}-lower`"
+          v-model="property.value.lower"
           class="w-full"
           :min-fraction-digits="0"
           :max-fraction-digits="0"
@@ -103,12 +103,12 @@ Licensed under the Elastic License 2.0. */
         />
       </div>
       <div class="flex flex-col">
-        <label :for="`${property.id}-max`" class="text-xs text-gray-400">{{
+        <label :for="`${property.id}-upper`" class="text-xs text-gray-400">{{
           $t('global.labels.max')
         }}</label>
         <InputNumber
-          :id="`${property.id}-max`"
-          v-model="property.value.max"
+          :id="`${property.id}-upper`"
+          v-model="property.value.upper"
           class="w-full"
           :min-fraction-digits="0"
           :max-fraction-digits="0"

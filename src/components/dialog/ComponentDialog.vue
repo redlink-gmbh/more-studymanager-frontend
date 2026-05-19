@@ -10,7 +10,6 @@ Licensed under the Elastic License 2.0. */
   import Button from 'primevue/button';
   import Dropdown from 'primevue/dropdown';
   import {
-    Observation,
     ObservationSchedule,
     StudyStatus,
     ValidationReport,
@@ -45,7 +44,7 @@ Licensed under the Elastic License 2.0. */
   const { t } = useI18n();
 
   const dialogRef: any = inject('dialogRef');
-  const component = dialogRef.value.data.component as Observation;
+  const component = dialogRef.value.data.component;
   const groupStates = dialogRef.value.data.groupStates || [];
   const observationGroupStates: MoreTableChoice[] =
     observationGroupStore.observationGroups.map(
@@ -60,6 +59,8 @@ Licensed under the Elastic License 2.0. */
   const hasSimpleScheduler = dialogRef.value.data.hasSimpleScheduler as
     | { key: string; label: string; time: string }[]
     | undefined;
+  const hasComponentCategories = dialogRef.value.data
+    .hasComponentCategories as MoreTableChoice[];
   const editable =
     studyStore.study.status === StudyStatus.Draft ||
     studyStore.study.status === StudyStatus.Paused ||
@@ -113,6 +114,7 @@ Licensed under the Elastic License 2.0. */
   );
 
   const studyGroupId = ref(component.studyGroupId);
+  const categories = ref(component.categories?.topics ?? []);
 
   function getLabelForChoiceValue(
     value: any,
@@ -149,6 +151,7 @@ Licensed under the Elastic License 2.0. */
           draggable: false,
         },
         onClose: (options) => {
+          console.log('on close in component dialog: ', options?.data, ' -')
           if (options?.data) {
             scheduler.value = options.data;
           }
@@ -158,7 +161,9 @@ Licensed under the Elastic License 2.0. */
   }
 
   function validate(): void {
+    console.log('validate')
     checkRequiredFields();
+    console.log('check required fields...', errors.length)
     if (errors.length > 0) {
       return;
     }
@@ -166,6 +171,7 @@ Licensed under the Elastic License 2.0. */
     let parsedProps: any;
     try {
       parsedProps = Property.toJson(properties.value);
+      console.log('parsedProps: ', parsedProps, ' -')
       componentsApi
         .validateProperties(
           componentType,
@@ -236,7 +242,16 @@ Licensed under the Elastic License 2.0. */
       studyGroupId: studyGroupId.value,
       hidden: hidden.value,
       reminder: reminder.value,
-    } as Observation;
+    };
+
+    console.log('returnComponent: ', returnComponent, ' -')
+
+    if (componentType === 'goalTemplate') {
+      returnComponent.categories = {
+        kind: component.categories?.kind ?? 'behavioral',
+        topics: categories.value,
+      };
+    }
 
     if (hasSimpleScheduler || !isObjectEmpty(scheduler.value)) {
       dialogRef.value.close(returnComponent);
@@ -246,6 +261,8 @@ Licensed under the Elastic License 2.0. */
   let errors: MoreTableChoice[] = [];
 
   function checkRequiredFields(): void {
+    console.log('checkRequiredFields')
+
     errors = [];
     if (!title.value) {
       errors.push({
@@ -269,6 +286,14 @@ Licensed under the Elastic License 2.0. */
         value: t('goaltemplate.error.addSchedule'),
       } as MoreTableChoice);
     }
+    if (isGoal && hasComponentCategories && categories.value.length === 0) {
+      errors.push({
+        label: 'categories',
+        value: t('goaltemplate.error.addCategory'),
+      } as MoreTableChoice);
+    }
+
+    console.log('errors: ', errors, ' -')
   }
 
   function getError(label: string): string | null | undefined {
@@ -327,6 +352,26 @@ Licensed under the Elastic License 2.0. */
             :disabled="!editable"
           ></InputText>
         </div>
+      </div>
+      <div
+        v-if="isGoal && hasComponentCategories"
+        class="col-span-8 col-start-0"
+        :class="{ 'pb-4': !editable }"
+      >
+        <h5 class="mb-1">{{ $t('goaltemplate.label.categoryTitle') }}*</h5>
+        <div v-if="getError('categories')" class="error mb-4">
+          {{ getError('categories') }}
+        </div>
+        <MultiSelect
+          v-model="categories"
+          :options="hasComponentCategories"
+          option-label="label"
+          option-value="value"
+          class="w-full"
+          :show-toggle-all="false"
+          :disabled="!editable"
+          :placeholder="$t('global.placeholder.chooseDropdownOptionDefault')"
+        ></MultiSelect>
       </div>
       <div v-if="hasSimpleScheduler" class="col-span-8 col-start-0">
         <h5 class="mb-1">{{ $t('scheduler.singular') }}*</h5>

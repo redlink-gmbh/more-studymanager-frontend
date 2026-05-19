@@ -78,8 +78,8 @@ export abstract class Property<T> {
       } else if (item.getType() === 'IntegerRange') {
         const val = item.getValue();
         result[item.id] = {
-          min: val && val.min !== undefined ? parseInt(val.min.toString()) : 0,
-          max: val && val.max !== undefined ? parseInt(val.max.toString()) : 0,
+          lower: val && val.lower !== undefined ? parseInt(val.lower.toString()) : 0,
+          upper: val && val.upper !== undefined ? parseInt(val.upper.toString()) : 0,
         };
       } else {
         result[item.id] = item.getValue();
@@ -364,7 +364,7 @@ export class IntegerProperty extends Property<number> {
   }
 }
 
-export class IntegerRangeProperty extends Property<{ min: number; max: number }> {
+export class IntegerRangeProperty extends Property<{ lower: number; upper: number }> {
   minLimit?: number;
   maxLimit?: number;
 
@@ -378,7 +378,14 @@ export class IntegerRangeProperty extends Property<{ min: number; max: number }>
   ) {
     super(defaultValue, description, id, immutable, name, required);
     if (!this.value) {
-      this.value = { min: 0, max: 0 };
+      if (this.defaultValue) {
+        this.value = {
+          lower: this.defaultValue.min ?? 1,
+          upper: this.defaultValue.max ?? 1,
+        };
+      } else {
+        this.value = { lower: 1, upper: 1 };
+      }
     }
   }
 
@@ -395,38 +402,39 @@ export class IntegerRangeProperty extends Property<{ min: number; max: number }>
     return 'IntegerRange';
   }
 
-  setValue(v: any): Property<{ min: number; max: number }> {
+  setValue(v: any): Property<{ lower: number; upper: number }> {
     if (v && typeof v === 'object') {
       this.value = {
-        min: v.min !== undefined ? v.min : v.lower !== undefined ? v.lower : (this.value?.min ?? 0),
-        max: v.max !== undefined ? v.max : v.upper !== undefined ? v.upper : (this.value?.max ?? 0),
-      } as { min: number; max: number };
+        lower:
+          v.lower !== undefined
+            ? v.lower
+            : v.min !== undefined
+              ? v.min
+              : (this.value?.lower ?? 1),
+        upper:
+          v.upper !== undefined
+            ? v.upper
+            : v.max !== undefined
+              ? v.max
+              : (this.value?.upper ?? 1),
+      };
     } else if (v === undefined || v === null) {
-      this.value = this.defaultValue ? { ...this.defaultValue } : { min: 0, max: 0 };
+      this.value = this.defaultValue
+        ? {
+            lower: this.defaultValue.min ?? 1,
+            upper: this.defaultValue.max ?? 1,
+          }
+        : { lower: 1, upper: 1 };
     }
     return this;
   }
 
   validate(): string | undefined {
-    if (this.required && (this.value === undefined || this.value === null)) {
-      return 'Value is required';
-    }
-    if (this.value) {
-      if (this.value.min > this.value.max) {
-        return 'goaltemplate.error.integerRange';
-      }
-      if (this.minLimit !== undefined && this.value.min < this.minLimit) {
-        return `goaltemplate.error.integerRangeMinLimit`;
-      }
-      if (this.maxLimit !== undefined && this.value.max > this.maxLimit) {
-        return `goaltemplate.error.integerRangeMaxLimit`;
-      }
-    }
     return undefined;
   }
 
   static fromJson(json: any): IntegerRangeProperty {
-    let defaultValue = { min: 0, max: 0 };
+    let defaultValue = { min: 1, max: 1 };
     if (json.defaultValue) {
       let rawDefault = json.defaultValue;
       if (typeof json.defaultValue === 'string') {
@@ -444,13 +452,13 @@ export class IntegerRangeProperty extends Property<{ min: number; max: number }>
               ? rawDefault.min
               : rawDefault.lower !== undefined
                 ? rawDefault.lower
-                : 0,
+                : 1,
           max:
             rawDefault.max !== undefined
               ? rawDefault.max
               : rawDefault.upper !== undefined
                 ? rawDefault.upper
-                : 0,
+                : 1,
         };
       }
     }

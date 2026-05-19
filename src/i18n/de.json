@@ -667,11 +667,13 @@
     },
     "label": {
       "goalTemplateTitle": "Template-Titel",
-      "goalTitle": "Ziel Titel"
+      "goalTitle": "Ziel Titel",
+      "categoryTitle": "Kategorie Titel"
     },
     "error": {
       "addParticipantInfo": "Die Teilnehmerinformationen sind ein erforderliches Feld. Bitte fügen Sie eine Beschreibung hinzu.",
       "addTitle": "Der Titel des Zieltemplates ist ein erforderliches Feld. Bitte fügen Sie einen Titel hinzu.",
+      "addCategory": "Die Kategorie ist ein erforderliches Feld. Bitte wählen Sie mindestens eine Kategorie aus.",
       "noValidField": "Fehler im Wert {key}: {message}",
       "addSchedule": "Bitte wählen Sie mindestens eine Messzeit aus.",
       "integerRange": "Der Minimum-Wert darf nicht größer als der Maximum-Wert sein.",

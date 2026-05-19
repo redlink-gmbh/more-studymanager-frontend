@@ -105,16 +105,7 @@ Licensed under the Elastic License 2.0. */
   );
 
   const goalTemplateCategories: MoreTableChoice[] = computed(() =>
-    goalTemplateStore.goalCategories.map((goalCategory) => ({
-      label: t(`goaltemplate.factory.${goalCategory}.title`),
-      description: t(`goaltemplate.factory.${goalCategory}.description`),
-      value: goalCategory,
-      command: (): void => {
-        openComponentDialog(t('goaltemplate.dialog.header.create'), {
-          type: goalCategory,
-        });
-      },
-    })),
+    goalTemplateStore.goalCategories as MoreTableChoice[],
   );
 
   const goalColumns: MoreTableColumn[] = [
@@ -280,7 +271,7 @@ Licensed under the Elastic License 2.0. */
 
   function openComponentDialog(
     headerText: string,
-    component?: Observation,
+    component?: GoalTemplate,
     clone?: boolean,
   ): void {
     dialog.open(ComponentDialog, {
@@ -289,6 +280,7 @@ Licensed under the Elastic License 2.0. */
         component: component,
         factory: factoryForType(component?.type),
         componentType: 'goalTemplate',
+        hasComponentCategories: goalTemplateStore.goalCategories as MoreTableChoice[],
         hasSimpleScheduler: goalTemplateStore.goalConfig?.schedule.map((item) => {
           return {
             key: item.key,
