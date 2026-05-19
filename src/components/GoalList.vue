@@ -32,8 +32,8 @@ Licensed under the Elastic License 2.0. */
   import { useI18n } from 'vue-i18n';
   import DeleteMoreTableRowDialog from './dialog/DeleteMoreTableRowDialog.vue';
   import { useGoalTemplateStore } from '@/stores/goalTemplateStore';
-  import GoalTemplateMessurementDropdown from '@/components/subComponents/GoalTemplateMessurementDropdown.vue';
-  import GoalTemplateCategoryHandling from '@/components/subComponents/GoalTemplateCategoryHandling.vue';
+  import GoalTemplateMessurementSection from '@/components/subComponents/GoalTemplateMeasssurementSection.vue';
+  import GoalTemplateCategorySection from '@/components/subComponents/GoalTemplateCategorySection.vue';
   import { extractCurrentLimeDomain } from '@/utils/limeSurveyUtils';
   import DropdownPanelWithSearch from '@/components/shared/DropdownPanelWithSearch.vue';
 
@@ -44,9 +44,6 @@ Licensed under the Elastic License 2.0. */
 
   const goalTemplatesList: ComputedRef<GoalTemplate[]> = computed(
     () => goalTemplateStore.goalTemplates ?? [],
-  );
-  const goalTemplateSchedule: ComputedRef<any[]> = computed(
-    () => goalTemplateStore.goalConfig?.schedule ?? [],
   );
 
   const dialog = useDialog();
@@ -367,10 +364,24 @@ Licensed under the Elastic License 2.0. */
 
 <template>
   <div class="goalTemplateList">
+    <div class="goal-description">
+      <div class="mb-8">
+        <div class="title w-full">
+          <h3 class="font-bold">
+            {{ $t('goaltemplate.goalTemplateList.title') }}
+          </h3>
+          <h4 class="text-lg">
+            {{ $t('goaltemplate.goalTemplateList.description') }}
+          </h4>
+        </div>
+      </div>
+      <div class="global-goal-settings">
+        <GoalTemplateMessurementSection :study-id="studyId" />
+        <GoalTemplateCategorySection class="mt-4" :study-id="studyId" :study-status="studyStatus" />
+      </div>
+    </div>
     <MoreTable
       row-id="templateId"
-      :title="$t('goaltemplate.goalTemplateList.title')"
-      :subtitle="$t('goaltemplate.goalTemplateList.description')"
       :columns="goalColumns"
       :rows="goalTemplatesList"
       :row-actions="rowActions"
@@ -387,32 +398,6 @@ Licensed under the Elastic License 2.0. */
       @on-action="executeAction($event)"
       @on-change="updateGoalTemplate($event)"
     >
-      <template #subTitleSection>
-        <div class="mt-4 mb-1 flex items-center justify-between">
-          <h4 class="text-lg font-bold">
-            {{ t('goaltemplate.goalTemplateList.meassurementTimes.title') }}
-          </h4>
-          <GoalTemplateMessurementDropdown :study-id="studyId" />
-        </div>
-        <div class="mb-4 text-sm text-gray-600">
-          {{ t('goaltemplate.goalTemplateList.meassurementTimes.description') }}
-        </div>
-        <div
-          class="mb-6 flex items-center gap-2 rounded border-gray-500 bg-gray-100 px-2"
-        >
-          <div
-            v-if="goalTemplateSchedule.length === 0"
-            class="py-2 text-sm text-gray-500 italic"
-          >
-            {{ t('goaltemplate.goalTemplateList.meassurementTimes.notSet') }}
-          </div>
-          <span v-else>{{
-            t('goaltemplate.goalTemplateList.meassurementTimes.set')
-          }}</span>
-        </div>
-
-        <GoalTemplateCategoryHandling class="mt-4" :study-id="studyId" />
-      </template>
       <template #tableActions="{ isInEditMode }">
         <div>
           <dropdown-panel-with-search

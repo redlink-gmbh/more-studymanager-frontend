@@ -629,6 +629,7 @@
         "notSet": "Es wurden noch keine Mess- und Reminder-Zeiten festgelegt.",
         "adaptMeassurment": "Messungszeiten anpassen",
         "meassurements": "Messzeiten",
+        "set": "Festgelegte Messzeiten",
         "meassurementsDescription": "Zudiesen Zieten werden mit Zielen zusammenhängende Messungen kontrolliert, um die Erreichung eines Ziels abzugleichen.",
         "times": {
           "morning": "Morgens",
@@ -649,12 +650,34 @@
       }
 
     },
+    "goalTemplateTopicList": {
+      "emptyListMessage": "Es wurden noch keine Kategorien hinzugefügt. Sobald welche vorhanden sind, scheinen sie in dieser Liste auf.",
+      "labels": {
+        "delete": "Zielkategorie löschen",
+        "add": "Zielkategorie hinzufügen"
+      },
+      "dialog": {
+        "header": {
+          "delete": "Zielkategorie löschen"
+        },
+        "msg": {
+          "delete": "Sind Sie sicher, dass Sie diese Zielkategorie löschen möchten? Alle zugehörigen Ziele werden ebenfalls gelöscht."
+        },
+          "deleteMsg": {
+            "intro": "Sie sind kurz davor folgende Zielkategorie zu löschen:",
+            "warning": "Eine gelöschte Zielkategorie kann nicht wiederhergestellt werden. Wenn Sie die Zielkategorie löschen, gehen alle Konfigurationen verloren.",
+            "confirm": "Möchten Sie diese Zielkategorie wirklich löschen?"
+        }
+      }
+    },
     "placeholder": {
       "chooseTemplateType": "Zieltemplatetyp auswählen",
       "enterMainPurpose": "Fügen Sie die Ziele der Studie hinzu."
     },
     "plural": "Zieltemplates",
     "props": {
+      "categoryTitle": "Kategorie",
+      "description": "Beschreibung",
       "goalType": "Zieltyp",
       "goalCategory": "Zielkategorie",
       "reminder": {
@@ -1411,6 +1434,7 @@
       "deleteStudyBtn": "Studie löschen",
       "deleteStudyGroupBtn": "Studiengruppe löschen",
       "deleteObservationGroupBtn": "Datenerhebungs-Gruppe löschen",
+      "deleteGoalCategory": "Zielkategorie löschen",
       "editBtn": "Bearbeiten Sie die gezeigten Eckdaten.",
       "goToStudy": "Studie öffnen",
       "saveChanges": "Änderungen speichern",
