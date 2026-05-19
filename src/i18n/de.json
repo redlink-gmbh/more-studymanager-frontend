@@ -569,29 +569,29 @@
   "goaltemplate": {
     "property": {
       "global": {
-          "appTitle": {
-            "name": "App Ziel Titel",
-            "description": "Der Default-Name des Ziels, welcher auf der Teilnehmer:innen App angezeigt wird.",
-            "placeholder": "App Titel eingeben"
-          },
-          "appDescription": {
-            "name": "App Ziel Beschreibung",
-            "description": "Die Beschreibung des Ziels, welche auf der App den Teilnehmer:innen angezeigt wird. Halten Sie die Beschreibung so kurz wie möglich, da diese sonst zu viel Platz einnimmt.",
-            "placeholder": "Füge Kurzbeschreibung des Ziels hinzu"
-          },
-          "goalTitleState": {
-            "name": "Überschreiben des Titels",
-            "description": "Erlaubt den Teilnehmer:innen bei der Personalisierung auf der App den Zieltitel anzupassen.",
-            "placeholder": "Überschreiben erlauben"
-          },
+        "appTitle": {
+          "name": "App Ziel Titel",
+          "description": "Der Default-Name des Ziels, welcher auf der Teilnehmer:innen App angezeigt wird.",
+          "placeholder": "App Titel eingeben"
+        },
+        "appDescription": {
+          "name": "App Ziel Beschreibung",
+          "description": "Die Beschreibung des Ziels, welche auf der App den Teilnehmer:innen angezeigt wird. Halten Sie die Beschreibung so kurz wie möglich, da diese sonst zu viel Platz einnimmt.",
+          "placeholder": "Füge Kurzbeschreibung des Ziels hinzu"
+        },
+        "goalTitleState": {
+          "name": "Überschreiben des Titels",
+          "description": "Erlaubt den Teilnehmer:innen bei der Personalisierung auf der App den Zieltitel anzupassen.",
+          "placeholder": "Überschreiben erlauben"
+        },
         "days-of-week": {
           "name": "Wochentage",
           "description": "Die Wochentage, an denen das Ziel erfüllt werden soll. Die Teilnehmer:innen können sich aus dem Range-Bereich einen Wert auf der App konfigurieren."
         },
-          "self-report-time": {
-            "name": "Sendungs Zeitpunkt",
-            "description": "Dies ist der Zeitpunkt, zu dem die Benachricthigung an die Teilnehmer:innen gesendet wird."
-          }
+        "self-report-time": {
+          "name": "Sendungs Zeitpunkt",
+          "description": "Dies ist der Zeitpunkt, zu dem die Benachricthigung an die Teilnehmer:innen gesendet wird."
+        }
       },
       "amountOfGoal": {
         "partOfTemplate": "Teil der Vorschau",
@@ -661,13 +661,13 @@
         "edit": "Zieltemplate bearbeiten",
         "view": "Details eines Zieltemplates"
       },
-      "label": {
-        "goalTemplateTitle": "Template-Titel",
-        "goalTitle": "Ziel Titel"
-      },
       "msg": {
         "delete": "Ein gelöschtes Zieltemplate kann nicht mehr wiederhergestellt werden! Möchten Sie das Zieltemplate wirklich löschen?"
       }
+    },
+    "label": {
+      "goalTemplateTitle": "Template-Titel",
+      "goalTitle": "Ziel Titel"
     },
     "error": {
       "addParticipantInfo": "Die Teilnehmerinformationen sind ein erforderliches Feld. Bitte fügen Sie eine Beschreibung hinzu.",
@@ -736,7 +736,6 @@
         "namePlaceholder": "Name der Kategorie",
         "descriptionPlaceholder": "Optionale Beschreibung"
       }
-
     },
     "goalTemplateTopicList": {
       "emptyListMessage": "Es wurden noch keine Kategorien hinzugefügt. Sobald welche vorhanden sind, scheinen sie in dieser Liste auf.",
@@ -751,10 +750,10 @@
         "msg": {
           "delete": "Sind Sie sicher, dass Sie diese Zielkategorie löschen möchten? Alle zugehörigen Ziele werden ebenfalls gelöscht."
         },
-          "deleteMsg": {
-            "intro": "Sie sind kurz davor folgende Zielkategorie zu löschen:",
-            "warning": "Eine gelöschte Zielkategorie kann nicht wiederhergestellt werden. Wenn Sie die Zielkategorie löschen, gehen alle Konfigurationen verloren.",
-            "confirm": "Möchten Sie diese Zielkategorie wirklich löschen?"
+        "deleteMsg": {
+          "intro": "Sie sind kurz davor folgende Zielkategorie zu löschen:",
+          "warning": "Eine gelöschte Zielkategorie kann nicht wiederhergestellt werden. Wenn Sie die Zielkategorie löschen, gehen alle Konfigurationen verloren.",
+          "confirm": "Möchten Sie diese Zielkategorie wirklich löschen?"
         }
       }
     },

@@ -302,6 +302,7 @@ Licensed under the Elastic License 2.0. */
           '640px': '90vw',
         },
         modal: true,
+        dismissableMask: false,
         draggable: false,
         closeOnEscape: false,
       },
@@ -326,12 +327,12 @@ Licensed under the Elastic License 2.0. */
       (goal: GoalTemplate) => goal.templateId === goalTemplateId,
     );
     if (goalTemplate) {
-      let dialogTitle = t('observation.dialog.header.edit');
+      let dialogTitle = t('goaltemplate.dialog.header.edit');
       if (
         props.studyStatus === StudyStatus.Active ||
         props.studyStatus === StudyStatus.Closed
       ) {
-        dialogTitle = t('observation.dialog.header.view');
+        dialogTitle = t('goaltemplate.dialog.header.view');
       }
       openComponentDialog(dialogTitle, goalTemplate);
     }

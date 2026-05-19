@@ -464,6 +464,7 @@ Licensed under the Elastic License 2.0. */
           '640px': '90vw',
         },
         modal: true,
+        dismissableMask: false,
         draggable: false,
         closeOnEscape: false,
       },

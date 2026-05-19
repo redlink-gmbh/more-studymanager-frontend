@@ -231,13 +231,17 @@ Licensed under the Elastic License 2.0. */
     if (!title.value) {
       errors.push({
         label: 'title',
-        value: t('observation.error.addTitle'),
+        value: isGoal
+          ? t('goaltemplate.error.addTitle')
+          : t('observation.error.addTitle'),
       } as MoreTableChoice);
     }
     if (!participantInfo.value) {
       errors.push({
         label: 'participantInfo',
-        value: t('observation.error.addParticipantInfo'),
+        value: isGoal
+          ? t('goaltemplate.error.addParticipantInfo')
+          : t('observation.error.addParticipantInfo'),
       } as MoreTableChoice);
     }
   }
@@ -281,7 +285,7 @@ Licensed under the Elastic License 2.0. */
         <h5 class="mb-1">
           {{
             isGoal
-              ? $t('goaltemplate.dialog.label.goalTitle')
+              ? $t('goaltemplate.label.goalTitle')
               : $t('observation.dialog.label.observationTitle')
           }}*
         </h5>
