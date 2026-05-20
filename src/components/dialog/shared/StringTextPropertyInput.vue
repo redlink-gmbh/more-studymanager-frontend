@@ -8,9 +8,12 @@ Licensed under the Elastic License 2.0. */
     StringTextProperty,
     StringProperty,
   } from '../../../models/InputModels';
-  import { PropType, watch } from 'vue';
+  import { PropType, watch, computed } from 'vue';
   import Textarea from 'primevue/textarea';
   import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
 
   const props = defineProps({
     property: {
@@ -30,6 +33,12 @@ Licensed under the Elastic License 2.0. */
   const emit = defineEmits<{
     (e: 'onInputChange', stringProperty: StringProperty): void;
   }>();
+
+  const placeholder = computed(() =>
+    props.property.description
+      ? t(`${props.property.description.split('.description')[0]}.placeholder`)
+      : undefined,
+  );
 
   watch(
     () => props.property.value,
@@ -61,11 +70,7 @@ Licensed under the Elastic License 2.0. */
       :required="property.required"
       :aria-describedby="`${property.id}-help`"
       :disabled="!editable || property.immutable"
-      :placeholder="
-        props.property.description
-          ? $t(props.property.description)
-          : $t('global.placeholder.enterTextValue')
-      "
+      :placeholder="placeholder ? placeholder : $t('global.placeholder.enterTextValue')"
     />
   </div>
 </template>

@@ -59,24 +59,36 @@ Licensed under the Elastic License 2.0. */
       return `<${p.id}>`;
     }
 
-    if (p.value === undefined || p.value === null || p.value === '') {
+    if (p.value === undefined || p.value === null || p.value === '' || String(p.value) === 'null') {
       return `<${p.id}>`;
     }
 
     if (p instanceof IntegerRangeProperty) {
       const val = p.value as any;
+
+      if (!val || (val.lower === null && val.upper === null)) {
+        return `<${p.id}>`;
+      }
+
       const min =
         val.min !== undefined
           ? val.min
-          : val.lower !== undefined
+          : val.lower !== undefined && val.lower !== null
             ? val.lower
             : 0;
       const max =
         val.max !== undefined
           ? val.max
-          : val.upper !== undefined
+          : val.upper !== undefined && val.upper !== null
             ? val.upper
             : 0;
+
+      // Handle cases where only one value might be null but we got some data
+      if (val.lower === null || val.upper === null) {
+          // If we want the ID as placeholder when it's incomplete, we can return ID.
+          // The user said "das gilt auch für die range elemente" referring to the placeholder ID logic.
+          return `<${p.id}>`;
+      }
 
       // Return a random value between min and max for the preview
       if (min === max) return `${min}`;

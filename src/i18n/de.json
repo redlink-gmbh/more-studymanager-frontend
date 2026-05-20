@@ -586,11 +586,14 @@
         },
         "days-of-week": {
           "name": "Wochentage",
-          "description": "Wochentage Bereich"
+          "description": "Wochentage Bereich",
+          "placeholder-min": "Mindestwert",
+          "placeholder-max": "Maximalwert"
         },
         "self-report-time": {
           "name": "Sendungs Zeitpunkt",
-          "description": "Dies ist der Zeitpunkt, zu dem die Benachricthigung an die Teilnehmer:innen gesendet wird."
+          "description": "Dies ist der Zeitpunkt, zu dem die Benachricthigung an die Teilnehmer:innen gesendet wird.",
+          "placeholder": "Zeitpunkte auswählen"
         }
       },
       "amountOfGoal": {
@@ -623,47 +626,58 @@
           "description": "Dies sind die Optionen für die Ziel-Einstellungen, mit dem die Teilnehmer:innen ihr persönliches Ziel anpassen können.",
           "amount": {
             "name": "Anzahl",
-            "description": "Bereich für die Zielerreichung"
+            "description": "Bereich für die Zielerreichung",
+            "placeholder-min": "Mindestwert",
+            "placeholder-max": "Maximalwert"
           },
           "unit": {
             "name": "Einheit",
-            "description": "Die Einheit für Zielwerte (z.B. Glas Wasser)"
+            "description": "Die Einheit für Zielwerte (z.B. Glas Wasser)",
+            "placeholder": "Einheit eingeben"
           }
         },
         "status-100-reached": {
           "name": "100% erreicht",
-          "description": "Text der bei 100% Zielerreichung angezeigt wird."
+          "description": "Text der bei 100% Zielerreichung angezeigt wird.",
+          "placeholder": "Statustext für '100'% eingeben"
         },
         "status-75-reached": {
           "name": "75% erreicht",
-          "description": "Text der bei 75%+ Zielerreichung angezeigt wird."
+          "description": "Text der bei 75%+ Zielerreichung angezeigt wird.",
+          "placeholder": "Statustext für '75'% eingeben"
         },
         "status-not-reached": {
           "name": "Noch nicht erreicht",
-          "description": "Text der zwischen 0 und 75% Zielerreichung angezeigt wird."
+          "description": "Text der zwischen 0 und 75% Zielerreichung angezeigt wird.",
+          "placeholder": "Statustext für 'noch nicht erreicht' eingeben"
         },
         "self-report-question": {
           "name": "Fargetext",
-          "description": "Dies ist die Nachricht, die an die Teilnehmer:innen gesendet wird."
+          "description": "Dies ist die Nachricht, die an die Teilnehmer:innen gesendet wird.",
+          "placeholder": "Fargetext eingeben"
         },
         "status-day-not-consumed": {
           "name": "Nichts konsumiert",
-          "description": "Dieser Status wird angezeigt, wenn an dem Tag nichts konsumiert wurde."
+          "description": "Dieser Status wird angezeigt, wenn an dem Tag nichts konsumiert wurde.",
+          "placeholder": "Statustext für 'Nichts konsumiert' eingeben"
         },
         "status-day-under-limit": {
           "name": "Unter dem Limit",
-          "description": "Dieser Status wird angezeigt, wenn der/die Teilnehmer:in unter dem Limit liegt."
+          "description": "Dieser Status wird angezeigt, wenn der/die Teilnehmer:in unter dem Limit liegt.",
+          "placeholder": "Statustext für 'Unter dem Limit' eingeben"
         },
         "status-day-over-limit": {
           "name": "Über dem Limit",
-          "description": "Dieser Status wird angezeigt, wenn das Limit überschritten wurde."
+          "description": "Dieser Status wird angezeigt, wenn das Limit überschritten wurde.",
+          "placeholder": "Statustext für 'Über dem Limit' eingeben"
         }
       },
       "reduceAmountOf": {
         "goal": {
           "activity": {
             "name": "Aktion",
-            "description": "Was wird gemacht?"
+            "description": "Was wird gemacht?",
+            "placeholder": "Aktion eingeben"
           }
         }
       }

@@ -5,9 +5,12 @@ Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Elastic License 2.0. */
 <script setup lang="ts">
   import { IntegerRangeProperty } from '../../../models/InputModels';
-  import { PropType, watch } from 'vue';
+  import { PropType, watch, computed } from 'vue';
   import InputNumber from 'primevue/inputnumber';
   import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
 
   const props = defineProps({
     property: {
@@ -27,6 +30,18 @@ Licensed under the Elastic License 2.0. */
   const emit = defineEmits<{
     (e: 'onInputChange', rangeInput: IntegerRangeProperty): void;
   }>();
+
+  const placeholderLower = computed(() =>
+    props.property.description
+      ? t(`${props.property.description.split('.description')[0]}.placeholder-min`)
+      : undefined,
+  );
+
+  const placeholderUpper = computed(() =>
+    props.property.description
+      ? t(`${props.property.description.split('.description')[0]}.placeholder-max`)
+      : undefined,
+  );
 
   watch(
     () => props.property.value?.lower,
@@ -99,6 +114,9 @@ Licensed under the Elastic License 2.0. */
           :disabled="!editable || property.immutable"
           :min="property.minLimit"
           :max="property.maxLimit"
+          :placeholder="
+            placeholderLower ? placeholderLower : $t('global.placeholder.enterTextValue')
+          "
         />
       </div>
       <div class="flex items-center gap-2">
@@ -114,6 +132,9 @@ Licensed under the Elastic License 2.0. */
           :disabled="!editable || property.immutable"
           :min="property.minLimit"
           :max="property.maxLimit"
+          :placeholder="
+            placeholderUpper ? placeholderUpper : $t('global.placeholder.enterTextValue')
+          "
         />
       </div>
     </div>

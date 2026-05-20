@@ -470,7 +470,7 @@ Licensed under the Elastic License 2.0. */
         ></Textarea>
       </div>
       <div v-if="properties.length" class="col-span-8 col-start-0">
-        <h5 class="mb-2">{{ $t('global.labels.config') }}</h5>
+        <h5 v-if="componentType === 'observation'" class="mb-2">{{ $t('global.labels.config') }}</h5>
         <div class="col-span-8 col-start-0">
           <div v-if="properties">
             <PropertyInputs

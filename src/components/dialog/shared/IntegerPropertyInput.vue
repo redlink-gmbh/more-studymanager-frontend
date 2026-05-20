@@ -5,9 +5,12 @@ Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Elastic License 2.0. */
 <script setup lang="ts">
   import { IntegerProperty } from '../../../models/InputModels';
-  import { PropType, watch } from 'vue';
+  import { PropType, watch, computed } from 'vue';
   import InputNumber from 'primevue/inputnumber';
   import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
 
   const props = defineProps({
     property: {
@@ -27,6 +30,12 @@ Licensed under the Elastic License 2.0. */
   const emit = defineEmits<{
     (e: 'onInputChange', integerInput: IntegerProperty): void;
   }>();
+
+  const placeholder = computed(() =>
+    props.property.description
+      ? t(`${props.property.description.split('.description')[0]}.placeholder`)
+      : undefined,
+  );
 
   watch(
     () => props.property.value,
@@ -61,6 +70,7 @@ Licensed under the Elastic License 2.0. */
       :disabled="!editable || property.immutable"
       class="w-full"
       :aria-describedby="`${property.id}-help`"
+      :placeholder="placeholder ? placeholder : $t('global.placeholder.enterTextValue')"
     />
   </div>
 </template>
