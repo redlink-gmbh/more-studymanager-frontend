@@ -161,7 +161,7 @@
       </Popover>
     </div>
   </div>
-  <div class="mb-4 text-sm text-gray-600">
+  <div class="mb-4">
     {{ $t('goaltemplate.goalTemplateList.meassurementTimes.description') }}
   </div>
   <div

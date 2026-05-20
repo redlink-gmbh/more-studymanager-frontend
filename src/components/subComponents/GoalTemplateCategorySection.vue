@@ -172,7 +172,7 @@
         />
       </Button>
     </div>
-    <p class="mb-4 text-sm text-gray-600">
+    <p class="mb-4">
       {{ t('goaltemplate.goalTemplateList.categories.description') }}
     </p>
 

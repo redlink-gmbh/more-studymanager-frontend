@@ -54,27 +54,34 @@ Licensed under the Elastic License 2.0. */
   );
 
   const goalTemplateListMap: ComputedRef<GoalTemplateMap[]> = computed(() => {
-    return goalTemplateStore.goalTemplatesMap.map((item) => ({
-      ...item,
-      goalTypeLabel: t(item.goalTypeLabel),
-      categoryKind: t(`goaltemplate.factory.type.${item.categoryKind}Goal`),
-      categoryTopics: goalTemplateStore.getTopicNames(item.categoryTopics ?? []),
-      adhearanceCheckLabels:
-        item.adhearanceCheckLabels?.length === 0
-          ? '-'
-          : item.adhearanceCheckLabels
-              .map((ad: string) =>
-                t(`goaltemplate.goalTemplateList.meassurmentTimes.itmes.${ad}`),
+    return goalTemplateStore.goalTemplatesMap.map(
+      (item) =>
+        ({
+          ...item,
+          goalTypeLabel: t(item.goalTypeLabel),
+          categoryKind: t(`goaltemplate.factory.type.${item.categoryKind}Goal`),
+          categoryTopics: goalTemplateStore.getTopicNames(
+            item.categoryTopics ?? [],
+          ),
+          adhearanceCheckLabels:
+            item.adhearanceCheckLabels?.length === 0
+              ? '-'
+              : item.adhearanceCheckLabels
+                  .map((ad: string) =>
+                    t(
+                      `goaltemplate.goalTemplateList.meassurmentTimes.itmes.${ad}`,
+                    ),
+                  )
+                  .join(','),
+          observationGroupValues: item.observationGroupIds?.length
+            ? item.observationGroupIds.map((id) =>
+                observationGroupStatuses.value?.find(
+                  (groupStatus) => groupStatus.value === id.toString(),
+                ),
               )
-              .join(','),
-      observationGroupValues: item.observationGroupIds?.length
-        ? item.observationGroupIds.map((id) =>
-            observationGroupStatuses.value?.find(
-              (groupStatus) => groupStatus.value === id.toString(),
-            ),
-          )
-        : [],
-    } as any));
+            : [],
+        }) as any,
+    );
   });
 
   const dialog = useDialog();
@@ -457,9 +464,9 @@ Licensed under the Elastic License 2.0. */
         </div>
       </div>
       <div class="global-goal-settings">
-        <GoalTemplateMessurementSection :study-id="studyId" />
+        <GoalTemplateMessurementSection :study-id="studyId" class="mb-8" />
         <GoalTemplateCategorySection
-          class="mt-4"
+          class="mb-8"
           :study-id="studyId"
           :study-status="studyStatus"
         />

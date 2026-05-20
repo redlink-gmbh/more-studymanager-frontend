@@ -80,7 +80,8 @@
         "error": "Error",
         "info": "Info",
         "warning": "Warning"
-      }
+      },
+      "unknownPropertyType": "Unknown Type"
     },
     "footer": {
       "aboutMore": "About More"
@@ -109,6 +110,8 @@
       "isRequired": "Required",
       "lastCollected": "Last collected",
       "lastDataReceived": "Last data received",
+      "min": "Minimum",
+      "max": "Maximum",
       "lastEdited": "Last edited",
       "message": "Message",
       "modules": "Modules",
@@ -562,6 +565,260 @@
       "dataHealth": "State"
     },
     "singular": "Observation"
+  },
+  "goaltemplate": {
+    "property": {
+      "global": {
+        "appTitle": {
+          "name": "App Goal Title",
+          "description": "The default name of the goal displayed in the participant app.",
+          "placeholder": "Enter app title"
+        },
+        "appDescription": {
+          "name": "App Goal Description",
+          "description": "The description of the goal displayed to participants in the app. Keep the description as short as possible, otherwise it will take up too much space.",
+          "placeholder": "Add a short goal description"
+        },
+        "goalTitleState": {
+          "name": "Allow Title Override",
+          "description": "Allows participants to customize the goal title during personalization in the app.",
+          "placeholder": "Allow overriding"
+        },
+        "days-of-week": {
+          "name": "Days of the Week",
+          "description": "Days of the week range",
+          "placeholder-min": "Minimum value",
+          "placeholder-max": "Maximum value"
+        },
+        "self-report-time": {
+          "name": "Notification Time",
+          "description": "This is the time at which the notification is sent to participants.",
+          "placeholder": "Select times"
+        }
+      },
+      "amountOfGoal": {
+        "partOfTemplate": "Part of the preview",
+        "section": {
+          "configuration": {
+            "name": "Goal Configuration",
+            "description": "Here you can configure the goal template. The configured values allow participants to personalize the goal in the app."
+          },
+          "goal": {
+            "name": "Configure Goal Settings",
+            "description": "The following goal settings define which values are available to participants for personalizing the goal."
+          },
+          "status-texts": {
+            "name": "Status Texts",
+            "description": "These texts are displayed in the app based on an algorithm. They should be motivating texts that encourage participants."
+          },
+          "self-report": {
+            "name": "Self-Report Notification",
+            "description": "Here you can send a notification to participants at a specific time to verify goal achievement."
+          }
+        },
+        "goal-preview": {
+          "name": "Goal Preview",
+          "description": "The goal is displayed in the app as follows:",
+          "partOfTemplate": "Part of the preview"
+        },
+        "goal": {
+          "name": "Goal Settings",
+          "description": "These are the options for the goal settings that participants can use to customize their personal goal.",
+          "amount": {
+            "name": "Amount",
+            "description": "Range for goal achievement",
+            "placeholder-min": "Minimum value",
+            "placeholder-max": "Maximum value"
+          },
+          "unit": {
+            "name": "Unit",
+            "description": "The unit for goal values (e.g. glass of water)",
+            "placeholder": "Enter unit"
+          }
+        },
+        "status-100-reached": {
+          "name": "100% Reached",
+          "description": "Text displayed when 100% of the goal is achieved.",
+          "placeholder": "Enter status text for '100%'"
+        },
+        "status-75-reached": {
+          "name": "75% Reached",
+          "description": "Text displayed when 75%+ of the goal is achieved.",
+          "placeholder": "Enter status text for '75%'"
+        },
+        "status-not-reached": {
+          "name": "Not Yet Reached",
+          "description": "Text displayed between 0 and 75% goal achievement.",
+          "placeholder": "Enter status text for 'not yet reached'"
+        },
+        "self-report-question": {
+          "name": "Question Text",
+          "description": "This is the message sent to participants.",
+          "placeholder": "Enter question text"
+        },
+        "status-day-not-consumed": {
+          "name": "Nothing Consumed",
+          "description": "This status is displayed when nothing was consumed that day.",
+          "placeholder": "Enter status text for 'nothing consumed'"
+        },
+        "status-day-under-limit": {
+          "name": "Below the Limit",
+          "description": "This status is displayed when the participant is below the limit.",
+          "placeholder": "Enter status text for 'below the limit'"
+        },
+        "status-day-over-limit": {
+          "name": "Above the Limit",
+          "description": "This status is displayed when the limit has been exceeded.",
+          "placeholder": "Enter status text for 'above the limit'"
+        }
+      },
+      "reduceAmountOf": {
+        "goal": {
+          "activity": {
+            "name": "Activity",
+            "description": "What is being done?",
+            "placeholder": "Enter activity"
+          }
+        }
+      }
+    },
+    "dialog": {
+      "deleteMsg": {
+        "confirm": "Do you really want to delete this goal template?",
+        "intro": "You are about to delete the following goal template:",
+        "warning": "A deleted goal template cannot be restored. If you delete the goal template, all configurations will be lost."
+      },
+      "header": {
+        "clone": "Clone Goal Template",
+        "create": "Add Goal Template",
+        "delete": "Delete Goal Template",
+        "edit": "Edit Goal Template",
+        "view": "Goal Template Details"
+      },
+      "msg": {
+        "delete": "A deleted goal template cannot be restored! Do you really want to delete the goal template?"
+      }
+    },
+    "label": {
+      "goalTemplateTitle": "Template Title",
+      "goalTitle": "Goal Title",
+      "categoryTitle": "Category Title"
+    },
+    "error": {
+      "addParticipantInfo": "Participant information is a required field. Please add a description.",
+      "addTitle": "The goal template title is a required field. Please add a title.",
+      "addCategory": "The category is a required field. Please select at least one category.",
+      "noValidField": "Error in value {key}: {message}",
+      "addSchedule": "Please select at least one measurement time.",
+      "integerRange": "The minimum value must not be greater than the maximum value.",
+      "integerRangeMinLimit": "The value must not be smaller than {min}.",
+      "integerRangeMaxLimit": "The value must not be greater than {max}.",
+      "noSimpleSchedulerOptions": "No measurement times have been set yet. Please close the dialog and configure at least one measurement time to create a goal template."
+    },
+    "factory": {
+      "trink-amount-of": {
+        "description": "This goal defines daily fluid intake. It supports building a healthy drinking habit and drinking enough regularly.",
+        "name": "Fluid Intake"
+      },
+      "eat-amount-of": {
+        "description": "This goal defines the daily intake of a product. It supports building healthy eating habits.",
+        "name": "Food Intake"
+      },
+      "reduce-amount-of": {
+        "description": "This goal helps limit unhealthy consumption (e.g. smoking, alcohol).",
+        "name": "Reduce Consumption"
+      },
+      "smoking": {
+        "description": "This goal helps reduce cigarette consumption and gradually achieve lower smoking levels in daily life.",
+        "title": "Reduce Smoking"
+      },
+      "type": {
+        "behavioralGoal": "Behavioral Goal",
+        "outcomeGoal": "Outcome Goal"
+      },
+      "category": {
+        "nutrition": "Nutrition",
+        "smoking": "Smoking"
+      }
+    },
+    "goalTemplateList": {
+      "action": {
+        "add": "Add Goal Template"
+      },
+      "description": "A goal template is created from a goal type and customized for the study and participants. It consists of a goal definition, customizable values, and a measurable component. These templates are used in the app to allow participants to configure and create a personal goal.",
+      "emptyListMsg": "Manage or add a goal template. They will be displayed here.",
+      "title": "Goal Templates",
+      "configuration": "Global Template Configuration",
+      "meassurementTimes": {
+        "title": "Measurement and Reminder Times",
+        "description": "The times defined here are used to check collected data for goal achievement at a specific point in time. This may involve comparing linked data such as Garmin step data or sending reminders for simple goals such as daily water consumption.",
+        "notSet": "No measurement and reminder times have been defined yet.",
+        "adaptMeassurment": "Adjust Measurement Times",
+        "meassurements": "Measurement Times",
+        "set": "Defined Measurement Times",
+        "meassurementsDescription": "At these times, measurements related to goals are checked to verify goal achievement.",
+        "times": {
+          "morning": "Morning",
+          "noon": "Noon",
+          "afternoon": "Afternoon",
+          "evening": "Evening",
+          "night": "Night"
+        },
+        "planer": "The times configured here trigger a measurement request that is sent directly to the participants' app."
+      },
+      "categories": {
+        "title": "Template Categories",
+        "description": "Template categories are displayed in the app as groups for goals. You can use them to organize and group your goals.",
+        "edit": "Edit Categories",
+        "add": "Add Category",
+        "delete": "Delete Category",
+        "namePlaceholder": "Category name",
+        "descriptionPlaceholder": "Optional description"
+      }
+    },
+    "goalTemplateTopicList": {
+      "emptyListMessage": "No categories have been added yet. Once available, they will appear in this list.",
+      "labels": {
+        "delete": "Delete Goal Category",
+        "add": "Add Goal Category"
+      },
+      "dialog": {
+        "header": {
+          "delete": "Delete Goal Category"
+        },
+        "msg": {
+          "delete": "Are you sure you want to delete this goal category? All associated goals will also be deleted."
+        },
+        "deleteMsg": {
+          "intro": "You are about to delete the following goal category:",
+          "warning": "A deleted goal category cannot be restored. If you delete the goal category, all configurations will be lost.",
+          "confirm": "Do you really want to delete this goal category?"
+        }
+      }
+    },
+    "placeholder": {
+      "chooseTemplateType": "Select goal template type",
+      "enterMainPurpose": "Add the study goals."
+    },
+    "plural": "Goal Templates",
+    "props": {
+      "categoryTitle": "Category",
+      "description": "Description",
+      "goalType": "Goal Type",
+      "goalCategory": "Goal Category",
+      "adhearanceCheck": "Measurement Times",
+      "reminder": {
+        "false": "No Reminder",
+        "true": "Reminder"
+      },
+      "goalTemplateType": {
+        "liquidity": "Fluid Intake",
+        "smoking": "Quit Smoking"
+      },
+      "type": "Type",
+      "dataHealth": "Status"
+    },
+    "singular": "Goal Template"
   },
   "participants": {
     "applicationAccess": {
@@ -1294,15 +1551,18 @@
       "cloneObservation": "Clone observation",
       "copyStudyUrl": "Share study",
       "deleteCollaborator": "Delete collaborator",
+      "cloneGoalTemplate": "Clone Goal Template",
       "deleteIntegration": "Delete integration",
       "deleteIntervention": "Delete intervention",
       "deleteObservation": "Delete observation",
       "deleteParticipantBtn": "Delete participant",
       "deleteStudyBtn": "Delete study",
+      "deleteGoalTemplate": "Delete Goal Template",
       "deleteStudyGroupBtn": "Delete study group",
       "deleteObservationGroupBtn": "Delete observation group",
       "editBtn": "Edit shown properties.",
       "goToStudy": "Go to study",
+      "deleteGoalCategory": "Delete Goal Category",
       "saveChanges": "Save changes",
       "showQrCode": "Show QR code",
       "showStudy": "Click on row to show study details page.",
