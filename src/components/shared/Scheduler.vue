@@ -121,8 +121,8 @@ Licensed under the Elastic License 2.0. */
     }
   }
 
-  let errors: MoreTableChoice[] = [];
-  let warnings: MoreTableChoice[] = [];
+  const errors: Ref<MoreTableChoice[]> = ref([]);
+  const warnings: Ref<MoreTableChoice[]> = ref([]);
 
   function getErrorOrWarning(
     type: string,
@@ -130,13 +130,13 @@ Licensed under the Elastic License 2.0. */
   ): string | null | undefined {
     switch (type) {
       case 'warning': {
-        const item = warnings.find((el) =>
+        const item = warnings.value.find((el) =>
           el.label === label ? el.value : '',
         );
         return item?.value;
       }
       case 'error': {
-        const item = errors.find((el) => (el.label === label ? el.value : ''));
+        const item = errors.value.find((el) => (el.label === label ? el.value : ''));
         return item?.value;
       }
       default:
@@ -149,8 +149,8 @@ Licensed under the Elastic License 2.0. */
     newValue: Date,
     oldValue: Date,
   ): void {
-    errors = [];
-    warnings = [];
+    errors.value = [];
+    warnings.value = [];
 
     const updateHours = (targetDate: Ref<Date>, sourceDate: Date): void => {
       targetDate.value.setHours(
@@ -174,7 +174,7 @@ Licensed under the Elastic License 2.0. */
               calendarEndChangedWithStart = false;
             }, 60);
 
-            warnings.push({
+            warnings.value.push({
               label: 'endWasChangedWithStartValue',
               value: t(
                 'scheduler.warningsAndErrors.endWasChangedWithStartValue',
@@ -259,7 +259,7 @@ Licensed under the Elastic License 2.0. */
       returnSchedule.value.rrule = undefined;
     }
 
-    if (!errors.length && !rruleErrors.length) {
+    if (!errors.value.length && !rruleErrors.length) {
       try {
         dialogRef.value.close(returnSchedule.value);
       } catch (e) {

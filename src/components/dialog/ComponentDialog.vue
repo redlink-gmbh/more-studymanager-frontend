@@ -34,6 +34,7 @@ Licensed under the Elastic License 2.0. */
   import { useObservationGroupStore } from '../../stores/observationGroupStore';
   import ObservationToggle from '../subComponents/ObservationToggle.vue';
   import { extractCurrentLimeDomain } from '../../utils/limeSurveyUtils';
+  import { scrollToFirstError } from '../../utils/componentUtils';
 
   const { handleToastErrors, showErrorToast } = useToastService();
   const dialog = useDialog();
@@ -161,7 +162,8 @@ Licensed under the Elastic License 2.0. */
 
   function validate(): void {
     checkRequiredFields();
-    if (errors.length > 0) {
+    if (errors.value.length > 0) {
+      scrollToFirstError();
       return;
     }
 
@@ -267,12 +269,12 @@ Licensed under the Elastic License 2.0. */
     }
   }
 
-  let errors: MoreTableChoice[] = [];
+  const errors: Ref<MoreTableChoice[]> = ref([]);
 
   function checkRequiredFields(): void {
-    errors = [];
+    errors.value = [];
     if (!title.value) {
-      errors.push({
+      errors.value.push({
         label: 'title',
         value: isGoal
           ? t('goaltemplate.error.addTitle')
@@ -280,7 +282,7 @@ Licensed under the Elastic License 2.0. */
       } as MoreTableChoice);
     }
     if (!participantInfo.value) {
-      errors.push({
+      errors.value.push({
         label: 'participantInfo',
         value: isGoal
           ? t('goaltemplate.error.addParticipantInfo')
@@ -288,13 +290,13 @@ Licensed under the Elastic License 2.0. */
       } as MoreTableChoice);
     }
     if (hasSimpleScheduler && simpleSchedulerSelection.value.length === 0) {
-      errors.push({
+      errors.value.push({
         label: 'scheduler',
         value: t('goaltemplate.error.addSchedule'),
       } as MoreTableChoice);
     }
     if (isGoal && hasComponentCategories && categories.value.length === 0) {
-      errors.push({
+      errors.value.push({
         label: 'categories',
         value: t('goaltemplate.error.addCategory'),
       } as MoreTableChoice);
@@ -302,7 +304,7 @@ Licensed under the Elastic License 2.0. */
   }
 
   function getError(label: string): string | null | undefined {
-    return errors.find((el) => el.label === label)?.value;
+    return errors.value.find((el) => el.label === label)?.value;
   }
 
   function cancel(): void {
@@ -344,7 +346,7 @@ Licensed under the Elastic License 2.0. */
               : $t('observation.dialog.label.observationTitle')
           }}*
         </h5>
-        <div v-if="getError('title')" class="error mb-4">
+        <div v-if="getError('title')" class="error error-label mb-4">
           {{ getError('title') }}
         </div>
         <div class="col-span-8 col-start-0" :class="{ 'pb-4': !editable }">
@@ -364,7 +366,7 @@ Licensed under the Elastic License 2.0. */
         :class="{ 'pb-4': !editable }"
       >
         <h5 class="mb-1">{{ $t('goaltemplate.label.categoryTitle') }}*</h5>
-        <div v-if="getError('categories')" class="error mb-4">
+        <div v-if="getError('categories')" class="error error-label mb-4">
           {{ getError('categories') }}
         </div>
         <MultiSelect
@@ -380,7 +382,7 @@ Licensed under the Elastic License 2.0. */
       </div>
       <div v-if="hasSimpleScheduler" class="col-span-8 col-start-0">
         <h5 class="mb-1">{{ $t('scheduler.singular') }}*</h5>
-        <div v-if="getError('scheduler')" class="error mb-4">
+        <div v-if="getError('scheduler')" class="error error-label mb-4">
           {{ getError('scheduler') }}
         </div>
         <div v-if="hasSimpleScheduler.length > 0">
@@ -455,7 +457,7 @@ Licensed under the Elastic License 2.0. */
         <h5 :class="getError('participantInfo') ? 'mb-1' : 'mb-2'">
           {{ $t('study.props.participantInfo') }}*
         </h5>
-        <div v-if="getError('participantInfo')" class="error mb-4">
+        <div v-if="getError('participantInfo')" class="error error-label mb-4">
           {{ getError('participantInfo') }}
         </div>
         <Textarea
@@ -584,7 +586,10 @@ Licensed under the Elastic License 2.0. */
             :type="editable ? 'submit' : 'button'"
             :label="$t('global.labels.save')"
             :disabled="!editable"
-            @click="checkRequiredFields()"
+            @click="
+              checkRequiredFields();
+              scrollToFirstError();
+            "
           />
         </div>
       </div>

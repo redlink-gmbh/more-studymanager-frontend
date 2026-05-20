@@ -74,7 +74,7 @@ Licensed under the Elastic License 2.0. */
         <label :for="`${property.id}-lower`" class="font-bold">{{
           $t(property.name)
         }}</label>
-        <PartOfTemplateBadge :visible="isPartOfTemplate" />
+        <PartOfTemplateBadge :visible="isPartOfTemplate" :component-id="property.id" />
       </div>
       <h6
         v-if="

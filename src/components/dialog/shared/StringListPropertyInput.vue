@@ -54,7 +54,7 @@ Licensed under the Elastic License 2.0. */
       <label>
         {{ $t(property.name) }}<span v-if="property.required">*</span>
       </label>
-      <PartOfTemplateBadge :visible="isPartOfTemplate" />
+      <PartOfTemplateBadge :visible="isPartOfTemplate" :component-id="property.id" />
     </h6>
     <div>{{ $t(props.property.description) }}</div>
     <div v-if="editable" class="flex w-full flex-col gap-1">

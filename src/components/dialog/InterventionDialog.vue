@@ -30,6 +30,7 @@ Licensed under the Elastic License 2.0. */
   import { PropertyEmit, StringEmit } from '../../models/PropertyInputModels';
   import MultiSelect from 'primevue/multiselect';
   import { useObservationGroupStore } from '../../stores/observationGroupStore';
+  import { scrollToFirstError } from '../../utils/componentUtils';
 
   const { componentsApi } = useComponentsApi();
   const studyStore = useStudyStore();
@@ -190,7 +191,12 @@ Licensed under the Elastic License 2.0. */
   }
 
   function save(): void {
-    if (errors.length === 0) {
+    checkErrors();
+    if (errors.value.length > 0) {
+      scrollToFirstError();
+      return;
+    }
+    if (errors.value.length === 0) {
       Promise.all(
         [
           ...actionsArray.value.map((action: Action, id) => ({
@@ -274,30 +280,30 @@ Licensed under the Elastic License 2.0. */
     }
   }
 
-  let errors: MoreTableChoice[] = [];
+  const errors: Ref<MoreTableChoice[]> = ref([]);
 
   function checkErrors(): void {
-    errors = [];
+    errors.value = [];
     if (!title.value) {
-      errors.push({
+      errors.value.push({
         label: 'title',
         value: t('intervention.error.addTitle'),
       } as MoreTableChoice);
     }
     if (typeof triggerProperties.value === 'undefined') {
-      errors.push({
+      errors.value.push({
         label: ListComponentsComponentTypeEnum.Trigger,
         value: t('intervention.error.addTriggerTypeConfig'),
       } as MoreTableChoice);
     }
     if (!actionsArray.value.length) {
-      errors.push({
+      errors.value.push({
         label: ListComponentsComponentTypeEnum.Action,
         value: t('intervention.error.addAction'),
       } as MoreTableChoice);
     }
     if (propInputError) {
-      errors.push({
+      errors.value.push({
         label: 'propInputError',
         value: t('intervention.error.triggerProp'),
       } as MoreTableChoice);
@@ -305,7 +311,7 @@ Licensed under the Elastic License 2.0. */
   }
 
   function getError(label: string): string | null | undefined {
-    return errors.find((el) => el.label === label)?.value;
+    return errors.value.find((el) => el.label === label)?.value;
   }
 
   function cancel(): void {
@@ -390,7 +396,7 @@ Licensed under the Elastic License 2.0. */
     >
       <div class="col-start-0 col-span-8 mt-2" :class="{ 'pb-4': !editable }">
         <h5>{{ $t('intervention.dialog.label.interventionTitle') }}*</h5>
-        <div v-if="getError('title')" class="error col-span-8 mb-2">
+        <div v-if="getError('title')" class="error error-label col-span-8 mb-2">
           {{ getError('title') }}
         </div>
         <InputText
@@ -438,7 +444,7 @@ Licensed under the Elastic License 2.0. */
         <div class="col-span-6">
           <div
             v-if="getError(ListComponentsComponentTypeEnum.Trigger)"
-            class="error col-span-8 mb-4"
+            class="error error-label col-span-8 mb-4"
           >
             {{ getError(ListComponentsComponentTypeEnum.Trigger) }}
           </div>
@@ -505,13 +511,13 @@ Licensed under the Elastic License 2.0. */
           </Button>
           <div
             v-if="getError(ListComponentsComponentTypeEnum.Action)"
-            class="error col-span-8 mb-4"
+            class="error error-label col-span-8 mb-4"
           >
             {{ getError(ListComponentsComponentTypeEnum.Action) }}
           </div>
           <Menu ref="actionMenu" :model="actionTypesOptions" :popup="true" />
         </div>
-        <div v-if="actionsEmptyError" class="error col-span-8">
+        <div v-if="actionsEmptyError" class="error error-label col-span-8">
           {{ actionsEmptyError }}
         </div>
         <div

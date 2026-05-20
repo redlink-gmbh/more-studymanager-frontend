@@ -184,8 +184,13 @@ Licensed under the Elastic License 2.0. */
     class="col-span-8 col-start-0 grid grid-cols-8"
     :class="{ 'scheduler-not-editable pb-4': !editable }"
   >
-    <h5 class="col-span-8 col-start-0">{{ $t('scheduler.singular') }}*</h5>
+    <h5 class="col-span-8 col-start-0" :class="{ 'error-label': !!error }">
+      {{ $t('scheduler.singular') }}*
+    </h5>
     <div class="col-span-8 mb-3">{{ getSchedulerDescription() }}</div>
+    <div v-if="error" class="error error-label col-span-8 mb-4">
+      {{ error }}
+    </div>
     <div
       v-if="isObjectEmpty(scheduler)"
       class="schedule-preview col-span-8 mb-2 px-6 py-4 italic"
