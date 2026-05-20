@@ -772,6 +772,7 @@
       "description": "Beschreibung",
       "goalType": "Zieltyp",
       "goalCategory": "Zielkategorie",
+      "adhearanceCheck": "Messungszeiten",
       "reminder": {
         "false": "Keine Erinnerung",
         "true": "Erinnerung"

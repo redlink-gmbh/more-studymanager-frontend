@@ -151,7 +151,6 @@ Licensed under the Elastic License 2.0. */
           draggable: false,
         },
         onClose: (options) => {
-          console.log('on close in component dialog: ', options?.data, ' -')
           if (options?.data) {
             scheduler.value = options.data;
           }
@@ -161,9 +160,7 @@ Licensed under the Elastic License 2.0. */
   }
 
   function validate(): void {
-    console.log('validate')
-    checkRequiredFields();
-    console.log('check required fields...', errors.length)
+    checkRequiredFields();;
     if (errors.length > 0) {
       return;
     }
@@ -171,14 +168,15 @@ Licensed under the Elastic License 2.0. */
     let parsedProps: any;
     try {
       parsedProps = Property.toJson(properties.value);
-      console.log('parsedProps: ', parsedProps, ' -')
       componentsApi
         .validateProperties(
           componentType,
           component.type as string,
           parsedProps,
         )
-        .then((response: any) => response.data)
+        .then((response: any) => {
+          return response.data;
+        })
         .then((report: ValidationReport) => {
           if (report.valid) {
             save(parsedProps);
@@ -205,6 +203,8 @@ Licensed under the Elastic License 2.0. */
     return date;
   };
 
+  console.error(component);
+
   function save(props: any): void {
     if (!hasSimpleScheduler && isObjectEmpty(scheduler.value)) {
       if (studyStore.study.plannedStart && studyStore.study.plannedEnd) {
@@ -224,36 +224,44 @@ Licensed under the Elastic License 2.0. */
       }
     }
 
-    const returnComponent = {
-      observationId: component.observationId,
-      title: title.value,
-      purpose: purpose.value,
-      participantInfo: participantInfo.value,
-      observationGroupIds: selectedObservationGroups.value?.length
-        ? selectedObservationGroups.value.map((id: string) => parseInt(id))
-        : [],
-      type: component.type,
-      properties: props,
-      schedule: hasSimpleScheduler
-        ? hasSimpleScheduler.filter((s) =>
-            simpleSchedulerSelection.value.includes(s.key),
-          )
-        : scheduler.value,
-      studyGroupId: studyGroupId.value,
-      hidden: hidden.value,
-      reminder: reminder.value,
-    };
-
-    console.log('returnComponent: ', returnComponent, ' -')
-
-    if (componentType === 'goalTemplate') {
-      returnComponent.categories = {
-        kind: component.categories?.kind ?? 'behavioral',
-        topics: categories.value,
+    if (componentType === 'observation') {
+      const returnComponent = {
+        observationId: component.observationId,
+        title: title.value,
+        purpose: purpose.value,
+        participantInfo: participantInfo.value,
+        observationGroupIds: selectedObservationGroups.value?.length
+          ? selectedObservationGroups.value.map((id: string) => parseInt(id))
+          : [],
+        type: component.type,
+        properties: props,
+        schedule: scheduler.value,
+        studyGroupId: studyGroupId.value,
+        hidden: hidden.value,
+        reminder: reminder.value,
       };
-    }
 
-    if (hasSimpleScheduler || !isObjectEmpty(scheduler.value)) {
+      if (!isObjectEmpty(scheduler.value)) {
+        dialogRef.value.close(returnComponent);
+      }
+    } else if (componentType === 'goalTemplate') {
+      const returnComponent = {
+        goalTemplateId: component.goalTemplateId,
+        title: title.value,
+        purpose: purpose.value,
+        participantInfo: participantInfo.value,
+        type: component.type,
+        properties: props,
+        adhearanceCheck:
+          hasSimpleScheduler?.filter((s) =>
+            simpleSchedulerSelection.value.includes(s.key),
+          ).map((s) => s.key) ?? [],
+        studyGroupId: studyGroupId.value,
+        categories: {
+          kind: component.categories?.kind ?? 'behavioral',
+          topics: categories.value,
+        },
+      };
       dialogRef.value.close(returnComponent);
     }
   }
@@ -261,8 +269,6 @@ Licensed under the Elastic License 2.0. */
   let errors: MoreTableChoice[] = [];
 
   function checkRequiredFields(): void {
-    console.log('checkRequiredFields')
-
     errors = [];
     if (!title.value) {
       errors.push({
@@ -292,8 +298,6 @@ Licensed under the Elastic License 2.0. */
         value: t('goaltemplate.error.addCategory'),
       } as MoreTableChoice);
     }
-
-    console.log('errors: ', errors, ' -')
   }
 
   function getError(label: string): string | null | undefined {

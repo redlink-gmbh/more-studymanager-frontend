@@ -8,13 +8,17 @@ import {
 } from '@gs';
 import { useGoalsApi } from '../composable/useApi';
 import { useErrorHandling } from '../composable/useErrorHandling';
+import { useObservationGroupStore } from './observationGroupStore';
 import { AxiosError } from 'axios';
+import type GoalTemplateMap from '../models/GoalTemplateMap';
+import { MoreTableChoice } from '@/models/MoreTableModel';
 
 export const useGoalTemplateStore = defineStore('goalTemplate', () => {
   const { goalsApi } = useGoalsApi();
   const { handleIndividualError } = useErrorHandling();
 
   const goalTemplates: Ref<GoalTemplate[]> = ref([]);
+  const goalTemplatesMap: Ref<GoalTemplateMap[]> = ref([]);
   const goalConfig: Ref<StudyGoalConfigData | undefined> = ref();
   const goalTopics: Ref<GoalTopic[]> = ref([]);
 
@@ -30,12 +34,43 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
       .listGoalTemplates(studyId)
       .then((response) => {
         console.info('listGoalTemplates response', response.data);
+        mapGoalTemplateToGoalTemplateMap(response.data);
         return response.data;
       })
       .catch((e: AxiosError) => {
         handleIndividualError(e, 'cannot list goal templates');
         return [];
       });
+  }
+
+  function mapGoalTemplateToGoalTemplateMap(goalTemplate: GoalTemplate[]): GoalTemplateMap {
+    goalTemplatesMap.value = goalTemplate.map((item) => mapToGoalTemplateMap(item));
+  }
+
+  function mapToGoalTemplateMap(goalTemplate: GoalTemplate): GoalTemplateMap {
+    const observationGroupStore = useObservationGroupStore();
+    return {
+      ...goalTemplate,
+      categoryKind: goalTemplate?.categories.kind,
+      categoryTopics: goalTemplate?.categories.topics,
+      goalTypeLabel: `goaltemplate.factory.${goalTemplate.type}.name`,
+      appTitle: goalTemplate?.properties['app-title'],
+      adhearanceCheckLabels: goalTemplate?.adherenceChecks ?? [],
+      observationGroupValues:
+        goalTemplate.observationGroupIds?.map((id) => {
+          const group = observationGroupStore.observationGroups.find(
+            (g) => g.observationGroupId === id,
+          );
+          return {
+            label: group?.title || id.toString(),
+            value: id.toString(),
+          } as MoreTableChoice;
+        }) ?? [],
+    };
+  }
+
+  function getTopicNames(keys: string[]): string {
+    return keys.map((key) => goalTopics.value.find((t) => t.key === key)?.title || key).join(', ');
   }
 
   async function addGoalTemplate(
@@ -66,8 +101,10 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
           goalTemplate.templateId as number,
           goalTemplate,
         )
-        .then((response) =>
-          goalTemplates.value.splice(position, 1, response.data),
+        .then((response) => {
+            goalTemplates.value.splice(position, 1, response.data);
+            goalTemplatesMap.value.splice(position, 1, mapToGoalTemplateMap(response.data));
+          }
         )
         .catch((e: AxiosError) =>
           handleIndividualError(e, 'cannot update goal template'),
@@ -190,8 +227,10 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
     goalCategories,
     goalTypes,
     goalTemplates,
+    goalTemplatesMap,
     goalConfig,
     goalTopics,
+    getTopicNames,
     listGoalTemplates,
     addGoalTemplate,
     updateGoalTemplate,

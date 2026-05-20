@@ -5,11 +5,10 @@ Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Elastic License 2.0. */
 <script setup lang="ts">
   import { computed, ComputedRef, PropType, ref } from 'vue';
-  import { useComponentsApi } from '../composable/useApi';
+  import { useComponentsApi, useObservationGroupsApi } from '../composable/useApi';
   import {
     ComponentFactory,
     GoalTemplate,
-    Observation,
     StudyGroup,
     StudyRole,
     StudyStatus,
@@ -32,19 +31,48 @@ Licensed under the Elastic License 2.0. */
   import { useI18n } from 'vue-i18n';
   import DeleteMoreTableRowDialog from './dialog/DeleteMoreTableRowDialog.vue';
   import { useGoalTemplateStore } from '@/stores/goalTemplateStore';
+  import { useObservationGroupStore } from '@/stores/observationGroupStore';
   import GoalTemplateMessurementSection from '@/components/subComponents/GoalTemplateMeasssurementSection.vue';
   import GoalTemplateCategorySection from '@/components/subComponents/GoalTemplateCategorySection.vue';
   import { extractCurrentLimeDomain } from '@/utils/limeSurveyUtils';
   import DropdownPanelWithSearch from '@/components/shared/DropdownPanelWithSearch.vue';
+  import { GoalTemplateMap } from '@/models/GoalTemplateMap';
 
   const loader = useLoader();
   const { componentsApi } = useComponentsApi();
+  const { observationGroupsApi } = useObservationGroupsApi();
   const { t } = useI18n();
   const goalTemplateStore = useGoalTemplateStore();
+  const observationGroupStore = useObservationGroupStore();
 
-  const goalTemplatesList: ComputedRef<GoalTemplate[]> = computed(
+  const goalTemplateList: ComputedRef<GoalTemplate[]> = computed(
     () => goalTemplateStore.goalTemplates ?? [],
   );
+
+  const goalTemplateListMap: ComputedRef<GoalTemplateMap[]> = computed(() => {
+    const goalMap = goalTemplateStore.goalTemplatesMap;
+    return goalMap.map((item) => ({
+      ...item,
+      goalTypeLabel: t(item.goalTypeLabel),
+      categoryKind: t(`goaltemplate.factory.type.${item.categoryKind}Goal`),
+      categoryTopics: goalTemplateStore.getTopicNames(item.categoryTopics),
+      adhearanceCheckLabels:
+        item.adhearanceCheckLabels?.length === 0
+          ? '-'
+          : item.adhearanceCheckLabels
+              .map((ad: string) =>
+                t(`goaltemplate.goalTemplateList.meassurmentTimes.itmes.${ad}`),
+              )
+              .join(','),
+      observationGroupValues: item.observationGroupIds?.length
+        ? item.observationGroupIds.map((id) =>
+            observationGroupStatuses.value?.find(
+              (groupStatus) => groupStatus.value === id.toString(),
+            ),
+          )
+        : [],
+    }));
+  });
 
   const dialog = useDialog();
 
@@ -76,6 +104,16 @@ Licensed under the Elastic License 2.0. */
     value: null,
   } as MoreTableChoice);
 
+  const observationGroupStatuses: ComputedRef<MoreTableChoice[]> = computed(() =>
+    observationGroupStore.observationGroups.map(
+      (observationGroup) =>
+        ({
+          label: observationGroup.title,
+          value: observationGroup.observationGroupId?.toString(),
+        }) as MoreTableChoice,
+    ),
+  );
+
   const factories = ref<ComponentFactory[]>([]);
 
   async function getGoalFactories(): Promise<ComponentFactory[]> {
@@ -104,16 +142,11 @@ Licensed under the Elastic License 2.0. */
       .sort((a, b) => a.label.localeCompare(b.label)),
   );
 
-  const goalTemplateCategories: MoreTableChoice[] = computed(() =>
-    goalTemplateStore.goalCategories as MoreTableChoice[],
-  );
-
   const goalColumns: MoreTableColumn[] = [
     {
-      field: 'typeLabel',
-      header: t('observation.props.type'),
+      field: 'templateId',
+      header: 'id',
       sortable: true,
-      filterable: true,
       columnWidth: '5vw',
     },
     {
@@ -125,32 +158,22 @@ Licensed under the Elastic License 2.0. */
       columnWidth: '10vw',
     },
     {
-      field: 'purpose',
-      header: t('study.props.purpose'),
-      editable: true,
-      type: MoreTableFieldType.longtext,
-      columnWidth: '10vw',
-    },
-    {
-      field: 'goalTypeId',
-      header: t('goaltemplate.props.goalType'),
-      type: MoreTableFieldType.choice,
-      editable: { enabled: true, values: goalTemplateTypes },
+      field: 'goalTypeLabel',
+      header: t('observation.props.type'),
       sortable: true,
       filterable: true,
       columnWidth: '5vw',
     },
     {
-      field: 'goalCategoryId',
+      field: 'categoryTopics',
       header: t('goaltemplate.props.goalCategory'),
-      type: MoreTableFieldType.choice,
-      editable: {
-        enabled: true,
-        values: goalTemplateCategories,
-      },
       sortable: true,
-      placeholder: t('global.placeholder.noGroup'),
-      columnWidth: '10vw',
+      filterable: true,
+    },
+    {
+      field: 'adhearanceCheckLabels',
+      header: t('goaltemplate.props.adhearanceCheck'),
+      sortable: true,
     },
     {
       field: 'studyGroupId',
@@ -160,7 +183,20 @@ Licensed under the Elastic License 2.0. */
       sortable: true,
       filterable: true,
       placeholder: t('global.placeholder.entireStudy'),
-      columnWidth: '5vw',
+      columnWidth: '8vw',
+    },
+    {
+      field: 'observationGroupValues',
+      header: t('observationGroup.plural'),
+      type: MoreTableFieldType.multiselect,
+      arrayLabels: observationGroupStatuses.value,
+      editable: {
+        enabled: actionsVisible,
+        values: observationGroupStatuses.value,
+      },
+      sortable: true,
+      placeholder: t('global.placeholder.noGroup'),
+      columnWidth: '10vw',
     },
   ];
 
@@ -229,7 +265,7 @@ Licensed under the Elastic License 2.0. */
   }
 
   function executeAction(action: MoreTableRowActionResult): void {
-    const row = action.row as Observation;
+    const row = action.row as GoalTemplate;
     switch (action.id) {
       case 'delete':
         deleteGoalTemplate(row);
@@ -238,7 +274,7 @@ Licensed under the Elastic License 2.0. */
         openComponentDialog(t('goaltemplate.dialog.header.clone'), row, true);
         break;
       case 'edit':
-        openEditGoalTemplate(row.observationId);
+        openEditGoalTemplate(row.templateId);
         break;
       default:
         console.error('no handler for action', action);
@@ -246,10 +282,16 @@ Licensed under the Elastic License 2.0. */
   }
 
   async function updateGoalTemplate(
-    goalTemplate: GoalTemplate,
-    fromDialog: boolean = false,
+    goalTemplate: any,
   ): Promise<void> {
-    await goalTemplateStore.updateGoalTemplate(goalTemplate, fromDialog);
+    if (goalTemplate.observationGroupValues) {
+      goalTemplate.observationGroupIds = goalTemplate.observationGroupValues.map(
+        (v: MoreTableChoice) => parseInt(v.value!),
+      );
+    }
+    const cleanGoalTemplate = { ...goalTemplate };
+    delete cleanGoalTemplate.observationGroupValues;
+    await goalTemplateStore.updateGoalTemplate(props.studyId, cleanGoalTemplate);
   }
 
   async function deleteGoalTemplate(
@@ -262,7 +304,15 @@ Licensed under the Elastic License 2.0. */
   }
 
   async function addGoalTemplate(newGoalTemplate: GoalTemplate): Promise<void> {
-    await goalTemplateStore.addGoalTemplate(props.studyId, newGoalTemplate);
+    const cleanGoalTemplate = { ...newGoalTemplate } as any;
+    if (cleanGoalTemplate.observationGroupValues) {
+      cleanGoalTemplate.observationGroupIds =
+        cleanGoalTemplate.observationGroupValues.map((v: MoreTableChoice) =>
+          parseInt(v.value!),
+        );
+      delete cleanGoalTemplate.observationGroupValues;
+    }
+    await goalTemplateStore.addGoalTemplate(props.studyId, cleanGoalTemplate);
   }
 
   function factoryForType(type?: string): ComponentFactory | undefined {
@@ -280,14 +330,19 @@ Licensed under the Elastic License 2.0. */
         component: component,
         factory: factoryForType(component?.type),
         componentType: 'goalTemplate',
-        hasComponentCategories: goalTemplateStore.goalCategories as MoreTableChoice[],
-        hasSimpleScheduler: goalTemplateStore.goalConfig?.schedule.map((item) => {
-          return {
-            key: item.key,
-            label: t(`goaltemplate.goalTemplateList.meassurementTimes.times.${item.key}`),
-            time: item.time
-          }
-        }),
+        hasComponentCategories:
+          goalTemplateStore.goalCategories as MoreTableChoice[],
+        hasSimpleScheduler: goalTemplateStore.goalConfig?.schedule.map(
+          (item) => {
+            return {
+              key: item.key,
+              label: t(
+                `goaltemplate.goalTemplateList.meassurementTimes.times.${item.key}`,
+              ),
+              time: item.time,
+            };
+          },
+        ),
         closeWithEscape: false,
       },
       props: {
@@ -307,11 +362,11 @@ Licensed under the Elastic License 2.0. */
       },
       onClose: (options) => {
         if (options?.data) {
-          if (options.data?.observationId) {
+          if (options.data?.templateId) {
             if (clone) {
               addGoalTemplate(options.data as GoalTemplate);
             } else {
-              updateGoalTemplate(options.data as GoalTemplate, true);
+              updateGoalTemplate(options.data as GoalTemplate);
             }
           } else {
             addGoalTemplate(options.data as GoalTemplate);
@@ -322,7 +377,7 @@ Licensed under the Elastic License 2.0. */
   }
 
   function openEditGoalTemplate(goalTemplateId: number | undefined): void {
-    const goalTemplate = goalTemplatesList.value.find(
+    const goalTemplate = goalTemplateList.value.find(
       (goal: GoalTemplate) => goal.templateId === goalTemplateId,
     );
     if (goalTemplate) {
@@ -357,6 +412,10 @@ Licensed under the Elastic License 2.0. */
   listGoalTemplates();
   getGoalConfig();
   getGoalFactories();
+
+  observationGroupsApi.listObservationGroups(props.studyId).then((response) => {
+    observationGroupStore.observationGroups = response.data;
+  });
 </script>
 
 <template>
@@ -384,7 +443,7 @@ Licensed under the Elastic License 2.0. */
     <MoreTable
       row-id="templateId"
       :columns="goalColumns"
-      :rows="goalTemplatesList"
+      :rows="goalTemplateListMap"
       :row-actions="rowActions"
       :end-row-actions="endRowActions"
       :sort-options="sortOptions"
