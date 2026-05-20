@@ -1,8 +1,3 @@
-/* Copyright LBI-DHP and/or licensed to LBI-DHP under one or more contributor
-license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
-Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
-Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
 <script setup lang="ts">
   import {
     StringTemplateProperty,
@@ -83,11 +78,8 @@ Licensed under the Elastic License 2.0. */
             ? val.upper
             : 0;
 
-      // Handle cases where only one value might be null but we got some data
       if (val.lower === null || val.upper === null) {
-          // If we want the ID as placeholder when it's incomplete, we can return ID.
-          // The user said "das gilt auch für die range elemente" referring to the placeholder ID logic.
-          return `<${p.id}>`;
+        return `<${p.id}>`;
       }
 
       // Return a random value between min and max for the preview
@@ -102,16 +94,15 @@ Licensed under the Elastic License 2.0. */
   const renderedTemplate = computed(() => {
     let template = props.property.value || props.property.defaultValue || '';
 
-    // Handle optional blocks [ ... <var> ... ]
     // This is simple implementation, might need refinement for nested or complex ones
     template = template.replace(
       /\[([^\]]*<([^>]+)>[^\]]*)\]/g,
       (match, inner, varName) => {
         const p = getPropertyByIdOrName(varName);
         if (p && p.value !== undefined && p.value !== null && p.value !== '') {
-          return inner; // Keep the block if variable is set
+          return inner;
         }
-        return ''; // Remove the block if variable is not set
+        return '';
       },
     );
 
