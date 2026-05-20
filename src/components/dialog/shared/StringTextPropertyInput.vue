@@ -43,7 +43,7 @@ Licensed under the Elastic License 2.0. */
 
 <template>
   <div class="flex flex-col gap-1">
-    <h6 class="font-bold">
+    <h6 class="font-bold glex items-center gap-1">
       <label v-if="property.name" :for="property.id">
         {{ $t(property.name) }}<span v-if="property.required">*</span>
       </label>

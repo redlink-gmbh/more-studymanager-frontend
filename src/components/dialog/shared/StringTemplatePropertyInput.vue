@@ -60,7 +60,7 @@ Licensed under the Elastic License 2.0. */
     }
 
     if (p.value === undefined || p.value === null || p.value === '') {
-      return `[${p.name || p.id}]`;
+      return `<${p.id}>`;
     }
 
     if (p instanceof IntegerRangeProperty) {

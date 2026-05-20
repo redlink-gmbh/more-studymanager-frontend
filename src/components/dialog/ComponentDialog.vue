@@ -256,9 +256,9 @@ Licensed under the Elastic License 2.0. */
         type: component.type,
         properties: props,
         adhearanceCheck:
-          hasSimpleScheduler?.filter((s) =>
-            simpleSchedulerSelection.value.includes(s.key),
-          ).map((s) => s.key) ?? [],
+          hasSimpleScheduler
+            ?.filter((s) => simpleSchedulerSelection.value.includes(s.key))
+            .map((s) => s.key) ?? [],
         studyGroupId: studyGroupId.value,
         categories: {
           kind: component.categories?.kind ?? 'behavioral',
@@ -486,6 +486,8 @@ Licensed under the Elastic License 2.0. */
         </div>
       </div>
 
+      <hr class="col-span-8 mt-5 mb-2 text-gray-300" />
+
       <div class="col-span-8 col-start-0 flex items-center justify-between">
         <div>
           <h5 v-if="editable" class="pb-2 font-bold">
@@ -556,8 +558,13 @@ Licensed under the Elastic License 2.0. */
         </div>
       </div>
 
-      <div class="buttons col-span-8 col-start-0 mt-1 grid grid-cols-2">
-        <div class="flex flex-wrap justify-items-center gap-3">
+      <div
+        class="buttons col-span-8 col-start-0 mt-1 flex flex-row items-center justify-between"
+      >
+        <div
+          v-if="componentType === 'observation'"
+          class="flex flex-wrap justify-items-center gap-3"
+        >
           <ObservationToggle
             v-model="hidden"
             :editable="editable"
@@ -576,7 +583,10 @@ Licensed under the Elastic License 2.0. */
             disabled-icon="pi-bell-slash"
           />
         </div>
-        <div class="flex flex-row items-center justify-end text-right">
+        <div
+          class="flex flex-row items-center justify-end text-right"
+          :class="componentType === 'observation' ? 'w-auto' : 'w-full'"
+        >
           <Button class="btn-gray" @click="cancel()">
             <span v-if="editable">{{ $t('global.labels.cancel') }}</span>
             <span v-else>{{ $t('global.labels.close') }}</span>

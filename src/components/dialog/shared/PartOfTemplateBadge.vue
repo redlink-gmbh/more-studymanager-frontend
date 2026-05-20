@@ -8,7 +8,7 @@ const props = defineProps<{
 <template>
   <span
     v-if="props.visible"
-    class="color-primary font-black ml-2 rounded px-1 text-[10px] uppercase"
+    class="color-primary font-bold text-md rounded px-1 text-[0.8rem]"
   >
     {{ componentId ? `<${componentId}>` :$t('goaltemplate.property.amountOfGoal.partOfTemplate') }}
   </span>

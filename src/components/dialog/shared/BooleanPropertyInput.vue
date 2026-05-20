@@ -40,12 +40,12 @@ Licensed under the Elastic License 2.0. */
 
 <template>
   <div class="flex flex-col gap-1">
-    <h5 class="font-bold">
+    <h6 class="font-bold flex items-center gap-1">
       <label v-if="property.name" :for="property.id">
         {{ $t(property.name) }}<span v-if="property.required">*</span>
       </label>
       <PartOfTemplateBadge :visible="isPartOfTemplate" :component-id="property.id" />
-    </h5>
+    </h6>
     <div v-if="props.property.description" :id="`${property.id}-help`">
       {{ $t(props.property.description) }}
     </div>

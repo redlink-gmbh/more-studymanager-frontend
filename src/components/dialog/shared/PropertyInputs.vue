@@ -81,132 +81,162 @@ Licensed under the Elastic License 2.0. */
   const isPartOfTemplate = (property: Property<any>): boolean => {
     return usedInTemplate.value.has(property.id) || usedInTemplate.value.has(property.name || '');
   };
+
+  interface PropertyGroup {
+    prefix: string | null;
+    properties: { property: Property<any>; originalIndex: number }[];
+  }
+
+  const groupedProperties = computed(() => {
+    const groups: PropertyGroup[] = [];
+    let currentGroup: PropertyGroup | null = null;
+
+    props.propertyList.forEach((property, index) => {
+      const dotIndex = property.id.indexOf('.');
+      const prefix = dotIndex !== -1 ? property.id.substring(0, dotIndex) : null;
+
+      if (prefix && currentGroup && currentGroup.prefix === prefix) {
+        currentGroup.properties.push({ property, originalIndex: index });
+      } else {
+        currentGroup = {
+          prefix: prefix,
+          properties: [{ property, originalIndex: index }],
+        };
+        groups.push(currentGroup);
+      }
+    });
+
+    return groups;
+  });
 </script>
 
 <template>
   <div class="property-inputs" :class="styleModifier">
-    <div v-for="(property, index) in propertyList" :key="index">
-      <StringPropertyInput
-        v-if="property instanceof StringProperty"
-        :property="property"
-        :class="{ 'mb-4': index < propertyList.length - 1 }"
-        :editable="editable"
-        :is-part-of-template="isPartOfTemplate(property)"
-        @on-input-change="
-          emit('onPropertyChange', { value: $event.value, index: index })
-        "
-      />
+    <div
+      v-for="(group, groupIndex) in groupedProperties"
+      :key="groupIndex"
+      :class="{
+        'flex flex-col md:flex-row gap-4': group.prefix && group.properties.length > 1,
+        'mb-4': groupIndex < groupedProperties.length - 1
+      }"
+    >
+      <div
+        v-for="({ property, originalIndex }, pIndex) in group.properties"
+        :key="pIndex"
+        :class="{ 'flex-1': group.prefix && group.properties.length > 1 }"
+      >
+        <StringPropertyInput
+          v-if="property instanceof StringProperty"
+          :property="property"
+          :editable="editable"
+          :is-part-of-template="isPartOfTemplate(property)"
+          @on-input-change="
+            emit('onPropertyChange', { value: $event.value, index: originalIndex })
+          "
+        />
 
-      <StringTemplatePropertyInput
-        v-if="property instanceof StringTemplateProperty"
-        :property="property"
-        :all-properties="propertyList"
-        :class="{ 'mb-4': index < propertyList.length - 1 }"
-        :editable="editable"
-        @on-input-change="
-          emit('onPropertyChange', { value: $event.value, index: index })
-        "
-      />
+        <StringTemplatePropertyInput
+          v-if="property instanceof StringTemplateProperty"
+          :property="property"
+          :all-properties="propertyList"
+          :editable="editable"
+          @on-input-change="
+            emit('onPropertyChange', { value: $event.value, index: originalIndex })
+          "
+        />
 
-      <StringTextPropertyInput
-        v-if="property instanceof StringTextProperty"
-        :property="property"
-        :editable="editable"
-        :is-part-of-template="isPartOfTemplate(property)"
-        :class="{ 'mb-4': index < propertyList.length - 1 }"
-        @on-input-change="
-          emit('onPropertyChange', { value: $event.value, index: index })
-        "
-      />
+        <StringTextPropertyInput
+          v-if="property instanceof StringTextProperty"
+          :property="property"
+          :editable="editable"
+          :is-part-of-template="isPartOfTemplate(property)"
+          @on-input-change="
+            emit('onPropertyChange', { value: $event.value, index: originalIndex })
+          "
+        />
 
-      <IntegerPropertyInput
-        v-if="property instanceof IntegerProperty"
-        :property="property"
-        :class="{ 'mb-4': index < propertyList.length - 1 }"
-        :editable="editable"
-        :is-part-of-template="isPartOfTemplate(property)"
-        @on-input-change="
-          emit('onPropertyChange', { value: $event.value, index: index })
-        "
-      />
+        <IntegerPropertyInput
+          v-if="property instanceof IntegerProperty"
+          :property="property"
+          :editable="editable"
+          :is-part-of-template="isPartOfTemplate(property)"
+          @on-input-change="
+            emit('onPropertyChange', { value: $event.value, index: originalIndex })
+          "
+        />
 
-      <IntegerRangePropertyInput
-        v-if="property instanceof IntegerRangeProperty"
-        :property="property"
-        :class="{ 'mb-4': index < propertyList.length - 1 }"
-        :editable="editable"
-        :is-part-of-template="isPartOfTemplate(property)"
-        @on-input-change="
-          emit('onPropertyChange', { value: $event.value, index: index })
-        "
-      />
+        <IntegerRangePropertyInput
+          v-if="property instanceof IntegerRangeProperty"
+          :property="property"
+          :editable="editable"
+          :is-part-of-template="isPartOfTemplate(property)"
+          @on-input-change="
+            emit('onPropertyChange', { value: $event.value, index: originalIndex })
+          "
+        />
 
-      <StringListPropertyInput
-        v-if="property instanceof StringListProperty"
-        :class="{ 'mb-4': index < propertyList.length - 1 }"
-        :property="property"
-        :editable="editable"
-        :is-part-of-template="isPartOfTemplate(property)"
-        @on-input-change="
-          emit('onPropertyChange', { value: $event.value, index: index })
-        "
-      />
+        <StringListPropertyInput
+          v-if="property instanceof StringListProperty"
+          :property="property"
+          :editable="editable"
+          :is-part-of-template="isPartOfTemplate(property)"
+          @on-input-change="
+            emit('onPropertyChange', { value: $event.value, index: originalIndex })
+          "
+        />
 
-      <BooleanPropertyInput
-        v-if="property instanceof BooleanProperty"
-        :class="{ 'mb-4': index < propertyList.length - 1 }"
-        :property="property"
-        :editable="editable"
-        :is-part-of-template="isPartOfTemplate(property)"
-        @on-boolean-change="
-          emit('onPropertyChange', { value: $event, index: index })
-        "
-      />
+        <BooleanPropertyInput
+          v-if="property instanceof BooleanProperty"
+          :property="property"
+          :editable="editable"
+          :is-part-of-template="isPartOfTemplate(property)"
+          @on-boolean-change="
+            emit('onPropertyChange', { value: $event, index: originalIndex })
+          "
+        />
 
-      <ObservationPropertyInput
-        v-if="property instanceof ObservationProperty"
-        :class="{ 'mb-4': index < propertyList.length - 1 }"
-        :property="property"
-        :context="context"
-        :editable="editable"
-        @on-input-change="
-          emit('onPropertyChange', { value: $event, index: index })
-        "
-      />
+        <ObservationPropertyInput
+          v-if="property instanceof ObservationProperty"
+          :property="property"
+          :context="context"
+          :editable="editable"
+          @on-input-change="
+            emit('onPropertyChange', { value: $event, index: originalIndex })
+          "
+        />
 
-      <CronSchedulerConfiguration
-        v-if="property instanceof CronProperty"
-        :class="{ 'mb-6': index < propertyList.length - 1 }"
-        :editable="editable"
-        :cron-schedule="property.value"
-        @on-valid-schedule="
-          emit('onPropertyChange', { value: $event, index: index })
-        "
-        @on-error="
-          emit('onError', { value: $event ? $event : '', index: index })
-        "
-      />
+        <CronSchedulerConfiguration
+          v-if="property instanceof CronProperty"
+          :editable="editable"
+          :cron-schedule="property.value"
+          @on-valid-schedule="
+            emit('onPropertyChange', { value: $event, index: originalIndex })
+          "
+          @on-error="
+            emit('onError', { value: $event ? $event : '', index: originalIndex })
+          "
+        />
 
-      <InterventionTriggerConditions
-        v-if="property instanceof DataCheckProperty"
-        :class="{ 'mb-8': index < propertyList.length - 1 }"
-        :trigger-conditions="property"
-        :editable="editable"
-        @on-emit-trigger-conditions="
-          emit('onPropertyChange', { value: $event, index: index })
-        "
-        @on-error="
-          emit('onError', { value: $event ? $event : '', index: index })
-        "
-      />
+        <InterventionTriggerConditions
+          v-if="property instanceof DataCheckProperty"
+          :trigger-conditions="property"
+          :editable="editable"
+          @on-emit-trigger-conditions="
+            emit('onPropertyChange', { value: $event, index: originalIndex })
+          "
+          @on-error="
+            emit('onError', { value: $event ? $event : '', index: originalIndex })
+          "
+        />
 
-      <GroupingPropertyInput
-        v-if="property instanceof GroupingProperty"
-        :property="property"
-      />
+        <GroupingPropertyInput
+          v-if="property instanceof GroupingProperty"
+          :property="property"
+        />
 
-      <div v-if="property instanceof UnknownProperty">
-        <UnknownPropertyElement :property="property" />
+        <div v-if="property instanceof UnknownProperty">
+          <UnknownPropertyElement :property="property" />
+        </div>
       </div>
     </div>
   </div>

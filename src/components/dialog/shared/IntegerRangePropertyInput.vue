@@ -68,33 +68,32 @@ Licensed under the Elastic License 2.0. */
 </script>
 
 <template>
-  <div>
-    <div class="mb-1">
-      <div class="flex items-center">
-        <label :for="`${property.id}-lower`" class="font-bold">{{
-          $t(property.name)
-        }}</label>
+  <div class="flex flex-col gap-1">
+      <div class="flex items-center gap-1">
+        <h6 class="font-bold">
+          <label :for="`${property.id}-lower`" class="font-bold">{{
+            $t(property.name)
+          }}</label>
+        </h6>
         <PartOfTemplateBadge :visible="isPartOfTemplate" :component-id="property.id" />
       </div>
-      <h6
+      <div
         v-if="
           property.description &&
           property.description !== 'inputModel.enterValue'
         "
-        class="text-xs text-gray-500"
       >
         {{ $t(property.description) }}
-      </h6>
-    </div>
-    <div class="grid grid-cols-2 gap-4">
-      <div class="flex flex-col">
-        <label :for="`${property.id}-lower`" class="text-xs text-gray-400">{{
+      </div>
+    <div class="grid grid-cols-2 gap-4 items-center">
+      <div class="flex items-center gap-2">
+        <label :for="`${property.id}-lower`" class="text-xs text-gray-400 whitespace-nowrap">{{
           $t('global.labels.min')
         }}</label>
         <InputNumber
           :id="`${property.id}-lower`"
           v-model="(property.value as any).lower"
-          class="w-full"
+          class="flex-1"
           :min-fraction-digits="0"
           :max-fraction-digits="0"
           :disabled="!editable || property.immutable"
@@ -102,14 +101,14 @@ Licensed under the Elastic License 2.0. */
           :max="property.maxLimit"
         />
       </div>
-      <div class="flex flex-col">
-        <label :for="`${property.id}-upper`" class="text-xs text-gray-400">{{
+      <div class="flex items-center gap-2">
+        <label :for="`${property.id}-upper`" class="text-xs text-gray-400 whitespace-nowrap">{{
           $t('global.labels.max')
         }}</label>
         <InputNumber
           :id="`${property.id}-upper`"
           v-model="(property.value as any).upper"
-          class="w-full"
+          class="flex-1"
           :min-fraction-digits="0"
           :max-fraction-digits="0"
           :disabled="!editable || property.immutable"
@@ -131,5 +130,11 @@ Licensed under the Elastic License 2.0. */
   :deep(.p-inputnumber) {
     border: transparent;
     padding: 0;
+    min-width: 0;
+  }
+
+  :deep(.p-inputnumber-input) {
+    width: 100%;
+    min-width: 0;
   }
 </style>

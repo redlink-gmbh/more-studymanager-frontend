@@ -586,7 +586,7 @@
         },
         "days-of-week": {
           "name": "Wochentage",
-          "description": "Die Wochentage, an denen das Ziel erfüllt werden soll. Die Teilnehmer:innen können sich aus dem Range-Bereich einen Wert auf der App konfigurieren."
+          "description": "Wochentage Bereich"
         },
         "self-report-time": {
           "name": "Sendungs Zeitpunkt",
@@ -623,11 +623,11 @@
           "description": "Dies sind die Optionen für die Ziel-Einstellungen, mit dem die Teilnehmer:innen ihr persönliches Ziel anpassen können.",
           "amount": {
             "name": "Anzahl",
-            "description": "Bereich für die Anzahl des Zielwertes. Die Teilnehmer:innen können sich aus dem Range-Bereich einen Wert auf der App konfigurieren."
+            "description": "Bereich für die Zielerreichung"
           },
           "unit": {
             "name": "Einheit",
-            "description": "Die Einheit, in der die Zielwerte angegeben werden (z.B. Glas Wasser)"
+            "description": "Die Einheit für Zielwerte (z.B. Glas Wasser)"
           }
         },
         "status-100-reached": {

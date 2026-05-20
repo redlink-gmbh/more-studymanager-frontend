@@ -39,13 +39,13 @@ Licensed under the Elastic License 2.0. */
 </script>
 
 <template>
-  <div class="gap-1">
-    <h5 class="flex items-center font-bold">
+  <div class="flex flex-col gap-1">
+    <h6 class="flex items-center font-bold">
       <label :for="property.id">
         {{ $t(property.name) }}<span v-if="property.required">*</span>
       </label>
       <PartOfTemplateBadge :visible="isPartOfTemplate" :component-id="property.id" />
-    </h5>
+    </h6>
 
     <div v-if="props.property.description" :id="`${property.id}-help`">
       {{ $t(props.property.description) }}
@@ -59,7 +59,7 @@ Licensed under the Elastic License 2.0. */
       :max="property.max"
       :min="property.min"
       :disabled="!editable || property.immutable"
-      class="mt-1 w-full"
+      class="w-full"
       :aria-describedby="`${property.id}-help`"
     />
   </div>
