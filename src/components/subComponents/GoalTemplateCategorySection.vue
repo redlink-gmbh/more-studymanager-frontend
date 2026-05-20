@@ -5,7 +5,7 @@
   import Button from 'primevue/button';
   import Popover from 'primevue/popover';
   import InputText from 'primevue/inputtext';
-  import { GoalTopic, Observation, StudyRole, StudyStatus } from '@gs';
+  import { GoalTopic, StudyRole, StudyStatus } from '@gs';
   import MoreTable from '@/components/shared/MoreTable.vue';
   import {
     MoreTableAction,
@@ -39,10 +39,10 @@
     if (!newTopicName.value.trim()) return;
 
     const topic = {
-      key: null,
+      key: undefined,
       title: newTopicName.value,
       description: newTopicDescription.value,
-    };
+    } as any;
 
     await goalTemplateStore
       .createGoalTopic(props.studyId, topic as GoalTopic)
@@ -85,7 +85,7 @@
   const dialog = useDialog();
 
   function executeAction(action: MoreTableRowActionResult): void {
-    const row = action.row as Observation;
+    const row = action.row as GoalTopic;
     switch (action.id) {
       case 'delete':
         deleteTopic(row);

@@ -7,7 +7,7 @@
  Licensed under the Elastic License 2.0.
  */
 
-import { Intervention, Observation, Participant, Study, StudyGroup } from '@gs';
+import { GoalTemplate, Intervention, Observation, Participant, Study, StudyGroup } from '@gs';
 
 export interface MoreTableColumn {
   field: string;
@@ -57,6 +57,7 @@ type ActionResult =
   | Study
   | Intervention
   | Observation
+  | GoalTemplate
   | MoreTableCollaboratorItem
   | MoreStudyGroupTableMap;
 

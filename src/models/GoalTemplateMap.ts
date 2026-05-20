@@ -1,9 +1,9 @@
-import { GoalTemplateCategoriesKindEnum, GoalTopic, type GoalTemplate } from '@gs';
+import { GoalTemplateCategoriesKindEnum, type GoalTemplate } from '@gs';
 import { MoreTableChoice } from './MoreTableModel';
 
 export interface GoalTemplateMap extends GoalTemplate {
   categoryKind?: GoalTemplateCategoriesKindEnum;
-  categoryTopics?: GoalTopic[];
+  categoryTopics?: string[];
   goalTypeLabel: string;
   adhearanceCheckLabels: string[];
   appTitle: string;

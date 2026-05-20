@@ -85,7 +85,7 @@ Licensed under the Elastic License 2.0. */
           return null;
         }
       })
-      .filter((p: any) => p !== null)
+      .filter((p: Property<any> | null): p is Property<any> => p !== null)
       .map((p: Property<any>) => p.setValue(component.properties?.[p.id])) ??
       [],
   );
@@ -246,7 +246,7 @@ Licensed under the Elastic License 2.0. */
       }
     } else if (componentType === 'goalTemplate') {
       const returnComponent = {
-        goalTemplateId: component.goalTemplateId,
+        templateId: component.templateId,
         title: title.value,
         purpose: purpose.value,
         participantInfo: participantInfo.value,

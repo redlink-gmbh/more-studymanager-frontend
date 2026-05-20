@@ -369,7 +369,7 @@ export class IntegerRangeProperty extends Property<{ lower: number; upper: numbe
   maxLimit?: number;
 
   constructor(
-    defaultValue: { min: number; max: number },
+    defaultValue: { lower: number; upper: number },
     description: string,
     id: string,
     immutable: boolean,
@@ -380,8 +380,8 @@ export class IntegerRangeProperty extends Property<{ lower: number; upper: numbe
     if (!this.value) {
       if (this.defaultValue) {
         this.value = {
-          lower: this.defaultValue.min ?? 1,
-          upper: this.defaultValue.max ?? 1,
+          lower: this.defaultValue.lower ?? 1,
+          upper: this.defaultValue.upper ?? 1,
         };
       } else {
         this.value = { lower: 1, upper: 1 };
@@ -421,8 +421,8 @@ export class IntegerRangeProperty extends Property<{ lower: number; upper: numbe
     } else if (v === undefined || v === null) {
       this.value = this.defaultValue
         ? {
-            lower: this.defaultValue.min ?? 1,
-            upper: this.defaultValue.max ?? 1,
+            lower: this.defaultValue.lower ?? 1,
+            upper: this.defaultValue.upper ?? 1,
           }
         : { lower: 1, upper: 1 };
     }
@@ -434,7 +434,7 @@ export class IntegerRangeProperty extends Property<{ lower: number; upper: numbe
   }
 
   static fromJson(json: any): IntegerRangeProperty {
-    let defaultValue = { min: 1, max: 1 };
+    let defaultValue = { lower: 1, upper: 1 };
     if (json.defaultValue) {
       let rawDefault = json.defaultValue;
       if (typeof json.defaultValue === 'string') {
@@ -447,13 +447,13 @@ export class IntegerRangeProperty extends Property<{ lower: number; upper: numbe
 
       if (typeof rawDefault === 'object' && rawDefault !== null) {
         defaultValue = {
-          min:
+          lower:
             rawDefault.min !== undefined
               ? rawDefault.min
               : rawDefault.lower !== undefined
                 ? rawDefault.lower
                 : 1,
-          max:
+          upper:
             rawDefault.max !== undefined
               ? rawDefault.max
               : rawDefault.upper !== undefined

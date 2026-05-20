@@ -5,7 +5,10 @@ Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Elastic License 2.0. */
 <script setup lang="ts">
   import { computed, ComputedRef, PropType, ref } from 'vue';
-  import { useComponentsApi, useObservationGroupsApi } from '../composable/useApi';
+  import {
+    useComponentsApi,
+    useObservationGroupsApi,
+  } from '../composable/useApi';
   import {
     ComponentFactory,
     GoalTemplate,
@@ -37,6 +40,7 @@ Licensed under the Elastic License 2.0. */
   import { extractCurrentLimeDomain } from '@/utils/limeSurveyUtils';
   import DropdownPanelWithSearch from '@/components/shared/DropdownPanelWithSearch.vue';
   import { GoalTemplateMap } from '@/models/GoalTemplateMap';
+  import { type ComponentTypeAction } from '@/models/ComponentTypeAction';
 
   const loader = useLoader();
   const { componentsApi } = useComponentsApi();
@@ -50,12 +54,11 @@ Licensed under the Elastic License 2.0. */
   );
 
   const goalTemplateListMap: ComputedRef<GoalTemplateMap[]> = computed(() => {
-    const goalMap = goalTemplateStore.goalTemplatesMap;
-    return goalMap.map((item) => ({
+    return goalTemplateStore.goalTemplatesMap.map((item) => ({
       ...item,
       goalTypeLabel: t(item.goalTypeLabel),
       categoryKind: t(`goaltemplate.factory.type.${item.categoryKind}Goal`),
-      categoryTopics: goalTemplateStore.getTopicNames(item.categoryTopics),
+      categoryTopics: goalTemplateStore.getTopicNames(item.categoryTopics ?? []),
       adhearanceCheckLabels:
         item.adhearanceCheckLabels?.length === 0
           ? '-'
@@ -71,7 +74,7 @@ Licensed under the Elastic License 2.0. */
             ),
           )
         : [],
-    }));
+    } as any));
   });
 
   const dialog = useDialog();
@@ -104,39 +107,40 @@ Licensed under the Elastic License 2.0. */
     value: null,
   } as MoreTableChoice);
 
-  const observationGroupStatuses: ComputedRef<MoreTableChoice[]> = computed(() =>
-    observationGroupStore.observationGroups.map(
-      (observationGroup) =>
-        ({
-          label: observationGroup.title,
-          value: observationGroup.observationGroupId?.toString(),
-        }) as MoreTableChoice,
-    ),
+  const observationGroupStatuses: ComputedRef<MoreTableChoice[]> = computed(
+    () =>
+      observationGroupStore.observationGroups.map(
+        (observationGroup) =>
+          ({
+            label: observationGroup.title,
+            value: observationGroup.observationGroupId?.toString(),
+          }) as MoreTableChoice,
+      ),
   );
 
   const factories = ref<ComponentFactory[]>([]);
 
   async function getGoalFactories(): Promise<ComponentFactory[]> {
     factories.value = await componentsApi
-      .listComponents('goalTemplate')
+      .listComponents('goalTemplate' as any)
       .then((response) => {
-        console.info('GOAL FACTORIES:', JSON.stringify(response.data, null, 2));
         return response.data ?? [];
       });
+    return factories.value;
   }
 
-  const goalTemplateTypes: any[] = computed(() =>
+  const goalTemplateTypes: ComputedRef<ComponentTypeAction[]> = computed(() =>
     factories.value
       .map((cf: ComponentFactory) => ({
         label: cf.title ? t(cf.title) : '',
-        value: cf.componentId,
+        value: cf.componentId ?? '',
         description: cf.description
           ? t(cf.description, { link: extractCurrentLimeDomain() })
           : '',
         command: (): void => {
           openComponentDialog(t('goaltemplate.dialog.header.create'), {
             type: cf.componentId,
-          });
+          } as GoalTemplate);
         },
       }))
       .sort((a, b) => a.label.localeCompare(b.label)),
@@ -216,7 +220,7 @@ Licensed under the Elastic License 2.0. */
       confirmDeleteDialog: {
         header: t('goaltemplate.dialog.header.delete'),
         message: t('goaltemplate.dialog.msg.delete'),
-        dialog: (row: any) =>
+        dialog: (row: GoalTemplate) =>
           dialog.open(DeleteMoreTableRowDialog, {
             data: {
               introMsg: t('goaltemplate.dialog.deleteMsg.intro'),
@@ -224,7 +228,7 @@ Licensed under the Elastic License 2.0. */
               confirmMsg: t('goaltemplate.dialog.deleteMsg.confirm'),
               row: row,
               elInfoTitle: t('study.props.purpose'),
-              elInfoDesc: row.purpose,
+              elInfoDesc: (row as any).purpose,
             },
             props: {
               header: t('goaltemplate.dialog.header.delete'),
@@ -282,16 +286,26 @@ Licensed under the Elastic License 2.0. */
   }
 
   async function updateGoalTemplate(
-    goalTemplate: any,
+    goalTemplate: GoalTemplateMap,
   ): Promise<void> {
     if (goalTemplate.observationGroupValues) {
-      goalTemplate.observationGroupIds = goalTemplate.observationGroupValues.map(
-        (v: MoreTableChoice) => parseInt(v.value!),
-      );
+      goalTemplate.observationGroupIds =
+        goalTemplate.observationGroupValues.map((v: MoreTableChoice) =>
+          parseInt(v.value!),
+        );
     }
-    const cleanGoalTemplate = { ...goalTemplate };
+    const cleanGoalTemplate = { ...goalTemplate } as any;
     delete cleanGoalTemplate.observationGroupValues;
-    await goalTemplateStore.updateGoalTemplate(props.studyId, cleanGoalTemplate);
+    delete cleanGoalTemplate.goalTypeLabel;
+    delete cleanGoalTemplate.categoryKind;
+    delete cleanGoalTemplate.categoryTopics;
+    delete cleanGoalTemplate.adhearanceCheckLabels;
+    delete cleanGoalTemplate.appTitle;
+
+    await goalTemplateStore.updateGoalTemplate(
+      props.studyId,
+      cleanGoalTemplate as GoalTemplate,
+    );
   }
 
   async function deleteGoalTemplate(
@@ -312,7 +326,18 @@ Licensed under the Elastic License 2.0. */
         );
       delete cleanGoalTemplate.observationGroupValues;
     }
-    await goalTemplateStore.addGoalTemplate(props.studyId, cleanGoalTemplate);
+    if (cleanGoalTemplate.goalTypeLabel) delete cleanGoalTemplate.goalTypeLabel;
+    if (cleanGoalTemplate.categoryKind) delete cleanGoalTemplate.categoryKind;
+    if (cleanGoalTemplate.categoryTopics)
+      delete cleanGoalTemplate.categoryTopics;
+    if (cleanGoalTemplate.adhearanceCheckLabels)
+      delete cleanGoalTemplate.adhearanceCheckLabels;
+    if (cleanGoalTemplate.appTitle) delete cleanGoalTemplate.appTitle;
+
+    await goalTemplateStore.addGoalTemplate(
+      props.studyId,
+      cleanGoalTemplate as GoalTemplate,
+    );
   }
 
   function factoryForType(type?: string): ComponentFactory | undefined {
@@ -366,7 +391,7 @@ Licensed under the Elastic License 2.0. */
             if (clone) {
               addGoalTemplate(options.data as GoalTemplate);
             } else {
-              updateGoalTemplate(options.data as GoalTemplate);
+              updateGoalTemplate(options.data as GoalTemplateMap);
             }
           } else {
             addGoalTemplate(options.data as GoalTemplate);
@@ -396,12 +421,12 @@ Licensed under the Elastic License 2.0. */
   const filteredGoalTemplateTypes = computed(() => {
     const q = goalTemplateQuery.value.trim().toLowerCase();
     if (!q) return goalTemplateTypes.value;
-    return goalTemplateTypes.value.filter((i: any) =>
+    return goalTemplateTypes.value.filter((i: ComponentTypeAction) =>
       i.label.toLowerCase().includes(q),
     );
   });
 
-  function selectedGoalTemplateTypes(item: any): any {
+  function selectedGoalTemplateTypes(item: ComponentTypeAction): void {
     item.command();
   }
 

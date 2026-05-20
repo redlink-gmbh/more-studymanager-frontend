@@ -36,7 +36,7 @@ Licensed under the Elastic License 2.0. */
   const originalValue = ref('');
 
   const startEditing = (): void => {
-    originalValue.value = props.property.value;
+    originalValue.value = props.property.value ?? '';
     isEditing.value = true;
   };
 

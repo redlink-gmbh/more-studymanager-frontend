@@ -10,8 +10,8 @@ import { useGoalsApi } from '../composable/useApi';
 import { useErrorHandling } from '../composable/useErrorHandling';
 import { useObservationGroupStore } from './observationGroupStore';
 import { AxiosError } from 'axios';
-import type GoalTemplateMap from '../models/GoalTemplateMap';
-import { MoreTableChoice } from '@/models/MoreTableModel';
+import type { GoalTemplateMap } from '../models/GoalTemplateMap';
+import { MoreTableChoice } from '../models/MoreTableModel';
 
 export const useGoalTemplateStore = defineStore('goalTemplate', () => {
   const { goalsApi } = useGoalsApi();
@@ -29,11 +29,9 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
 
   // Actions
   async function listGoalTemplates(studyId: number): Promise<void> {
-    console.info('listGoalTemplates from goalTemplateStore');
     goalTemplates.value = await goalsApi
       .listGoalTemplates(studyId)
       .then((response) => {
-        console.info('listGoalTemplates response', response.data);
         mapGoalTemplateToGoalTemplateMap(response.data);
         return response.data;
       })
@@ -43,7 +41,7 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
       });
   }
 
-  function mapGoalTemplateToGoalTemplateMap(goalTemplate: GoalTemplate[]): GoalTemplateMap {
+  function mapGoalTemplateToGoalTemplateMap(goalTemplate: GoalTemplate[]): void {
     goalTemplatesMap.value = goalTemplate.map((item) => mapToGoalTemplateMap(item));
   }
 
@@ -52,10 +50,10 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
     return {
       ...goalTemplate,
       categoryKind: goalTemplate?.categories.kind,
-      categoryTopics: goalTemplate?.categories.topics,
+      categoryTopics: goalTemplate?.categories.topics ?? [],
       goalTypeLabel: `goaltemplate.factory.${goalTemplate.type}.name`,
-      appTitle: goalTemplate?.properties['app-title'],
-      adhearanceCheckLabels: goalTemplate?.adherenceChecks ?? [],
+      appTitle: goalTemplate?.properties?.['app-title'] ?? '',
+      adhearanceCheckLabels: (goalTemplate?.adherenceChecks as any) ?? [],
       observationGroupValues:
         goalTemplate.observationGroupIds?.map((id) => {
           const group = observationGroupStore.observationGroups.find(
@@ -80,7 +78,8 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
     await goalsApi
       .addGoalTemplate(studyId, goalTemplate)
       .then((response) => {
-        return goalTemplates.value.push(response.data);
+        goalTemplates.value.push(response.data);
+        goalTemplatesMap.value.push(mapToGoalTemplateMap(response.data));
       })
       .catch((e: AxiosError) => {
         handleIndividualError(e, 'cannot add goal template');
@@ -124,6 +123,7 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
         );
         if (position > -1) {
           goalTemplates.value.splice(position, 1);
+          goalTemplatesMap.value.splice(position, 1);
         }
       })
       .catch((e: AxiosError) =>
@@ -132,13 +132,12 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
   }
 
   async function getGoalConfig(studyId: number): Promise<void> {
-    console.info('template store, getGoalConfig');
     await goalsApi
       .getGoalConfig(studyId)
       .then((response) => {
         goalConfig.value = response.data;
-        if (response.data.topics) {
-          goalTopics.value = response.data.topics;
+        if ((response.data as any).topics) {
+          goalTopics.value = (response.data as any).topics;
         }
       })
       .catch((e: AxiosError) => {
@@ -150,13 +149,12 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
     studyId: number,
     config: StudyGoalConfig,
   ): Promise<void> {
-    console.info('template store, setGoalConfig', config, studyId);
     await goalsApi
       .setGoalConfig(studyId, config)
       .then((response) => {
         goalConfig.value = response.data;
-        if (response.data?.topics) {
-          goalTopics.value = response.data.topics;
+        if ((response.data as any).topics) {
+          goalTopics.value = (response.data as any).topics;
         }
       })
       .catch((e: AxiosError) => {
@@ -170,7 +168,6 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
     studyId: number,
     topic: GoalTopic,
   ): Promise<void> {
-    console.info('createGoalTopic:', studyId, topic);
     await goalsApi
       .createGoalTopic(studyId, topic)
       .then(async (response) => {
@@ -187,7 +184,6 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
     key: string,
     topic: GoalTopic,
   ): Promise<void> {
-    console.info('updateGoalTopic: ', studyId, key, topic);
     await goalsApi
       .updateGoalTopic(studyId, key, topic)
       .then((response) => {
@@ -202,7 +198,6 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
   }
 
   async function deleteGoalTopic(studyId: number, key: string): Promise<void> {
-    console.info('deleteGoalTopic: ', studyId, key);
     await goalsApi
       .deleteGoalTopic(studyId, key)
       .then(() => {

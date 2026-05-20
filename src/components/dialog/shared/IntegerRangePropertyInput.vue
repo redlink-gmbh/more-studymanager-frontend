@@ -93,7 +93,7 @@ Licensed under the Elastic License 2.0. */
         }}</label>
         <InputNumber
           :id="`${property.id}-lower`"
-          v-model="property.value.lower"
+          v-model="(property.value as any).lower"
           class="w-full"
           :min-fraction-digits="0"
           :max-fraction-digits="0"
@@ -108,7 +108,7 @@ Licensed under the Elastic License 2.0. */
         }}</label>
         <InputNumber
           :id="`${property.id}-upper`"
-          v-model="property.value.upper"
+          v-model="(property.value as any).upper"
           class="w-full"
           :min-fraction-digits="0"
           :max-fraction-digits="0"
