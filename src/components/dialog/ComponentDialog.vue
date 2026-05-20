@@ -160,7 +160,7 @@ Licensed under the Elastic License 2.0. */
   }
 
   function validate(): void {
-    checkRequiredFields();;
+    checkRequiredFields();
     if (errors.length > 0) {
       return;
     }
@@ -202,8 +202,6 @@ Licensed under the Elastic License 2.0. */
     date.setHours(23, 59, 59);
     return date;
   };
-
-  console.error(component);
 
   function save(props: any): void {
     if (!hasSimpleScheduler && isObjectEmpty(scheduler.value)) {
@@ -250,6 +248,9 @@ Licensed under the Elastic License 2.0. */
         title: title.value,
         purpose: purpose.value,
         participantInfo: participantInfo.value,
+        observationGroupIds: selectedObservationGroups.value?.length
+          ? selectedObservationGroups.value.map((id: string) => parseInt(id))
+          : [],
         type: component.type,
         properties: props,
         adhearanceCheck:

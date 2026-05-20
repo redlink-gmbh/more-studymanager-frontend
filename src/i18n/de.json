@@ -645,6 +645,26 @@
         "self-report-question": {
           "name": "Fargetext",
           "description": "Dies ist die Nachricht, die an die Teilnehmer:innen gesendet wird."
+        },
+        "status-day-not-consumed": {
+          "name": "Nichts konsumiert",
+          "description": "Dieser Status wird angezeigt, wenn an dem Tag nichts konsumiert wurde."
+        },
+        "status-day-under-limit": {
+          "name": "Unter dem Limit",
+          "description": "Dieser Status wird angezeigt, wenn der/die Teilnehmer:in unter dem Limit liegt."
+        },
+        "status-day-over-limit": {
+          "name": "Über dem Limit",
+          "description": "Dieser Status wird angezeigt, wenn das Limit überschritten wurde."
+        }
+      },
+      "reduceAmountOf": {
+        "goal": {
+          "activity": {
+            "name": "Aktion",
+            "description": "Was wird gemacht?"
+          }
         }
       }
     },
