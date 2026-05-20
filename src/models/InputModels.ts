@@ -430,6 +430,16 @@ export class IntegerRangeProperty extends Property<{ lower: number; upper: numbe
   }
 
   validate(): string | undefined {
+    if (this.required) {
+      if (
+        this.value?.lower === undefined ||
+        this.value?.lower === null ||
+        this.value?.upper === undefined ||
+        this.value?.upper === null
+      ) {
+        return 'global.error.required';
+      }
+    }
     return undefined;
   }
 
