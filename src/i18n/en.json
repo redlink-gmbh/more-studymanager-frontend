@@ -705,7 +705,7 @@
     "label": {
       "goalTemplateTitle": "Template Title",
       "goalTitle": "Goal Title",
-      "categoryTitle": "Category Title"
+      "categoryTitle": "Category"
     },
     "error": {
       "addParticipantInfo": "Participant information is a required field. Please add a description.",

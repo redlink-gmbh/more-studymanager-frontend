@@ -28,7 +28,16 @@
   import useLoader from '../composable/useLoader';
   import { useI18n } from 'vue-i18n';
   import DeleteMoreTableRowDialog from './dialog/DeleteMoreTableRowDialog.vue';
-  import { useGoalTemplateStore } from '@/stores/goalTemplateStore';
+  import {
+    useGoalTemplates,
+    useGoalConfig,
+    useAddGoalTemplate,
+    useUpdateGoalTemplate,
+    useDeleteGoalTemplate,
+    mapToGoalTemplateMap,
+    checkMissingTopicsError,
+    getTopicNames,
+  } from '@/api/goalQueries';
   import { useObservationGroupStore } from '@/stores/observationGroupStore';
   import GoalTemplateMessurementSection from '@/components/subComponents/GoalTemplateMeasssurementSection.vue';
   import GoalTemplateCategorySection from '@/components/subComponents/GoalTemplateCategorySection.vue';
@@ -41,52 +50,84 @@
   const { componentsApi } = useComponentsApi();
   const { observationGroupsApi } = useObservationGroupsApi();
   const { t } = useI18n();
-  const goalTemplateStore = useGoalTemplateStore();
-  const observationGroupStore = useObservationGroupStore();
-
-  const goalTemplateListMap: ComputedRef<GoalTemplateMap[]> = computed(() => {
-    return goalTemplateStore.goalTemplatesMap.map(
-      (item) =>
-        ({
-          ...item,
-          goalTypeLabel: t(item.goalTypeLabel),
-          categoryKind: t(`goaltemplate.factory.type.${item.categoryKind}Goal`),
-          categoryTopics: goalTemplateStore.getTopicNames(
-            item.categoryTopics ?? [],
-          ),
-          hasError: goalTemplateStore.checkMissingTopicsError(item),
-          errorMessage: goalTemplateStore.checkMissingTopicsError(item)
-            ? t(`goaltemplate.goalTemplateList.error.invalidCategoryTopics`)
-            : undefined,
-          adheranceCheckLabels:
-            (item.adherenceChecks
-              ?.map((ad: string) =>
-                adherenceCheckOptions.value.find((opt) => opt.value === ad),
-              )
-              .filter(Boolean) as MoreTableChoice[]) ?? [],
-          observationGroupValues: item.observationGroupIds?.length
-            ? item.observationGroupIds.map((id) =>
-                observationGroupStatuses.value?.find(
-                  (groupStatus) => groupStatus.value === id.toString(),
-                ),
-              )
-            : [],
-        }) as any,
-    );
-  });
-
-  const dialog = useDialog();
-
   const props = defineProps({
     studyId: { type: Number, required: true },
     studyGroups: { type: Array as PropType<Array<StudyGroup>>, required: true },
     studyStatus: { type: String as PropType<StudyStatus>, required: true },
   });
 
-  const sortOptions: MoreTableSortOptions = {
-    sortField: 'title',
-    sortOrder: -1,
-  };
+  const observationGroupStore = useObservationGroupStore();
+  const { data: goalTemplates = [] } = useGoalTemplates(props.studyId);
+  const { data: goalConfig } = useGoalConfig(props.studyId);
+  const addMutation = useAddGoalTemplate();
+  const updateMutation = useUpdateGoalTemplate();
+  const deleteMutation = useDeleteGoalTemplate();
+
+  const adherenceCheckOptions: ComputedRef<MoreTableChoice[]> = computed(() => {
+    const options =
+      goalConfig.value?.schedule?.map((item) => ({
+        label: t(
+          `goaltemplate.goalTemplateList.meassurementTimes.times.${item.key}`,
+        ),
+        value: item.key ?? null,
+      })) ?? [];
+    return options as MoreTableChoice[];
+  });
+
+  const categoryTopicOptions: ComputedRef<MoreTableChoice[]> = computed(() => {
+    return (
+      goalConfig.value?.topics?.map((item) => ({
+        label: item.title,
+        value: item.key ?? null,
+      })) ?? []
+    );
+  });
+
+  const observationGroupStatuses: ComputedRef<MoreTableChoice[]> = computed(
+    () =>
+      observationGroupStore.observationGroups.map(
+        (observationGroup) =>
+          ({
+            label: observationGroup.title,
+            value: observationGroup.observationGroupId?.toString(),
+          }) as MoreTableChoice,
+      ),
+  );
+
+  const goalTemplateListMap: ComputedRef<GoalTemplateMap[]> = computed(() => {
+    return (
+      goalTemplates.value?.map((item) => {
+        const mapped = mapToGoalTemplateMap(
+          item,
+          observationGroupStore.observationGroups,
+        );
+        return {
+          ...mapped,
+          goalTypeLabel: t(mapped.goalTypeLabel),
+          categoryKind: t(`goaltemplate.factory.type.${mapped.categoryKind}Goal`),
+          categoryTopics: getTopicNames(
+            mapped.categoryTopics ?? [],
+            goalConfig.value?.topics ?? [],
+          ),
+          hasError: checkMissingTopicsError(item, goalConfig.value?.topics ?? []),
+          errorMessage: checkMissingTopicsError(
+            item,
+            goalConfig.value?.topics ?? [],
+          )
+            ? t(`goaltemplate.goalTemplateList.error.invalidCategoryTopics`)
+            : undefined,
+          adheranceCheckLabels:
+            (mapped.adherenceChecks
+              ?.map((ad: string) =>
+                adherenceCheckOptions.value.find((opt) => opt.value === ad),
+              )
+              .filter(Boolean) as MoreTableChoice[]) ?? [],
+        } as any;
+      }) ?? []
+    );
+  });
+
+  const dialog = useDialog();
 
   const actionsVisible =
     props.studyStatus === StudyStatus.Draft ||
@@ -105,36 +146,10 @@
     value: null,
   } as MoreTableChoice);
 
-  const observationGroupStatuses: ComputedRef<MoreTableChoice[]> = computed(
-    () =>
-      observationGroupStore.observationGroups.map(
-        (observationGroup) =>
-          ({
-            label: observationGroup.title,
-            value: observationGroup.observationGroupId?.toString(),
-          }) as MoreTableChoice,
-      ),
-  );
-
-  const categoryTopicOptions: ComputedRef<MoreTableChoice[]> = computed(() => {
-    return (
-      goalTemplateStore.goalCategories?.map((item) => ({
-        label: item.label,
-        value: item.value ?? null,
-      })) ?? []
-    );
-  });
-
-  const adherenceCheckOptions: ComputedRef<MoreTableChoice[]> = computed(() => {
-    const options =
-      goalTemplateStore.goalConfig?.schedule?.map((item) => ({
-        label: t(
-          `goaltemplate.goalTemplateList.meassurementTimes.times.${item.key}`,
-        ),
-        value: item.key ?? null,
-      })) ?? [];
-    return options as MoreTableChoice[];
-  });
+  const sortOptions: MoreTableSortOptions = {
+    sortField: 'title',
+    sortOrder: -1,
+  };
 
   const factories = ref<ComponentFactory[]>([]);
 
@@ -296,10 +311,6 @@
     },
   ];
 
-  async function listGoalTemplates(): Promise<void> {
-    await goalTemplateStore.listGoalTemplates(props.studyId);
-  }
-
   function executeAction(action: MoreTableRowActionResult): void {
     const row = action.row as GoalTemplateMap;
     switch (action.id) {
@@ -316,6 +327,12 @@
         console.error('no handler for action', action);
     }
   }
+
+  getGoalFactories();
+
+  observationGroupsApi.listObservationGroups(props.studyId).then((response) => {
+    observationGroupStore.observationGroups = response.data;
+  });
 
   function mapToApiGoalTemplate(goalTemplate: GoalTemplateMap): GoalTemplate {
     const clean = { ...goalTemplate } as any;
@@ -356,19 +373,20 @@
     goalTemplate: GoalTemplateMap,
   ): Promise<void> {
     const cleanGoalTemplate = mapToApiGoalTemplate(goalTemplate);
-    await goalTemplateStore.updateGoalTemplate(
-      props.studyId,
-      cleanGoalTemplate as GoalTemplate,
-    );
+    await updateMutation.mutateAsync({
+      studyId: props.studyId,
+      templateId: cleanGoalTemplate.templateId as number,
+      goalTemplate: cleanGoalTemplate as GoalTemplate,
+    });
   }
 
   async function deleteGoalTemplate(
     reuqestGoalTemplate: GoalTemplate,
   ): Promise<void> {
-    await goalTemplateStore.deleteGoalTemplate(
-      props.studyId,
-      reuqestGoalTemplate.templateId as number,
-    );
+    await deleteMutation.mutateAsync({
+      studyId: props.studyId,
+      templateId: reuqestGoalTemplate.templateId as number,
+    });
   }
 
   async function addGoalTemplate(
@@ -377,10 +395,10 @@
     const cleanGoalTemplate = mapToApiGoalTemplate(newGoalTemplate);
     delete cleanGoalTemplate.templateId;
 
-    await goalTemplateStore.addGoalTemplate(
-      props.studyId,
-      cleanGoalTemplate as GoalTemplate,
-    );
+    await addMutation.mutateAsync({
+      studyId: props.studyId,
+      goalTemplate: cleanGoalTemplate as GoalTemplate,
+    });
   }
 
   function factoryForType(type?: string): ComponentFactory | undefined {
@@ -398,19 +416,16 @@
         component: component,
         factory: factoryForType(component?.type),
         componentType: 'goalTemplate',
-        hasComponentCategories:
-          goalTemplateStore.goalCategories as MoreTableChoice[],
+        hasComponentCategories: categoryTopicOptions.value,
         errorMessage: component?.errorMessage,
-        hasSimpleScheduler: goalTemplateStore.goalConfig?.schedule.map(
-          (item) => {
-            return {
-              key: item.key,
-              label: t(
-                `goaltemplate.goalTemplateList.meassurementTimes.times.${item.key}`,
-              ),
-            };
-          },
-        ),
+        hasSimpleScheduler: goalConfig.value?.schedule?.map((item) => {
+          return {
+            key: item.key,
+            label: t(
+              `goaltemplate.goalTemplateList.meassurementTimes.times.${item.key}`,
+            ),
+          };
+        }),
         simpleSchedulerValues: component?.adherenceChecks ?? [],
         closeWithEscape: false,
       },
@@ -475,12 +490,6 @@
     item.command();
   }
 
-  async function getGoalConfig(): Promise<void> {
-    await goalTemplateStore.getGoalConfig(props.studyId);
-  }
-
-  listGoalTemplates();
-  getGoalConfig();
   getGoalFactories();
 
   observationGroupsApi.listObservationGroups(props.studyId).then((response) => {

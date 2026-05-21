@@ -5,7 +5,7 @@
   import Checkbox from 'primevue/checkbox';
   import InputText from 'primevue/inputtext';
   import { AdherenceCheckScheduleEnum, StudyGoalConfig } from '@gs';
-  import { useGoalTemplateStore } from '@/stores/goalTemplateStore';
+  import { useGoalConfig, useSetGoalConfig } from '@/api/goalQueries';
   import { useI18n } from 'vue-i18n';
 
   const { t } = useI18n();
@@ -18,9 +18,12 @@
   const props = withDefaults(defineProps<Props>(), {
     isButtonDisabled: false,
   });
-  const goalTemplateStore = useGoalTemplateStore();
+
+  const { data: goalConfig } = useGoalConfig(props.studyId);
+  const { mutateAsync: setGoalConfigMutation } = useSetGoalConfig();
+
   const goalTemplateSchedule: ComputedRef<any[]> = computed(
-    () => goalTemplateStore.goalConfig?.schedule ?? [],
+    () => goalConfig.value?.schedule ?? [],
   );
   const isOpen = ref(false);
   const overlayPanel = ref<InstanceType<typeof Popover> | null>(null);
@@ -38,7 +41,7 @@
   );
 
   const initTimeSlots = (): void => {
-    const schedule = goalTemplateStore.goalConfig?.schedule || [];
+    const schedule = goalConfig.value?.schedule || [];
     timeSlots.value.forEach((slot) => {
       const existing = schedule.find((s) => s.key === slot.id);
       if (existing) {
@@ -52,7 +55,7 @@
   };
 
   onMounted(initTimeSlots);
-  watch(() => goalTemplateStore.goalConfig, initTimeSlots, { deep: true });
+  watch(() => goalConfig.value, initTimeSlots, { deep: true });
 
   const handleSave = async (): Promise<void> => {
     const newSchedule = timeSlots.value
@@ -63,17 +66,16 @@
       }));
 
     const newConfig: StudyGoalConfig = {
-      ...goalTemplateStore.goalConfig,
-      consents: goalTemplateStore.goalConfig?.consents || {
+      ...goalConfig.value,
+      consents: goalConfig.value?.consents || {
         commitment: '',
         achievability: '',
         understandable: '',
       },
       schedule: newSchedule,
-    };
+    } as StudyGoalConfig;
 
-    await goalTemplateStore
-      .setGoalConfig(props.studyId, newConfig)
+    await setGoalConfigMutation({ studyId: props.studyId, config: newConfig })
       .then(() => (isOpen.value = false));
     overlayPanel.value?.hide();
     isOpen.value = false;

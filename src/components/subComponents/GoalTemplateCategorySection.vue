@@ -1,6 +1,11 @@
 <script setup lang="ts">
   import { ref, computed } from 'vue';
-  import { useGoalTemplateStore } from '@/stores/goalTemplateStore';
+  import {
+    useGoalConfig,
+    useCreateGoalTopic,
+    useUpdateGoalTopic,
+    useDeleteGoalTopic,
+  } from '@/api/goalQueries';
   import { useI18n } from 'vue-i18n';
   import Button from 'primevue/button';
   import Popover from 'primevue/popover';
@@ -16,7 +21,6 @@
   import { useDialog } from 'primevue/usedialog';
 
   const { t } = useI18n();
-  const goalTemplateStore = useGoalTemplateStore();
 
   interface Props {
     studyId: number;
@@ -25,7 +29,12 @@
 
   const props = defineProps<Props>();
 
-  const goalTopics = computed(() => goalTemplateStore.goalTopics);
+  const { data: goalConfig } = useGoalConfig(props.studyId);
+  const { mutateAsync: createGoalTopicMutation } = useCreateGoalTopic();
+  const { mutateAsync: updateGoalTopicMutation } = useUpdateGoalTopic();
+  const { mutateAsync: deleteGoalTopicMutation } = useDeleteGoalTopic();
+
+  const goalTopics = computed(() => goalConfig.value?.topics ?? []);
 
   const overlayPanel = ref<InstanceType<typeof Popover> | null>(null);
   const isOpen = ref(false);
@@ -46,8 +55,7 @@
       description: newTopicDescription.value,
     } as any;
 
-    await goalTemplateStore
-      .createGoalTopic(props.studyId, topic as GoalTopic)
+    await createGoalTopicMutation({ studyId: props.studyId, topic: topic as GoalTopic })
       .then(() => {
         isOpen.value = false;
         overlayPanel.value?.hide();
@@ -58,7 +66,7 @@
 
   async function deleteTopic(topic: GoalTopic): Promise<void> {
     if (!topic.key) return;
-    await goalTemplateStore.deleteGoalTopic(props.studyId, topic.key);
+    await deleteGoalTopicMutation({ studyId: props.studyId, key: topic.key });
   }
 
   const goalCategoryColumns: MoreTableColumn[] = [
@@ -99,7 +107,7 @@
 
   function changeValueInPlace(topic: GoalTopic): void {
     if (topic && !!topic?.key) {
-      goalTemplateStore.updateGoalTopic(props.studyId, topic.key, topic);
+      updateGoalTopicMutation({ studyId: props.studyId, key: topic.key, topic: topic });
     }
   }
 
