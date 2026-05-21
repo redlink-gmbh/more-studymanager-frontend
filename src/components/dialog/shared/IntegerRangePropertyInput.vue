@@ -1,25 +1,21 @@
 <script setup lang="ts">
-  import { IntegerRangeProperty } from '../../../models/InputModels';
-  import { PropType, watch, computed } from 'vue';
+  import { IntegerRangeProperty } from '@/models/InputModels';
+  import { watch, computed } from 'vue';
   import InputNumber from 'primevue/inputnumber';
   import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
   import { useI18n } from 'vue-i18n';
 
   const { t } = useI18n();
 
-  const props = defineProps({
-    property: {
-      type: Object as PropType<IntegerRangeProperty>,
-      required: true,
-    },
-    isPartOfTemplate: {
-      type: Boolean,
-      default: false,
-    },
-    editable: {
-      type: Boolean,
-      default: true,
-    },
+  interface Props {
+    property: IntegerRangeProperty;
+    isPartOfTemplate?: boolean;
+    editable?: boolean;
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    isPartOfTemplate: false,
+    editable: true,
   });
 
   const emit = defineEmits<{
@@ -28,13 +24,17 @@
 
   const placeholderLower = computed(() =>
     props.property.description
-      ? t(`${props.property.description.split('.description')[0]}.placeholder-min`)
+      ? t(
+          `${props.property.description.split('.description')[0]}.placeholder-min`,
+        )
       : undefined,
   );
 
   const placeholderUpper = computed(() =>
     props.property.description
-      ? t(`${props.property.description.split('.description')[0]}.placeholder-max`)
+      ? t(
+          `${props.property.description.split('.description')[0]}.placeholder-max`,
+        )
       : undefined,
   );
 
@@ -78,59 +78,79 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-1">
-      <div class="flex items-center gap-1">
-        <h6 class="font-bold">
-          <label :for="`${property.id}-lower`" class="font-bold">{{
-            $t(property.name)
-          }}</label>
-        </h6>
-        <PartOfTemplateBadge :visible="isPartOfTemplate" :component-id="property.id" />
-      </div>
-      <div
-        v-if="
-          property.description &&
-          property.description !== 'inputModel.enterValue'
-        "
-      >
-        {{ $t(property.description) }}
-      </div>
-    <div class="grid grid-cols-2 gap-4 items-center">
-      <div class="flex items-center gap-2">
-        <label :for="`${property.id}-lower`" class="text-xs text-gray-400 whitespace-nowrap">{{
-          $t('global.labels.min')
+  <div class="integer-range-property-input flex flex-col gap-1">
+    <div class="flex items-center gap-1">
+      <h6 class="font-bold">
+        <label :for="`${property.id}-lower`" class="font-bold">{{
+          $t(property.name)
         }}</label>
+      </h6>
+      <PartOfTemplateBadge
+        :visible="isPartOfTemplate"
+        :component-id="property.id"
+      />
+    </div>
+    <div
+      v-if="
+        property.description && property.description !== 'inputModel.enterValue'
+      "
+    >
+      {{ $t(property.description) }}
+    </div>
+    <div class="grid grid-cols-2 items-center gap-4">
+      <div class="flex items-center gap-2">
+        <label
+          :for="`${property.id}-lower`"
+          class="text-xs whitespace-nowrap text-gray-400"
+          >{{ $t('global.labels.min') }}</label
+        >
         <InputNumber
           :id="`${property.id}-lower`"
           v-model="(property.value as any).lower"
           class="flex-1"
-          :class="{ 'p-invalid': property.required && (property.value?.lower === null || property.value?.lower === undefined) }"
+          :class="{
+            'p-invalid':
+              property.required &&
+              (property.value?.lower === null ||
+                property.value?.lower === undefined),
+          }"
           :min-fraction-digits="0"
           :max-fraction-digits="0"
           :disabled="!editable || property.immutable"
           :min="property.minLimit"
           :max="property.maxLimit"
           :placeholder="
-            placeholderLower ? placeholderLower : $t('global.placeholder.enterTextValue')
+            placeholderLower
+              ? placeholderLower
+              : $t('global.placeholder.enterTextValue')
           "
         />
       </div>
       <div class="flex items-center gap-2">
-        <label :for="`${property.id}-upper`" class="text-xs text-gray-400 whitespace-nowrap">{{
-          $t('global.labels.max')
-        }}</label>
+        <label
+          :for="`${property.id}-upper`"
+          class="text-xs whitespace-nowrap text-gray-400"
+          >{{ $t('global.labels.max') }}</label
+        >
         <InputNumber
           :id="`${property.id}-upper`"
           v-model="(property.value as any).upper"
           class="flex-1"
-          :class="{ 'p-invalid': property.required && (property.value?.upper === null || property.value?.upper === undefined) }"
+          :class="{
+            'p-invalid':
+              property.required &&
+              (property.value?.upper === null ||
+                property.value?.upper === undefined),
+          }"
           :min-fraction-digits="0"
           :max-fraction-digits="0"
           :disabled="!editable || property.immutable"
           :min="property.minLimit"
           :max="property.maxLimit"
           :placeholder="
-            placeholderUpper ? placeholderUpper : $t('global.placeholder.enterTextValue')
+            placeholderUpper
+              ? placeholderUpper
+              : $t('global.placeholder.enterTextValue')
           "
         />
       </div>
@@ -144,15 +164,6 @@
   </div>
 </template>
 
-<style scoped>
-  :deep(.p-inputnumber) {
-    border: transparent;
-    padding: 0;
-    min-width: 0;
-  }
-
-  :deep(.p-inputnumber-input) {
-    width: 100%;
-    min-width: 0;
-  }
+<style>
+  @import '@/styles/components/custom-property-input-styles.css';
 </style>

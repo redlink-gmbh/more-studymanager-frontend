@@ -10,17 +10,14 @@
 
   const { t } = useI18n();
 
-  const props = defineProps({
-    studyId: {
-      type: Number,
-      required: true,
-    },
-    isButtonDisabled: {
-      type: Boolean,
-      default: false,
-    },
-  });
+  interface Props {
+    studyId: number;
+    isButtonDisabled?: boolean;
+  }
 
+  const props = withDefaults(defineProps<Props>(), {
+    isButtonDisabled: false,
+  });
   const goalTemplateStore = useGoalTemplateStore();
   const goalTemplateSchedule: ComputedRef<any[]> = computed(
     () => goalTemplateStore.goalConfig?.schedule ?? [],
@@ -100,7 +97,9 @@
           @click="toggleOverlay($event)"
         >
           <span>{{
-            $t('goaltemplate.goalTemplateList.meassurementTimes.adaptMeassurment')
+            $t(
+              'goaltemplate.goalTemplateList.meassurementTimes.adaptMeassurment',
+            )
           }}</span>
           <span
             class="pi pi-angle-down ml-3"
@@ -174,9 +173,7 @@
       >
         {{ $t('goaltemplate.goalTemplateList.meassurementTimes.notSet') }}
       </div>
-      <span
-        v-else
-        class="py-2 text-sm"
+      <span v-else class="py-2 text-sm"
         >{{ $t('goaltemplate.goalTemplateList.meassurementTimes.set') }}:
         {{
           goalTemplateSchedule

@@ -1,20 +1,22 @@
 <script setup lang="ts">
-  import { GroupingProperty } from '../../../models/InputModels';
-  import { PropType } from 'vue';
+  import { GroupingProperty } from '@/models/InputModels';
 
-  defineProps({
-    property: {
-      type: Object as PropType<GroupingProperty>,
-      required: true,
-    },
-  });
+  interface Props {
+    property: GroupingProperty;
+  }
+
+  defineProps<Props>();
 </script>
 
 <template>
   <div class="col-span-8 mt-4 mb-4">
-    <hr class="text-gray-300 mt-10 mb-8" />
+    <hr class="mt-10 mb-8 text-gray-300" />
     <h5 class="mb-2">{{ $t(property.name) }}</h5>
-    <p v-if="property.description && property.description !== 'inputModel.enterValue'">
+    <p
+      v-if="
+        property.description && property.description !== 'inputModel.enterValue'
+      "
+    >
       {{ $t(property.description) }}
     </p>
   </div>

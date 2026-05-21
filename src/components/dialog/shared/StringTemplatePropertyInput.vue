@@ -3,24 +3,19 @@
     StringTemplateProperty,
     Property,
     IntegerRangeProperty,
-  } from '../../../models/InputModels';
-  import { PropType, computed, ref } from 'vue';
+  } from '@/models/InputModels';
   import InputText from 'primevue/inputtext';
   import Button from 'primevue/button';
+  import { ref, computed } from 'vue';
 
-  const props = defineProps({
-    property: {
-      type: Object as PropType<StringTemplateProperty>,
-      required: true,
-    },
-    allProperties: {
-      type: Array as PropType<Property<any>[]>,
-      required: true,
-    },
-    editable: {
-      type: Boolean,
-      default: true,
-    },
+  interface Props {
+    property: StringTemplateProperty;
+    allProperties: Property<any>[];
+    editable?: boolean;
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    editable: true,
   });
 
   const emit = defineEmits<{
@@ -54,7 +49,12 @@
       return `<${p.id}>`;
     }
 
-    if (p.value === undefined || p.value === null || p.value === '' || String(p.value) === 'null') {
+    if (
+      p.value === undefined ||
+      p.value === null ||
+      p.value === '' ||
+      String(p.value) === 'null'
+    ) {
       return `<${p.id}>`;
     }
 
@@ -65,24 +65,13 @@
         return `<${p.id}>`;
       }
 
-      const min =
-        val.min !== undefined
-          ? val.min
-          : val.lower !== undefined && val.lower !== null
-            ? val.lower
-            : 0;
-      const max =
-        val.max !== undefined
-          ? val.max
-          : val.upper !== undefined && val.upper !== null
-            ? val.upper
-            : 0;
+      const min = val.min ?? val.lower ?? 0;
+      const max = val.max ?? val.upper ?? 0;
 
       if (val.lower === null || val.upper === null) {
         return `<${p.id}>`;
       }
 
-      // Return a random value between min and max for the preview
       if (min === max) return `${min}`;
       const randomVal = Math.floor(Math.random() * (max - min + 1)) + min;
       return `${randomVal}`;
@@ -154,7 +143,9 @@
     </div>
 
     <div v-if="isEditing" class="mb-4">
-      <div class="relative mb-2 rounded border border-gray-300 bg-gray-50 p-4 flex justify-between items-center">
+      <div
+        class="relative mb-2 flex items-center justify-between rounded border border-gray-300 bg-gray-50 p-4"
+      >
         <div class="w-full">
           <InputText
             v-model="property.value"
@@ -196,9 +187,7 @@
               >
                 {{ $t(part.varName || '') }}
               </span>
-              <div
-                class="property-values rounded px-1 font-medium"
-              >
+              <div class="property-values rounded px-1 font-medium">
                 {{ part.content }}
               </div>
             </div>

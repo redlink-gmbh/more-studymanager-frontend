@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, computed, PropType } from 'vue';
+  import { ref, computed } from 'vue';
   import { useGoalTemplateStore } from '@/stores/goalTemplateStore';
   import { useI18n } from 'vue-i18n';
   import Button from 'primevue/button';
@@ -18,10 +18,12 @@
   const { t } = useI18n();
   const goalTemplateStore = useGoalTemplateStore();
 
-  const props = defineProps({
-    studyId: { type: Number, required: true },
-    studyStatus: { type: String as PropType<StudyStatus>, required: true },
-  });
+  interface Props {
+    studyId: number;
+    studyStatus: StudyStatus;
+  }
+
+  const props = defineProps<Props>();
 
   const goalTopics = computed(() => goalTemplateStore.goalTopics);
 
@@ -200,11 +202,13 @@
         ></div>
       </template>
       <div v-else class="py-2 text-sm text-gray-500 italic">
-        Noch keine Kategorien vorhanden
+        {{
+          t('goaltemplate.goalTemplateList.categories.noCategoriesAvailable')
+        }}
       </div>
     </div>
 
-    <Popover ref="overlayPanel" :class="['w-[400px]']">
+    <Popover ref="overlayPanel" class="w-100">
       <div class="p-2">
         <div class="flex flex-col gap-3">
           <div class="flex flex-col gap-1">

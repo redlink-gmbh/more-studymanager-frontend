@@ -14,27 +14,28 @@ Licensed under the Elastic License 2.0. */
     StudyStatus,
     ValidationReport,
   } from '@gs/models';
-  import { MoreTableChoice } from '../../models/MoreTableModel';
+  import { MoreTableChoice } from '@/models/MoreTableModel';
   import RelativeScheduler from '../shared/RelativeScheduler.vue';
   import { useDialog } from 'primevue/usedialog';
-  import { useComponentsApi } from '../../composable/useApi';
-  import { useStudyStore } from '../../stores/studyStore';
+  import { useComponentsApi } from '@/composable/useApi';
+  import { useStudyStore } from '@/stores/studyStore';
   import { useI18n } from 'vue-i18n';
-  import { Property } from '../../models/InputModels';
+  import { Property } from '@/models/InputModels';
   import PropertyInputs from './shared/PropertyInputs.vue';
-  import { PropertyEmit } from '../../models/PropertyInputModels';
+  import { PropertyEmit } from '@/models/PropertyInputModels';
   import SchedulerInfoBlock from '../subComponents/SchedulerInfoBlock.vue';
   import AbsoluteScheduler from '../shared/Scheduler.vue';
-  import { isObjectEmpty } from '../../utils/commonUtils';
-  import { ScheduleType } from '../../models/Scheduler';
+  import { isObjectEmpty } from '@/utils/commonUtils';
+  import { ScheduleType } from '@/models/Scheduler';
   import { AxiosError } from 'axios';
-  import { useErrorHandling } from '../../composable/useErrorHandling';
-  import { useToastService } from '../../composable/toastService';
+  import { useErrorHandling } from '@/composable/useErrorHandling';
+  import { useToastService } from '@/composable/toastService';
   import MultiSelect from 'primevue/multiselect';
-  import { useObservationGroupStore } from '../../stores/observationGroupStore';
+  import { useObservationGroupStore } from '@/stores/observationGroupStore';
   import ObservationToggle from '../subComponents/ObservationToggle.vue';
-  import { extractCurrentLimeDomain } from '../../utils/limeSurveyUtils';
-  import { scrollToFirstError } from '../../utils/componentUtils';
+  import { extractCurrentLimeDomain } from '@/utils/limeSurveyUtils';
+  import { scrollToFirstError } from '@/utils/componentUtils';
+  import InfoWarningErrorSection from '@/components/shared/InfoWarningErrorSection.vue';
 
   const { handleToastErrors, showErrorToast } = useToastService();
   const dialog = useDialog();
@@ -118,7 +119,7 @@ Licensed under the Elastic License 2.0. */
   );
 
   const studyGroupId = ref(component.studyGroupId);
-  const categories = ref(component.categories?.topics ?? []);
+  const categories = ref(component.categories?.topics ?? undefined);
 
   function getLabelForChoiceValue(
     value: any,
@@ -336,18 +337,11 @@ Licensed under the Elastic License 2.0. */
       ></h6>
     </div>
 
-    <div
-      v-if="errorMessage"
-      class="col-span-8 mb-4 rounded border border-red-700 bg-red-50 py-2 px-4"
-    >
-      <div class="flex items-center gap-1 text-red-700">
-        <i class="pi pi-exclamation-circle"></i>
-        <span class="font-bold">{{ $t('global.labels.error') }}</span>
-      </div>
-      <div class="mt-1 text-red-700">
-        {{ errorMessage }}
-      </div>
-    </div>
+    <info-warning-error-section
+      class="mb-4"
+      :error-message="errorMessage"
+      :error-label="t('global.labels.error')"
+    />
 
     <form
       id="componentDialogForm"
@@ -441,15 +435,12 @@ Licensed under the Elastic License 2.0. */
             </template>
           </MultiSelect>
         </div>
-        <div v-else class="rounded border border-yellow-400 bg-yellow-50 p-4">
-          <div class="flex items-center gap-2 text-yellow-700">
-            <i class="pi pi-exclamation-triangle"></i>
-            <span class="font-bold">{{ $t('global.labels.warning') }}</span>
-          </div>
-          <div class="mt-2 text-yellow-700">
-            {{ $t('goaltemplate.error.noSimpleSchedulerOptions') }}
-          </div>
-        </div>
+        <info-warning-error-section
+          v-else
+          :is-warning="true"
+          :error-message="$t('goaltemplate.error.noSimpleSchedulerOptions')"
+          :error-label="$t('global.labels.warning')"
+        />
       </div>
       <SchedulerInfoBlock
         v-else
@@ -632,10 +623,6 @@ Licensed under the Elastic License 2.0. */
   @import '../../styles/components/eye-checkbox.css';
 
   .dialog {
-    :deep(.dropdown-has-value .p-select-label) {
-      color: var(--text-color);
-    }
-
     .day {
       &:after {
         content: ', ';

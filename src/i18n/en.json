@@ -133,7 +133,8 @@
       "to": "to",
       "leavePage": "Do you really want to leave the page?",
       "dataHealth": "Data health",
-      "searchPlaceholder": "Search..."
+      "searchPlaceholder": "Search...",
+      "warning": "Warning"
     },
     "placeholder": {
       "all": "All",
@@ -775,7 +776,8 @@
         "add": "Add Category",
         "delete": "Delete Category",
         "namePlaceholder": "Category name",
-        "descriptionPlaceholder": "Optional description"
+        "descriptionPlaceholder": "Optional description",
+        "noCategoriesAvailable": "No categories available"
       },
       "error": {
         "invalidCategoryTopics": "One or more target categories are invalid."

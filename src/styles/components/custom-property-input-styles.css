@@ -1,0 +1,17 @@
+.integer-range-property-input {
+  .p-inputnumber {
+    min-width: 0;
+  }
+
+  .p-inputnumber-input {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.integer-property-input, .integer-range-property-input {
+  .p-inputnumber {
+    border: transparent;
+    padding: 0;
+  }
+}

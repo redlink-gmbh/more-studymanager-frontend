@@ -4,27 +4,23 @@ Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Elastic License 2.0. */
 <script setup lang="ts">
-  import { IntegerProperty } from '../../../models/InputModels';
-  import { PropType, watch, computed } from 'vue';
+  import { IntegerProperty } from '@/models/InputModels';
+  import { watch, computed } from 'vue';
   import InputNumber from 'primevue/inputnumber';
   import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
   import { useI18n } from 'vue-i18n';
 
   const { t } = useI18n();
 
-  const props = defineProps({
-    property: {
-      type: Object as PropType<IntegerProperty>,
-      required: true,
-    },
-    isPartOfTemplate: {
-      type: Boolean,
-      default: false,
-    },
-    editable: {
-      type: Boolean,
-      default: true,
-    },
+  interface Props {
+    property: IntegerProperty;
+    isPartOfTemplate?: boolean;
+    editable?: boolean;
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    isPartOfTemplate: false,
+    editable: true
   });
 
   const emit = defineEmits<{
@@ -48,12 +44,15 @@ Licensed under the Elastic License 2.0. */
 </script>
 
 <template>
-  <div class="flex flex-col gap-1">
+  <div class="integer-property-input flex flex-col gap-1">
     <h6 class="flex items-center font-bold">
       <label :for="property.id">
         {{ $t(property.name) }}<span v-if="property.required">*</span>
       </label>
-      <PartOfTemplateBadge :visible="isPartOfTemplate" :component-id="property.id" />
+      <PartOfTemplateBadge
+        :visible="isPartOfTemplate"
+        :component-id="property.id"
+      />
     </h6>
 
     <div v-if="props.property.description" :id="`${property.id}-help`">
@@ -70,14 +69,13 @@ Licensed under the Elastic License 2.0. */
       :disabled="!editable || property.immutable"
       class="w-full"
       :aria-describedby="`${property.id}-help`"
-      :placeholder="placeholder ? placeholder : $t('global.placeholder.enterTextValue')"
+      :placeholder="
+        placeholder ? placeholder : $t('global.placeholder.enterTextValue')
+      "
     />
   </div>
 </template>
 
-<style scoped>
-  :deep(.p-inputnumber) {
-    border: transparent;
-    padding: 0;
-  }
+<style>
+  @import '@/styles/components/custom-property-input-styles.css';
 </style>

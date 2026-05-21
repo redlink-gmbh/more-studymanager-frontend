@@ -133,7 +133,8 @@
       "to": "zu",
       "leavePage": "Möchten Sie die Seite wirklich verlassen?",
       "dataHealth": "Datenqualität",
-      "searchPlaceholder": "Suchen..."
+      "searchPlaceholder": "Suchen...",
+      "warning": "Warnung"
     },
     "placeholder": {
       "all": "Alle",
@@ -775,7 +776,8 @@
         "add": "Kategorie hinzufügen",
         "delete": "Kategorie löschen",
         "namePlaceholder": "Name der Kategorie",
-        "descriptionPlaceholder": "Optionale Beschreibung"
+        "descriptionPlaceholder": "Optionale Beschreibung",
+        "noCategoriesAvailable": "Noch keine Kategorien vorhanden"
       },
       "error": {
         "invalidCategoryTopics": "Eine oder mehrere Zielkategorien sind ungültig."
