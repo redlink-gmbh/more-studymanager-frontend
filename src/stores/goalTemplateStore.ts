@@ -53,7 +53,7 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
       categoryTopics: goalTemplate?.categories.topics ?? [],
       goalTypeLabel: `goaltemplate.factory.${goalTemplate.type}.name`,
       appTitle: goalTemplate?.properties?.['app-title'] ?? '',
-      adhearanceCheckLabels: (goalTemplate?.adherenceChecks as any) ?? [],
+      adheranceCheckLabels: [],
       observationGroupValues:
         goalTemplate.observationGroupIds?.map((id) => {
           const group = observationGroupStore.observationGroups.find(

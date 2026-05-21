@@ -58,16 +58,10 @@
           categoryTopics: goalTemplateStore.getTopicNames(
             item.categoryTopics ?? [],
           ),
-          adhearanceCheckLabels:
-            item.adhearanceCheckLabels?.length === 0
-              ? '-'
-              : item.adhearanceCheckLabels
-                  .map((ad: string) =>
-                    t(
-                      `goaltemplate.goalTemplateList.meassurmentTimes.itmes.${ad}`,
-                    ),
-                  )
-                  .join(','),
+          adheranceCheckLabels:
+            (item.adherenceChecks?.map((ad: string) =>
+              adherenceCheckOptions.value.find((opt) => opt.value === ad),
+            ).filter(Boolean) as MoreTableChoice[]) ?? [],
           observationGroupValues: item.observationGroupIds?.length
             ? item.observationGroupIds.map((id) =>
                 observationGroupStatuses.value?.find(
@@ -119,6 +113,17 @@
           }) as MoreTableChoice,
       ),
   );
+
+  const adherenceCheckOptions: ComputedRef<MoreTableChoice[]> = computed(() => {
+    return (
+      goalTemplateStore.goalConfig?.schedule?.map((item) => ({
+        label: t(
+          `goaltemplate.goalTemplateList.meassurementTimes.times.${item.key}`,
+        ),
+        value: item.key,
+      })) ?? []
+    );
+  });
 
   const factories = ref<ComponentFactory[]>([]);
 
@@ -177,8 +182,14 @@
       filterable: true,
     },
     {
-      field: 'adhearanceCheckLabels',
+      field: 'adheranceCheckLabels',
       header: t('goaltemplate.props.adhearanceCheck'),
+      type: MoreTableFieldType.multiselect,
+      arrayLabels: adherenceCheckOptions.value,
+      editable: {
+        enabled: actionsVisible,
+        values: adherenceCheckOptions.value,
+      },
       sortable: true,
     },
     {
@@ -296,11 +307,17 @@
           parseInt(v.value!),
         );
     }
+    if (goalTemplate.adheranceCheckLabels) {
+      goalTemplate.adherenceChecks = goalTemplate.adheranceCheckLabels.map(
+        (v: MoreTableChoice) => v.value as any,
+      );
+    }
     const cleanGoalTemplate = { ...goalTemplate } as any;
     delete cleanGoalTemplate.observationGroupValues;
     delete cleanGoalTemplate.goalTypeLabel;
     delete cleanGoalTemplate.categoryKind;
     delete cleanGoalTemplate.categoryTopics;
+    delete cleanGoalTemplate.adheranceCheckLabels;
     delete cleanGoalTemplate.adhearanceCheckLabels;
     delete cleanGoalTemplate.appTitle;
 
@@ -327,6 +344,13 @@
           parseInt(v.value!),
         );
       delete cleanGoalTemplate.observationGroupValues;
+    }
+    if (cleanGoalTemplate.adheranceCheckLabels) {
+      cleanGoalTemplate.adherenceChecks = cleanGoalTemplate.adheranceCheckLabels.map(
+        (v: MoreTableChoice) => v.value as any,
+      );
+      delete cleanGoalTemplate.adheranceCheckLabels;
+      delete cleanGoalTemplate.adhearanceCheckLabels;
     }
     if (cleanGoalTemplate.goalTypeLabel) delete cleanGoalTemplate.goalTypeLabel;
     if (cleanGoalTemplate.categoryKind) delete cleanGoalTemplate.categoryKind;
@@ -366,10 +390,10 @@
               label: t(
                 `goaltemplate.goalTemplateList.meassurementTimes.times.${item.key}`,
               ),
-              time: item.time,
             };
           },
         ),
+        simpleSchedulerValues: component?.adherenceChecks ?? [],
         closeWithEscape: false,
       },
       props: {

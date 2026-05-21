@@ -60,6 +60,7 @@ Licensed under the Elastic License 2.0. */
   const hasSimpleScheduler = dialogRef.value.data.hasSimpleScheduler as
     | { key: string; label: string; time: string }[]
     | undefined;
+  const simpleSchedulerValues = dialogRef.value.data.simpleSchedulerValues;
   const hasComponentCategories = dialogRef.value.data
     .hasComponentCategories as MoreTableChoice[];
   const editable =
@@ -109,9 +110,10 @@ Licensed under the Elastic License 2.0. */
   );
 
   const simpleSchedulerSelection = ref(
-    Array.isArray(component.schedule)
-      ? component.schedule.map((s: any) => s.key)
-      : [],
+    simpleSchedulerValues ||
+      (Array.isArray(component.schedule)
+        ? component.schedule.map((s: any) => s.key)
+        : []),
   );
 
   const studyGroupId = ref(component.studyGroupId);
@@ -255,7 +257,7 @@ Licensed under the Elastic License 2.0. */
           : [],
         type: component.type,
         properties: props,
-        adhearanceCheck:
+        adherenceChecks:
           hasSimpleScheduler
             ?.filter((s) => simpleSchedulerSelection.value.includes(s.key))
             .map((s) => s.key) ?? [],
@@ -404,7 +406,9 @@ Licensed under the Elastic License 2.0. */
               <div class="flex items-center">
                 <div>
                   {{ slotProps.option.label }}
-                  ({{ slotProps.option.time.slice(0, 5) }})
+                  <span v-if="slotProps.option.time">
+                    ({{ slotProps.option.time.slice(0, 5) }})
+                  </span>
                 </div>
               </div>
             </template>
@@ -470,7 +474,9 @@ Licensed under the Elastic License 2.0. */
         ></Textarea>
       </div>
       <div v-if="properties.length" class="col-span-8 col-start-0">
-        <h5 v-if="componentType === 'observation'" class="mb-2">{{ $t('global.labels.config') }}</h5>
+        <h5 v-if="componentType === 'observation'" class="mb-2">
+          {{ $t('global.labels.config') }}
+        </h5>
         <div class="col-span-8 col-start-0">
           <div v-if="properties">
             <PropertyInputs

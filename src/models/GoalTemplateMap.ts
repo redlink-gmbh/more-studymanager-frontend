@@ -5,7 +5,7 @@ export interface GoalTemplateMap extends GoalTemplate {
   categoryKind?: GoalTemplateCategoriesKindEnum;
   categoryTopics?: string[];
   goalTypeLabel: string;
-  adhearanceCheckLabels: string[];
+  adheranceCheckLabels: MoreTableChoice[];
   appTitle: string;
   observationGroupValues?: MoreTableChoice[];
 }
