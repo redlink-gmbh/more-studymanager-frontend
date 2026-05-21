@@ -115,14 +115,13 @@
   );
 
   const adherenceCheckOptions: ComputedRef<MoreTableChoice[]> = computed(() => {
-    return (
-      goalTemplateStore.goalConfig?.schedule?.map((item) => ({
-        label: t(
-          `goaltemplate.goalTemplateList.meassurementTimes.times.${item.key}`,
-        ),
-        value: item.key,
-      })) ?? []
-    );
+    const options = goalTemplateStore.goalConfig?.schedule?.map((item) => ({
+      label: t(
+        `goaltemplate.goalTemplateList.meassurementTimes.times.${item.key}`,
+      ),
+      value: item.key ?? null,
+    })) ?? [];
+    return options as MoreTableChoice[];
   });
 
   const factories = ref<ComponentFactory[]>([]);
@@ -153,7 +152,7 @@
       .sort((a, b) => a.label.localeCompare(b.label)),
   );
 
-  const goalColumns: MoreTableColumn[] = [
+  const goalColumns: ComputedRef<MoreTableColumn[]> = computed(() => [
     {
       field: 'templateId',
       header: 'id',
@@ -215,7 +214,7 @@
       placeholder: t('global.placeholder.noGroup'),
       columnWidth: '10vw',
     },
-  ];
+  ]);
 
   const rowActions: MoreTableAction[] = [
     {
@@ -413,14 +412,15 @@
       },
       onClose: (options) => {
         if (options?.data) {
-          if (options.data?.templateId) {
+          const resultData = options.data as GoalTemplateMap;
+          if (resultData.templateId) {
             if (clone) {
-              addGoalTemplate(options.data as GoalTemplate);
+              addGoalTemplate(resultData);
             } else {
-              updateGoalTemplate(options.data as GoalTemplateMap);
+              updateGoalTemplate(resultData);
             }
           } else {
-            addGoalTemplate(options.data as GoalTemplate);
+            addGoalTemplate(resultData);
           }
         }
       },
