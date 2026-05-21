@@ -66,15 +66,7 @@
       }
 
       const min = val.min ?? val.lower ?? 0;
-      const max = val.max ?? val.upper ?? 0;
-
-      if (val.lower === null || val.upper === null) {
-        return `<${p.id}>`;
-      }
-
-      if (min === max) return `${min}`;
-      const randomVal = Math.floor(Math.random() * (max - min + 1)) + min;
-      return `${randomVal}`;
+      return `${min}`;
     }
 
     return String(p.value);
