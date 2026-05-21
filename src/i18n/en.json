@@ -91,6 +91,7 @@
       "logout": "Log out"
     },
     "labels": {
+      "error": "Error",
       "add": "Add",
       "apply": "Apply",
       "cancel": "Cancel",
@@ -143,7 +144,8 @@
       "noGroup": "No group",
       "nothingSelected": "Nothing selected",
       "optionsSelected": "options selected",
-      "selected": "selected"
+      "selected": "selected",
+      "chooseCategory": "Choose category"
     }
   },
   "inputModel": {
@@ -774,6 +776,9 @@
         "delete": "Delete Category",
         "namePlaceholder": "Category name",
         "descriptionPlaceholder": "Optional description"
+      },
+      "error": {
+        "invalidCategoryTopics": "One or more target categories are invalid."
       }
     },
     "goalTemplateTopicList": {

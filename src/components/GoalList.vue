@@ -44,10 +44,6 @@
   const goalTemplateStore = useGoalTemplateStore();
   const observationGroupStore = useObservationGroupStore();
 
-  const goalTemplateList: ComputedRef<GoalTemplate[]> = computed(
-    () => goalTemplateStore.goalTemplates ?? [],
-  );
-
   const goalTemplateListMap: ComputedRef<GoalTemplateMap[]> = computed(() => {
     return goalTemplateStore.goalTemplatesMap.map(
       (item) =>
@@ -58,10 +54,16 @@
           categoryTopics: goalTemplateStore.getTopicNames(
             item.categoryTopics ?? [],
           ),
+          hasError: goalTemplateStore.checkMissingTopicsError(item),
+          errorMessage: goalTemplateStore.checkMissingTopicsError(item)
+            ? t(`goaltemplate.goalTemplateList.error.invalidCategoryTopics`)
+            : undefined,
           adheranceCheckLabels:
-            (item.adherenceChecks?.map((ad: string) =>
-              adherenceCheckOptions.value.find((opt) => opt.value === ad),
-            ).filter(Boolean) as MoreTableChoice[]) ?? [],
+            (item.adherenceChecks
+              ?.map((ad: string) =>
+                adherenceCheckOptions.value.find((opt) => opt.value === ad),
+              )
+              .filter(Boolean) as MoreTableChoice[]) ?? [],
           observationGroupValues: item.observationGroupIds?.length
             ? item.observationGroupIds.map((id) =>
                 observationGroupStatuses.value?.find(
@@ -114,13 +116,23 @@
       ),
   );
 
+  const categoryTopicOptions: ComputedRef<MoreTableChoice[]> = computed(() => {
+    return (
+      goalTemplateStore.goalCategories?.map((item) => ({
+        label: item.label,
+        value: item.value ?? null,
+      })) ?? []
+    );
+  });
+
   const adherenceCheckOptions: ComputedRef<MoreTableChoice[]> = computed(() => {
-    const options = goalTemplateStore.goalConfig?.schedule?.map((item) => ({
-      label: t(
-        `goaltemplate.goalTemplateList.meassurementTimes.times.${item.key}`,
-      ),
-      value: item.key ?? null,
-    })) ?? [];
+    const options =
+      goalTemplateStore.goalConfig?.schedule?.map((item) => ({
+        label: t(
+          `goaltemplate.goalTemplateList.meassurementTimes.times.${item.key}`,
+        ),
+        value: item.key ?? null,
+      })) ?? [];
     return options as MoreTableChoice[];
   });
 
@@ -146,7 +158,7 @@
         command: (): void => {
           openComponentDialog(t('goaltemplate.dialog.header.create'), {
             type: cf.componentId,
-          } as GoalTemplate);
+          } as GoalTemplateMap);
         },
       }))
       .sort((a, b) => a.label.localeCompare(b.label)),
@@ -179,6 +191,14 @@
       header: t('goaltemplate.props.goalCategory'),
       sortable: true,
       filterable: true,
+      type: MoreTableFieldType.multiselect,
+      arrayLabels: categoryTopicOptions.value,
+      editable: {
+        enabled: actionsVisible,
+        values: categoryTopicOptions.value,
+      },
+      placeholder: t('global.placeholder.chooseCategory'),
+      columnWidth: '10vw',
     },
     {
       field: 'adheranceCheckLabels',
@@ -281,7 +301,7 @@
   }
 
   function executeAction(action: MoreTableRowActionResult): void {
-    const row = action.row as GoalTemplate;
+    const row = action.row as GoalTemplateMap;
     switch (action.id) {
       case 'delete':
         deleteGoalTemplate(row);
@@ -297,29 +317,45 @@
     }
   }
 
-  async function updateGoalTemplate(
-    goalTemplate: GoalTemplateMap,
-  ): Promise<void> {
-    if (goalTemplate.observationGroupValues) {
-      goalTemplate.observationGroupIds =
-        goalTemplate.observationGroupValues.map((v: MoreTableChoice) =>
-          parseInt(v.value!),
-        );
+  function mapToApiGoalTemplate(goalTemplate: GoalTemplateMap): GoalTemplate {
+    const clean = { ...goalTemplate } as any;
+
+    if (clean.observationGroupValues) {
+      clean.observationGroupIds = clean.observationGroupValues.map(
+        (v: MoreTableChoice) => parseInt(v.value!),
+      );
     }
-    if (goalTemplate.adheranceCheckLabels) {
-      goalTemplate.adherenceChecks = goalTemplate.adheranceCheckLabels.map(
+    if (clean.adheranceCheckLabels) {
+      clean.adherenceChecks = clean.adheranceCheckLabels.map(
         (v: MoreTableChoice) => v.value as any,
       );
     }
-    const cleanGoalTemplate = { ...goalTemplate } as any;
-    delete cleanGoalTemplate.observationGroupValues;
-    delete cleanGoalTemplate.goalTypeLabel;
-    delete cleanGoalTemplate.categoryKind;
-    delete cleanGoalTemplate.categoryTopics;
-    delete cleanGoalTemplate.adheranceCheckLabels;
-    delete cleanGoalTemplate.adhearanceCheckLabels;
-    delete cleanGoalTemplate.appTitle;
+    if (clean.categoryTopics && Array.isArray(clean.categoryTopics)) {
+      clean.categories = {
+        ...clean.categories,
+        topics: clean.categoryTopics.map((v: any) =>
+          typeof v === 'string' ? v : v.value,
+        ),
+      };
+    }
 
+    delete clean.observationGroupValues;
+    delete clean.goalTypeLabel;
+    delete clean.categoryKind;
+    delete clean.categoryTopics;
+    delete clean.adheranceCheckLabels;
+    delete clean.adhearanceCheckLabels;
+    delete clean.appTitle;
+    delete clean.hasError;
+    delete clean.errorMessage;
+
+    return clean as GoalTemplate;
+  }
+
+  async function updateGoalTemplate(
+    goalTemplate: GoalTemplateMap,
+  ): Promise<void> {
+    const cleanGoalTemplate = mapToApiGoalTemplate(goalTemplate);
     await goalTemplateStore.updateGoalTemplate(
       props.studyId,
       cleanGoalTemplate as GoalTemplate,
@@ -335,29 +371,11 @@
     );
   }
 
-  async function addGoalTemplate(newGoalTemplate: GoalTemplate): Promise<void> {
-    const cleanGoalTemplate = { ...newGoalTemplate } as any;
-    if (cleanGoalTemplate.observationGroupValues) {
-      cleanGoalTemplate.observationGroupIds =
-        cleanGoalTemplate.observationGroupValues.map((v: MoreTableChoice) =>
-          parseInt(v.value!),
-        );
-      delete cleanGoalTemplate.observationGroupValues;
-    }
-    if (cleanGoalTemplate.adheranceCheckLabels) {
-      cleanGoalTemplate.adherenceChecks = cleanGoalTemplate.adheranceCheckLabels.map(
-        (v: MoreTableChoice) => v.value as any,
-      );
-      delete cleanGoalTemplate.adheranceCheckLabels;
-      delete cleanGoalTemplate.adhearanceCheckLabels;
-    }
-    if (cleanGoalTemplate.goalTypeLabel) delete cleanGoalTemplate.goalTypeLabel;
-    if (cleanGoalTemplate.categoryKind) delete cleanGoalTemplate.categoryKind;
-    if (cleanGoalTemplate.categoryTopics)
-      delete cleanGoalTemplate.categoryTopics;
-    if (cleanGoalTemplate.adhearanceCheckLabels)
-      delete cleanGoalTemplate.adhearanceCheckLabels;
-    if (cleanGoalTemplate.appTitle) delete cleanGoalTemplate.appTitle;
+  async function addGoalTemplate(
+    newGoalTemplate: GoalTemplateMap,
+  ): Promise<void> {
+    const cleanGoalTemplate = mapToApiGoalTemplate(newGoalTemplate);
+    delete cleanGoalTemplate.templateId;
 
     await goalTemplateStore.addGoalTemplate(
       props.studyId,
@@ -371,7 +389,7 @@
 
   function openComponentDialog(
     headerText: string,
-    component?: GoalTemplate,
+    component?: GoalTemplateMap,
     clone?: boolean,
   ): void {
     dialog.open(ComponentDialog, {
@@ -382,6 +400,7 @@
         componentType: 'goalTemplate',
         hasComponentCategories:
           goalTemplateStore.goalCategories as MoreTableChoice[],
+        errorMessage: component?.errorMessage,
         hasSimpleScheduler: goalTemplateStore.goalConfig?.schedule.map(
           (item) => {
             return {
@@ -428,7 +447,7 @@
   }
 
   function openEditGoalTemplate(goalTemplateId: number | undefined): void {
-    const goalTemplate = goalTemplateList.value.find(
+    const goalTemplate = goalTemplateListMap.value.find(
       (goal: GoalTemplate) => goal.templateId === goalTemplateId,
     );
     if (goalTemplate) {

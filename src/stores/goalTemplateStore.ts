@@ -50,10 +50,11 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
     return {
       ...goalTemplate,
       categoryKind: goalTemplate?.categories.kind,
-      categoryTopics: goalTemplate?.categories.topics ?? [],
+      categoryTopics: goalTemplate?.categories.topics,
       goalTypeLabel: `goaltemplate.factory.${goalTemplate.type}.name`,
       appTitle: goalTemplate?.properties?.['app-title'] ?? '',
       adheranceCheckLabels: [],
+      hasError: false,
       observationGroupValues:
         goalTemplate.observationGroupIds?.map((id) => {
           const group = observationGroupStore.observationGroups.find(
@@ -67,8 +68,28 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
     };
   }
 
-  function getTopicNames(keys: string[]): string {
-    return keys.map((key) => goalTopics.value.find((t) => t.key === key)?.title || key).join(', ');
+  function checkMissingTopicsError(goalTemplate: GoalTemplate): boolean {
+    const missingTopics = goalTemplate.categories.topics.filter(
+      (topicKey) => !goalTopics.value.find((t) => t.key === topicKey),
+    );
+
+    if (missingTopics.length > 0 || goalTemplate.categories.topics.length === 0) {
+      return true
+    }
+    return false;
+  }
+
+  function getTopicNames(keys: string[]): MoreTableChoice[] {
+    return keys.map((key) =>
+    {
+      const item = goalTopics.value.find((t) => t.key === key)
+
+      return {
+        label: item?.title as string,
+        value: item?.key as string ?? key
+      }
+    })
+    ;
   }
 
   async function addGoalTemplate(
@@ -162,8 +183,6 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
       });
   }
 
-  // goal category/topic rud
-
   async function createGoalTopic(
     studyId: number,
     topic: GoalTopic,
@@ -212,15 +231,18 @@ export const useGoalTemplateStore = defineStore('goalTemplate', () => {
   }
 
   const goalCategories = computed(() => {
-    return goalTopics.value.map((topic) => ({
-      label: topic.title,
-      value: topic.key,
-    }));
+    return (
+      goalTopics.value?.map((topic) => ({
+        label: topic.title,
+        value: topic.key,
+      })) ?? []
+    );
   });
 
   return {
     goalCategories,
     goalTypes,
+    checkMissingTopicsError,
     goalTemplates,
     goalTemplatesMap,
     goalConfig,

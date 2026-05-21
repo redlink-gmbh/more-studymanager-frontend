@@ -8,4 +8,6 @@ export interface GoalTemplateMap extends GoalTemplate {
   adheranceCheckLabels: MoreTableChoice[];
   appTitle: string;
   observationGroupValues?: MoreTableChoice[];
+  hasError: boolean;
+  errorMessage?: string;
 }

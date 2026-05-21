@@ -91,6 +91,7 @@
       "logout": "Ausloggen"
     },
     "labels": {
+      "error": "Error",
       "add": "Hinzufügen",
       "apply": "Anwenden",
       "cancel": "Abbrechen",
@@ -143,7 +144,8 @@
       "noGroup": "Keine Gruppe",
       "nothingSelected": "Nichts ausgewählt",
       "optionsSelected": "Optionen ausgewählt",
-      "selected": "ausgewählt"
+      "selected": "ausgewählt",
+      "chooseCategory": "Kategorie auswählen"
     }
   },
   "inputModel": {
@@ -774,6 +776,9 @@
         "delete": "Kategorie löschen",
         "namePlaceholder": "Name der Kategorie",
         "descriptionPlaceholder": "Optionale Beschreibung"
+      },
+      "error": {
+        "invalidCategoryTopics": "Eine oder mehrere Zielkategorien sind ungültig."
       }
     },
     "goalTemplateTopicList": {

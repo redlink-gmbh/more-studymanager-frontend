@@ -46,6 +46,7 @@ Licensed under the Elastic License 2.0. */
 
   const dialogRef: any = inject('dialogRef');
   const component = dialogRef.value.data.component;
+  const errorMessage = dialogRef.value.data.errorMessage;
   const groupStates = dialogRef.value.data.groupStates || [];
   const observationGroupStates: MoreTableChoice[] =
     observationGroupStore.observationGroups.map(
@@ -333,6 +334,19 @@ Licensed under the Elastic License 2.0. */
         v-if="factory.description"
         v-html="$t(factory.description, { link: extractCurrentLimeDomain() })"
       ></h6>
+    </div>
+
+    <div
+      v-if="errorMessage"
+      class="col-span-8 mb-4 rounded border border-red-700 bg-red-50 py-2 px-4"
+    >
+      <div class="flex items-center gap-1 text-red-700">
+        <i class="pi pi-exclamation-circle"></i>
+        <span class="font-bold">{{ $t('global.labels.error') }}</span>
+      </div>
+      <div class="mt-1 text-red-700">
+        {{ errorMessage }}
+      </div>
     </div>
 
     <form
