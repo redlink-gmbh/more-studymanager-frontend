@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  import { computed, ComputedRef, PropType, ref } from 'vue';
+  import { computed, ComputedRef, PropType, ref, toValue } from 'vue';
   import {
     useComponentsApi,
     useObservationGroupsApi,
-  } from '../composable/useApi';
+  } from '@/composable/useApi';
   import {
     ComponentFactory,
     GoalTemplate,
@@ -19,7 +19,7 @@
     MoreTableRowActionResult,
     MoreTableSortOptions,
     RowSelectionMode,
-  } from '../models/MoreTableModel';
+  } from '@/models/MoreTableModel';
   import ConfirmDialog from 'primevue/confirmdialog';
   import DynamicDialog from 'primevue/dynamicdialog';
   import MoreTable from '../components/shared/MoreTable.vue';
@@ -37,6 +37,7 @@
     mapToGoalTemplateMap,
     checkMissingTopicsError,
     getTopicNames,
+    StudyGoalConfigData,
   } from '@/api/goalQueries';
   import { useObservationGroupStore } from '@/stores/observationGroupStore';
   import GoalTemplateMessurementSection from '@/components/subComponents/GoalTemplateMeasssurementSection.vue';
@@ -57,8 +58,9 @@
   });
 
   const observationGroupStore = useObservationGroupStore();
-  const { data: goalTemplates = [] } = useGoalTemplates(props.studyId);
-  const { data: goalConfig } = useGoalConfig(props.studyId);
+  const { data: goalTemplatesResponse } = useGoalTemplates(props.studyId);
+  const goalTemplates = computed(() => toValue(goalTemplatesResponse) ?? []);
+  const { data: goalConfig } = useGoalConfig(props.studyId) as { data: { value: StudyGoalConfigData | undefined } };
   const addMutation = useAddGoalTemplate();
   const updateMutation = useUpdateGoalTemplate();
   const deleteMutation = useDeleteGoalTemplate();
@@ -96,7 +98,7 @@
 
   const goalTemplateListMap: ComputedRef<GoalTemplateMap[]> = computed(() => {
     return (
-      goalTemplates.value?.map((item) => {
+      goalTemplates.value?.map((item: GoalTemplate) => {
         const mapped = mapToGoalTemplateMap(
           item,
           observationGroupStore.observationGroups,

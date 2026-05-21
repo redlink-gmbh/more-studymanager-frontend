@@ -1,14 +1,16 @@
 import { useMutation, useQuery, useQueryClient, UseQueryReturnType, UseMutationReturnType } from '@tanstack/vue-query';
-import { useGoalsApi } from '../composable/useApi';
+import { useGoalsApi } from '@/composable/useApi';
 import { MaybeRefOrGetter, toValue } from 'vue';
 import {
   GoalTemplate,
   GoalTopic,
   StudyGoalConfig,
-  StudyGoalConfigData,
+  StudyGoalConfigData as StudyGoalConfigDataBase,
 } from '@gs';
-import type { GoalTemplateMap } from '../models/GoalTemplateMap';
-import { MoreTableChoice } from '../models/MoreTableModel';
+
+export type StudyGoalConfigData = StudyGoalConfigDataBase & { topics: GoalTopic[] };
+import type { GoalTemplateMap } from '@/models/GoalTemplateMap';
+import { MoreTableChoice } from '@/models/MoreTableModel';
 
 export const useGoalTemplates = (
   studyId: MaybeRefOrGetter<number>,
@@ -119,7 +121,7 @@ export const useSetGoalConfig = (): UseMutationReturnType<
     mutationFn: ({ studyId, config }) =>
       goalsApi
         .setGoalConfig(studyId, config)
-        .then((res) => res.data),
+        .then((res) => res.data as StudyGoalConfigData),
     onSuccess: (_, { studyId }) => {
       queryClient.invalidateQueries({
         queryKey: ['studies', studyId, 'goal-config'],
@@ -217,7 +219,7 @@ export function mapToGoalTemplateMap(
     categoryKind: goalTemplate?.categories.kind,
     categoryTopics: goalTemplate?.categories.topics,
     goalTypeLabel: `goaltemplate.factory.${goalTemplate.type}.name`,
-    appTitle: goalTemplate?.properties?.['app-title'] ?? '',
+    appTitle: (goalTemplate?.properties as any)?.['app-title'] ?? '',
     adheranceCheckLabels: [],
     hasError: false,
     observationGroupValues:

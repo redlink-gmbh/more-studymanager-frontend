@@ -5,6 +5,7 @@
     useCreateGoalTopic,
     useUpdateGoalTopic,
     useDeleteGoalTopic,
+    StudyGoalConfigData,
   } from '@/api/goalQueries';
   import { useI18n } from 'vue-i18n';
   import Button from 'primevue/button';
@@ -29,7 +30,7 @@
 
   const props = defineProps<Props>();
 
-  const { data: goalConfig } = useGoalConfig(props.studyId);
+  const { data: goalConfig } = useGoalConfig(props.studyId) as { data: { value: StudyGoalConfigData | undefined } };
   const { mutateAsync: createGoalTopicMutation } = useCreateGoalTopic();
   const { mutateAsync: updateGoalTopicMutation } = useUpdateGoalTopic();
   const { mutateAsync: deleteGoalTopicMutation } = useDeleteGoalTopic();
