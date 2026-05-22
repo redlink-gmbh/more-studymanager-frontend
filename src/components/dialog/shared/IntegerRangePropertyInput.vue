@@ -4,6 +4,7 @@
   import InputNumber from 'primevue/inputnumber';
   import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
   import { useI18n } from 'vue-i18n';
+  import { varifyPlaceholderText } from '@/utils/setPlaceholderText';
 
   const { t } = useI18n();
 
@@ -22,21 +23,15 @@
     (e: 'onInputChange', rangeInput: IntegerRangeProperty): void;
   }>();
 
-  const placeholderLower = computed(() =>
-    props.property.description
-      ? t(
-          `${props.property.description.split('.description')[0]}.placeholder-min`,
-        )
-      : undefined,
-  );
+  const placeholderLower = computed(() => {
+    const placeholder = varifyPlaceholderText(props.property.description, 'placeholder-min',);
+    return placeholder ? t(placeholder) : undefined;
+  });
 
-  const placeholderUpper = computed(() =>
-    props.property.description
-      ? t(
-          `${props.property.description.split('.description')[0]}.placeholder-max`,
-        )
-      : undefined,
-  );
+  const placeholderUpper = computed(() => {
+    const placeholder = varifyPlaceholderText(props.property.description, 'placeholder-max');
+    return placeholder ? t(placeholder) : undefined;
+  });
 
   watch(
     () => props.property.value?.lower,

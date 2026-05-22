@@ -9,6 +9,7 @@ Licensed under the Elastic License 2.0. */
   import InputNumber from 'primevue/inputnumber';
   import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
   import { useI18n } from 'vue-i18n';
+  import { varifyPlaceholderText } from '@/utils/setPlaceholderText';
 
   const { t } = useI18n();
 
@@ -20,18 +21,17 @@ Licensed under the Elastic License 2.0. */
 
   const props = withDefaults(defineProps<Props>(), {
     isPartOfTemplate: false,
-    editable: true
+    editable: true,
   });
 
   const emit = defineEmits<{
     (e: 'onInputChange', integerInput: IntegerProperty): void;
   }>();
 
-  const placeholder = computed(() =>
-    props.property.description
-      ? t(`${props.property.description.split('.description')[0]}.placeholder`)
-      : undefined,
-  );
+  const placeholder = computed(() => {
+    const placeholder = varifyPlaceholderText(props.property.description, 'placeholder');
+    return placeholder ? t(placeholder) : undefined;
+  });
 
   watch(
     () => props.property.value,

@@ -1,13 +1,10 @@
 <script setup lang="ts">
   import { UnknownProperty } from '@/models/InputModels';
-  import { PropType } from 'vue';
+  interface Props {
+    property: UnknownProperty;
+  }
 
-defineProps({
-    property: {
-      type: Object as PropType<UnknownProperty>,
-      required: true,
-    },
-  });
+defineProps<Props>();
 </script>
 
 <template>

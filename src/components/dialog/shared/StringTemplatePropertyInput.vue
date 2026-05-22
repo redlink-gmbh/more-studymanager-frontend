@@ -7,6 +7,10 @@
   import InputText from 'primevue/inputtext';
   import Button from 'primevue/button';
   import { ref, computed } from 'vue';
+  import {
+    SIMPLE_TEMPLATE_PROPERTY_INPUT_REGEX,
+    SIMPLE_TEMPLATE_PROPERTY_PARTS_REGEX,
+  } from '@/utils/constants';
 
   interface Props {
     property: StringTemplateProperty;
@@ -77,7 +81,7 @@
 
     // This is simple implementation, might need refinement for nested or complex ones
     template = template.replace(
-      /\[([^\]]*<([^>]+)>[^\]]*)\]/g,
+      SIMPLE_TEMPLATE_PROPERTY_INPUT_REGEX,
       (match, inner, varName) => {
         const p = getPropertyByIdOrName(varName);
         if (p && p.value !== undefined && p.value !== null && p.value !== '') {
@@ -92,7 +96,7 @@
 
   const parts = computed(() => {
     const text = renderedTemplate.value;
-    const regex = /<([^>]+)>/g;
+    const regex = SIMPLE_TEMPLATE_PROPERTY_PARTS_REGEX;
     const result = [];
     let lastIndex = 0;
     let match;
