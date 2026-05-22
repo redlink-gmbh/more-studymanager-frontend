@@ -10,31 +10,32 @@ Licensed under the Elastic License 2.0. */
   import Button from 'primevue/button';
   import Dropdown from 'primevue/dropdown';
   import {
-    Observation,
     ObservationSchedule,
     StudyStatus,
     ValidationReport,
   } from '@gs/models';
-  import { MoreTableChoice } from '../../models/MoreTableModel';
+  import { MoreTableChoice } from '@/models/MoreTableModel';
   import RelativeScheduler from '../shared/RelativeScheduler.vue';
   import { useDialog } from 'primevue/usedialog';
-  import { useComponentsApi } from '../../composable/useApi';
-  import { useStudyStore } from '../../stores/studyStore';
+  import { useComponentsApi } from '@/composable/useApi';
+  import { useStudyStore } from '@/stores/studyStore';
   import { useI18n } from 'vue-i18n';
-  import { Property } from '../../models/InputModels';
+  import { Property } from '@/models/InputModels';
   import PropertyInputs from './shared/PropertyInputs.vue';
-  import { PropertyEmit } from '../../models/PropertyInputModels';
+  import { PropertyEmit } from '@/models/PropertyInputModels';
   import SchedulerInfoBlock from '../subComponents/SchedulerInfoBlock.vue';
   import AbsoluteScheduler from '../shared/Scheduler.vue';
-  import { isObjectEmpty } from '../../utils/commonUtils';
-  import { ScheduleType } from '../../models/Scheduler';
+  import { isObjectEmpty } from '@/utils/commonUtils';
+  import { ScheduleType } from '@/models/Scheduler';
   import { AxiosError } from 'axios';
-  import { useErrorHandling } from '../../composable/useErrorHandling';
-  import { useToastService } from '../../composable/toastService';
+  import { useErrorHandling } from '@/composable/useErrorHandling';
+  import { useToastService } from '@/composable/toastService';
   import MultiSelect from 'primevue/multiselect';
-  import { useObservationGroupStore } from '../../stores/observationGroupStore';
+  import { useObservationGroupStore } from '@/stores/observationGroupStore';
   import ObservationToggle from '../subComponents/ObservationToggle.vue';
-  import { extractCurrentLimeDomain } from '../../utils/limeSurveyUtils';
+  import { extractCurrentLimeDomain } from '@/utils/limeSurveyUtils';
+  import { scrollToFirstError } from '@/utils/componentUtils';
+  import InfoWarningErrorSection from '@/components/shared/InfoWarningErrorSection.vue';
 
   const { handleToastErrors, showErrorToast } = useToastService();
   const dialog = useDialog();
@@ -45,7 +46,8 @@ Licensed under the Elastic License 2.0. */
   const { t } = useI18n();
 
   const dialogRef: any = inject('dialogRef');
-  const observation = dialogRef.value.data.observation as Observation;
+  const component = dialogRef.value.data.component;
+  const errorMessage = dialogRef.value.data.errorMessage;
   const groupStates = dialogRef.value.data.groupStates || [];
   const observationGroupStates: MoreTableChoice[] =
     observationGroupStore.observationGroups.map(
@@ -56,38 +58,68 @@ Licensed under the Elastic License 2.0. */
         }) as MoreTableChoice,
     );
   const factory = dialogRef.value.data.factory;
+  const componentType = dialogRef.value.data.componentType || 'observation';
+  const hasSimpleScheduler = dialogRef.value.data.hasSimpleScheduler as
+    | { key: string; label: string; time: string }[]
+    | undefined;
+  const simpleSchedulerValues = dialogRef.value.data.simpleSchedulerValues;
+  const hasComponentCategories = dialogRef.value.data
+    .hasComponentCategories as MoreTableChoice[];
   const editable =
     studyStore.study.status === StudyStatus.Draft ||
     studyStore.study.status === StudyStatus.Paused ||
     studyStore.study.status === StudyStatus.PausedPreview;
+  const isGoal = componentType === 'goalTemplate';
 
-  const title = ref(observation.title);
-  const purpose = ref(observation.purpose);
-  const participantInfo = ref(observation.participantInfo);
+  const title = ref(component.title);
+  const purpose = ref(component.purpose);
+  const participantInfo = ref(component.participantInfo);
   const properties: Ref<Property<any>[]> = ref(
     factory.properties
-      .map((json: any) => Property.fromJson(json))
-      .map((p: Property<any>) => p.setValue(observation.properties?.[p.id])),
+      ?.map((json: any) => {
+        try {
+          return Property.fromJson(json);
+        } catch (e) {
+          console.warn(
+            'Skipping unknown property type in dialog:',
+            json.type,
+            json,
+            e,
+          );
+          return null;
+        }
+      })
+      .filter((p: Property<any> | null): p is Property<any> => p !== null)
+      .map((p: Property<any>) => p.setValue(component.properties?.[p.id])) ??
+      [],
   );
   const selectedObservationGroups = ref(
-    observation.observationGroupIds?.map((id: number) => id.toString()) ?? [],
+    component.observationGroupIds?.map((id: number) => id.toString()) ?? [],
   );
 
   const hidden: Ref<boolean> = ref(
-    observation.hidden !== undefined
-      ? observation.hidden
-      : factory.visibility.hiddenByDefault,
+    component.hidden !== undefined
+      ? component.hidden
+      : (factory.visibility?.hiddenByDefault ?? false),
   );
 
   const reminder: Ref<boolean> = ref(
-    observation.reminder !== undefined ? observation.reminder : false,
+    component.reminder !== undefined ? component.reminder : false,
   );
 
   const scheduler: Ref<ObservationSchedule> = ref(
-    observation.schedule ? observation.schedule : {},
+    component.schedule ? component.schedule : {},
   );
 
-  const studyGroupId = ref(observation.studyGroupId);
+  const simpleSchedulerSelection = ref(
+    simpleSchedulerValues ||
+      (Array.isArray(component.schedule)
+        ? component.schedule.map((s: any) => s.key)
+        : []),
+  );
+
+  const studyGroupId = ref(component.studyGroupId);
+  const categories = ref(component.categories?.topics ?? undefined);
 
   function getLabelForChoiceValue(
     value: any,
@@ -133,16 +165,24 @@ Licensed under the Elastic License 2.0. */
   }
 
   function validate(): void {
+    checkRequiredFields();
+    if (errors.value.length > 0) {
+      scrollToFirstError();
+      return;
+    }
+
     let parsedProps: any;
     try {
       parsedProps = Property.toJson(properties.value);
       componentsApi
         .validateProperties(
-          'observation',
-          observation.type as string,
+          componentType,
+          component.type as string,
           parsedProps,
         )
-        .then((response: any) => response.data)
+        .then((response: any) => {
+          return response.data;
+        })
         .then((report: ValidationReport) => {
           if (report.valid) {
             save(parsedProps);
@@ -170,7 +210,7 @@ Licensed under the Elastic License 2.0. */
   };
 
   function save(props: any): void {
-    if (isObjectEmpty(scheduler.value)) {
+    if (!hasSimpleScheduler && isObjectEmpty(scheduler.value)) {
       if (studyStore.study.plannedStart && studyStore.study.plannedEnd) {
         scheduler.value = {
           type: ScheduleType.Event,
@@ -188,47 +228,87 @@ Licensed under the Elastic License 2.0. */
       }
     }
 
-    const returnObservation = {
-      observationId: observation.observationId,
-      title: title.value,
-      purpose: purpose.value,
-      participantInfo: participantInfo.value,
-      observationGroupIds: selectedObservationGroups.value?.length
-        ? selectedObservationGroups.value.map((id: string) => parseInt(id))
-        : [],
-      type: observation.type,
-      properties: props,
-      schedule: scheduler.value,
-      studyGroupId: studyGroupId.value,
-      hidden: hidden.value,
-      reminder: reminder.value,
-    } as Observation;
+    if (componentType === 'observation') {
+      const returnComponent = {
+        observationId: component.observationId,
+        title: title.value,
+        purpose: purpose.value,
+        participantInfo: participantInfo.value,
+        observationGroupIds: selectedObservationGroups.value?.length
+          ? selectedObservationGroups.value.map((id: string) => parseInt(id))
+          : [],
+        type: component.type,
+        properties: props,
+        schedule: scheduler.value,
+        studyGroupId: studyGroupId.value,
+        hidden: hidden.value,
+        reminder: reminder.value,
+      };
 
-    if (!isObjectEmpty(scheduler.value)) {
-      dialogRef.value.close(returnObservation);
+      if (!isObjectEmpty(scheduler.value)) {
+        dialogRef.value.close(returnComponent);
+      }
+    } else if (componentType === 'goalTemplate') {
+      const returnComponent = {
+        templateId: component.templateId,
+        title: title.value,
+        purpose: purpose.value,
+        participantInfo: participantInfo.value,
+        observationGroupIds: selectedObservationGroups.value?.length
+          ? selectedObservationGroups.value.map((id: string) => parseInt(id))
+          : [],
+        type: component.type,
+        properties: props,
+        adherenceChecks:
+          hasSimpleScheduler
+            ?.filter((s) => simpleSchedulerSelection.value.includes(s.key))
+            .map((s) => s.key) ?? [],
+        studyGroupId: studyGroupId.value,
+        categories: {
+          kind: component.categories?.kind ?? 'behavioral',
+          topics: categories.value,
+        },
+      };
+      dialogRef.value.close(returnComponent);
     }
   }
 
-  let errors: MoreTableChoice[] = [];
+  const errors: Ref<MoreTableChoice[]> = ref([]);
 
   function checkRequiredFields(): void {
-    errors = [];
+    errors.value = [];
     if (!title.value) {
-      errors.push({
+      errors.value.push({
         label: 'title',
-        value: t('observation.error.addTitle'),
+        value: isGoal
+          ? t('goaltemplate.error.addTitle')
+          : t('observation.error.addTitle'),
       } as MoreTableChoice);
     }
     if (!participantInfo.value) {
-      errors.push({
+      errors.value.push({
         label: 'participantInfo',
-        value: t('observation.error.addParticipantInfo'),
+        value: isGoal
+          ? t('goaltemplate.error.addParticipantInfo')
+          : t('observation.error.addParticipantInfo'),
+      } as MoreTableChoice);
+    }
+    if (hasSimpleScheduler && simpleSchedulerSelection.value.length === 0) {
+      errors.value.push({
+        label: 'scheduler',
+        value: t('goaltemplate.error.addSchedule'),
+      } as MoreTableChoice);
+    }
+    if (isGoal && hasComponentCategories && categories.value.length === 0) {
+      errors.value.push({
+        label: 'categories',
+        value: t('goaltemplate.error.addCategory'),
       } as MoreTableChoice);
     }
   }
 
   function getError(label: string): string | null | undefined {
-    return errors.find((el) => el.label === label)?.value;
+    return errors.value.find((el) => el.label === label)?.value;
   }
 
   function cancel(): void {
@@ -249,7 +329,7 @@ Licensed under the Elastic License 2.0. */
 <template>
   <div class="dialog" :class="{ 'dialog-disabled': !editable }">
     <div class="mb-4" :class="{ 'pb-4': !editable }">
-      <h5 class="mb-1">{{ $t(factory.title) }}</h5>
+      <h5 class="mb-1">{{ factory.title ? $t(factory.title) : '' }}</h5>
       <!-- eslint-disable vue/no-v-html -->
       <h6
         v-if="factory.description"
@@ -257,16 +337,26 @@ Licensed under the Elastic License 2.0. */
       ></h6>
     </div>
 
+    <info-warning-error-section
+      class="mb-4"
+      :error-message="errorMessage"
+      :error-label="t('global.labels.error')"
+    />
+
     <form
-      id="observationDialogForm"
+      id="componentDialogForm"
       class="grid grid-cols-8 items-center gap-4"
       @submit.prevent="validate()"
     >
       <div class="col-span-8 col-start-0" :class="{ 'pb-4': !editable }">
         <h5 class="mb-1">
-          {{ $t('observation.dialog.label.observationTitle') }}*
+          {{
+            isGoal
+              ? $t('goaltemplate.label.goalTitle')
+              : $t('observation.dialog.label.observationTitle')
+          }}*
         </h5>
-        <div v-if="getError('title')" class="error mb-4">
+        <div v-if="getError('title')" class="error error-label mb-4">
           {{ getError('title') }}
         </div>
         <div class="col-span-8 col-start-0" :class="{ 'pb-4': !editable }">
@@ -280,7 +370,80 @@ Licensed under the Elastic License 2.0. */
           ></InputText>
         </div>
       </div>
+      <div
+        v-if="isGoal && hasComponentCategories"
+        class="col-span-8 col-start-0"
+        :class="{ 'pb-4': !editable }"
+      >
+        <h5 class="mb-1">{{ $t('goaltemplate.label.categoryTitle') }}*</h5>
+        <div v-if="getError('categories')" class="error error-label mb-4">
+          {{ getError('categories') }}
+        </div>
+        <MultiSelect
+          v-model="categories"
+          :options="hasComponentCategories"
+          option-label="label"
+          option-value="value"
+          class="w-full"
+          :show-toggle-all="false"
+          :disabled="!editable"
+          :placeholder="$t('global.placeholder.chooseDropdownOptionDefault')"
+        ></MultiSelect>
+      </div>
+      <div v-if="hasSimpleScheduler" class="col-span-8 col-start-0">
+        <h5 class="mb-1">{{ $t('scheduler.singular') }}*</h5>
+        <div v-if="getError('scheduler')" class="error error-label mb-4">
+          {{ getError('scheduler') }}
+        </div>
+        <div v-if="hasSimpleScheduler.length > 0">
+          <div class="mb-2">
+            {{ $t('goaltemplate.goalTemplateList.meassurementTimes.planer') }}
+          </div>
+          <MultiSelect
+            v-model="simpleSchedulerSelection"
+            :options="hasSimpleScheduler"
+            :show-toggle-all="false"
+            option-label="label"
+            option-value="key"
+            class="w-full"
+            :disabled="!editable"
+            :placeholder="$t('global.placeholder.chooseDropdownOptionDefault')"
+            :show-select-all="false"
+          >
+            <template #option="slotProps">
+              <div class="flex items-center">
+                <div>
+                  {{ slotProps.option.label }}
+                  <span v-if="slotProps.option.time">
+                    ({{ slotProps.option.time.slice(0, 5) }})
+                  </span>
+                </div>
+              </div>
+            </template>
+            <template #value="slotProps">
+              <div v-if="slotProps.value && slotProps.value.length > 0">
+                {{
+                  hasSimpleScheduler
+                    .filter((s) => slotProps.value.includes(s.key))
+                    .map((s) => s.label)
+                    .join(', ')
+                }}
+              </div>
+              <span v-else>
+                {{ slotProps.placeholder }}
+              </span>
+            </template>
+          </MultiSelect>
+        </div>
+        <info-warning-error-section
+          v-else
+          :is-warning="true"
+          :error-message="$t('goaltemplate.error.noSimpleSchedulerOptions')"
+          :error-label="$t('global.labels.warning')"
+        />
+      </div>
       <SchedulerInfoBlock
+        v-else
         :scheduler="scheduler"
         :editable="editable"
         :error="getError('scheduler') ? (getError('scheduler') as string) : ''"
@@ -303,7 +466,7 @@ Licensed under the Elastic License 2.0. */
         <h5 :class="getError('participantInfo') ? 'mb-1' : 'mb-2'">
           {{ $t('study.props.participantInfo') }}*
         </h5>
-        <div v-if="getError('participantInfo')" class="error mb-4">
+        <div v-if="getError('participantInfo')" class="error error-label mb-4">
           {{ getError('participantInfo') }}
         </div>
         <Textarea
@@ -316,7 +479,9 @@ Licensed under the Elastic License 2.0. */
         ></Textarea>
       </div>
       <div v-if="properties.length" class="col-span-8 col-start-0">
-        <h5 class="mb-2">{{ $t('global.labels.config') }}</h5>
+        <h5 v-if="componentType === 'observation'" class="mb-2">
+          {{ $t('global.labels.config') }}
+        </h5>
         <div class="col-span-8 col-start-0">
           <div v-if="properties">
             <PropertyInputs
@@ -332,6 +497,8 @@ Licensed under the Elastic License 2.0. */
         </div>
       </div>
 
+      <hr class="col-span-8 mt-5 mb-2 text-gray-300" />
+
       <div class="col-span-8 col-start-0 flex items-center justify-between">
         <div>
           <h5 v-if="editable" class="pb-2 font-bold">
@@ -344,7 +511,9 @@ Licensed under the Elastic License 2.0. */
           <div v-if="editable" class="mb-2">
             {{
               $t('study.dialog.description.howToCreateGroups', {
-                for: $t('studyNavigation.tabs.observations'),
+                for: isGoal
+                  ? $t('studyNavigation.tabs.goals')
+                  : $t('studyNavigation.tabs.observations'),
               })
             }}
           </div>
@@ -400,12 +569,17 @@ Licensed under the Elastic License 2.0. */
         </div>
       </div>
 
-      <div class="buttons col-span-8 col-start-0 mt-1 grid grid-cols-2">
-        <div class="flex flex-wrap justify-items-center gap-3">
+      <div
+        class="buttons col-span-8 col-start-0 mt-1 flex flex-row items-center justify-between"
+      >
+        <div
+          v-if="componentType === 'observation'"
+          class="flex flex-wrap justify-items-center gap-3"
+        >
           <ObservationToggle
             v-model="hidden"
             :editable="editable"
-            :changeable="factory.visibility.changeable"
+            :changeable="factory.visibility?.changeable ?? false"
             :info-text="$t('observation.dialog.msg.hiddenInfo')"
             :label="$t(`observation.props.hidden.${hidden}`)"
             enabled-icon="pi-eye-slash"
@@ -420,7 +594,10 @@ Licensed under the Elastic License 2.0. */
             disabled-icon="pi-bell-slash"
           />
         </div>
-        <div class="flex flex-row items-center justify-end text-right">
+        <div
+          class="flex flex-row items-center justify-end text-right"
+          :class="componentType === 'observation' ? 'w-auto' : 'w-full'"
+        >
           <Button class="btn-gray" @click="cancel()">
             <span v-if="editable">{{ $t('global.labels.cancel') }}</span>
             <span v-else>{{ $t('global.labels.close') }}</span>
@@ -430,7 +607,10 @@ Licensed under the Elastic License 2.0. */
             :type="editable ? 'submit' : 'button'"
             :label="$t('global.labels.save')"
             :disabled="!editable"
-            @click="checkRequiredFields()"
+            @click="
+              checkRequiredFields();
+              scrollToFirstError();
+            "
           />
         </div>
       </div>
@@ -439,37 +619,33 @@ Licensed under the Elastic License 2.0. */
 </template>
 
 <style scoped>
-@import '../../styles/components/moreTable-dialogs.css';
-@import '../../styles/components/eye-checkbox.css';
+  @import '../../styles/components/moreTable-dialogs.css';
+  @import '../../styles/components/eye-checkbox.css';
 
-.dialog {
-  :deep(.dropdown-has-value .p-select-label) {
-    color: var(--text-color);
-  }
+  .dialog {
+    .day {
+      &:after {
+        content: ', ';
+      }
 
-  .day {
-    &:after {
-      content: ', ';
+      &:last-of-type:after {
+        content: '';
+      }
     }
 
-    &:last-of-type:after {
-      content: '';
-    }
-  }
+    .info-box {
+      &-hidden {
+        width: 20vw;
+        border: 1px solid var(--bluegray-200);
+        transition: ease-in-out opacity 0.25s;
+        box-shadow: 1px 1px 5px var(--bluegray-200);
+      }
 
-  .info-box {
-    &-hidden {
-      width: 20vw;
-      border: 1px solid var(--bluegray-200);
-      transition: ease-in-out opacity 0.25s;
-      box-shadow: 1px 1px 5px var(--bluegray-200);
-    }
-
-    &:hover {
-      .info-box-hidden {
-        opacity: 1;
+      &:hover {
+        .info-box-hidden {
+          opacity: 1;
+        }
       }
     }
   }
-}
 </style>

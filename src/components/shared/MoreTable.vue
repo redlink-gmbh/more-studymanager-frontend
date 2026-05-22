@@ -243,12 +243,13 @@ Licensed under the Elastic License 2.0. */
   function getLabelForMultiSelectValue(
     setValues: any,
     valueChoices?: MoreTableChoice[],
-    placeholder?: string
+    placeholder?: string,
   ): string[] {
     if (setValues?.length === 0) {
-      return placeholder ? [placeholder] : [t('global.placeholder.chooseDropdownOptionDefault')]
-    }
-    else if (valueChoices) {
+      return placeholder
+        ? [placeholder]
+        : [t('global.placeholder.chooseDropdownOptionDefault')];
+    } else if (valueChoices) {
       const labels: string[] = [];
       setValues.forEach((v: StudyRole) => {
         const valueLabel = valueChoices.find((vc) => vc.value === v);
@@ -325,22 +326,24 @@ Licensed under the Elastic License 2.0. */
 
 <template>
   <div class="more-table">
-    <div class="mb-8 flex flex-row items-center justify-between">
+    <div class="mb-8">
       <div class="title w-full">
         <h3 v-if="title" class="font-bold">{{ title }}</h3>
         <h4 v-if="subtitle" class="text-lg">
           <!-- eslint-disable vue/no-v-html -->
           <span v-html="subtitle" />
         </h4>
+        <slot name="subTitleSection" />
       </div>
-      <div
-        class="actions table-actions ml-2.5 flex flex-row items-center justify-end gap-2"
-      >
-        <slot
-          name="tableActions"
-          :is-in-edit-mode="rowIDsInEditMode.length"
-        ></slot>
-      </div>
+    </div>
+
+    <div
+      class="actions table-actions ml-2.5 flex flex-row items-center justify-end gap-2 mb-2"
+    >
+      <slot
+        name="tableActions"
+        :is-in-edit-mode="rowIDsInEditMode.length"
+      ></slot>
     </div>
 
     <DataTable
@@ -511,7 +514,7 @@ Licensed under the Elastic License 2.0. */
             @keydown.enter="filterCallback()"
           />
         </template>
-        <template #body="{ data, field }: { data: any, field: any }">
+        <template #body="{ data, field }: { data: any; field: any }">
           <div v-if="(data as any)[field] === null" class="placeholder">
             {{ column.placeholder ?? $t('global.labels.noValue') }}
           </div>
@@ -520,7 +523,10 @@ Licensed under the Elastic License 2.0. */
               v-if="field === 'title'"
               class="align-center flex flex-row gap-1.5"
             >
-              <span v-if="(data as any)['hasError']" class="title-has-warning mr-0.2">
+              <span
+                v-if="(data as any)['hasError']"
+                class="title-has-warning mr-0.2"
+              >
                 <ExclamationIcon id="exclamationIcon" />
               </span>
               {{ (data as any)[field] }}
@@ -556,11 +562,15 @@ Licensed under the Elastic License 2.0. */
               )
             }}</span>
             <span v-if="column.type === MoreTableFieldType.calendar">
-              {{ $d(new Date((data as any)[`__internalValue_${field}`]), 'short') }}
+              {{
+                $d(new Date((data as any)[`__internalValue_${field}`]), 'short')
+              }}
             </span>
             <span v-if="column.type === MoreTableFieldType.datetime">
               <span v-if="!(data as any)[field]"> - </span>
-              <span v-else-if="(data as any)[field] && (data as any)[field] !== '-'">
+              <span
+                v-else-if="(data as any)[field] && (data as any)[field] !== '-'"
+              >
                 {{ $d(new Date((data as any)[field]), 'long') }}
               </span>
               <span v-else>
@@ -579,12 +589,16 @@ Licensed under the Elastic License 2.0. */
             >
               <span
                 v-for="(value, index) in getLabelForMultiSelectValue(
-                  (data as any)[field]
+                  (data as any)[field],
                 )"
                 :key="index"
                 class="multiselect-item"
-                :class="{'text-gray-300': MoreTableFieldType.multiselect && (data as any)[field]?.length === 0}"
-              >{{ value }}</span
+                :class="{
+                  'text-gray-300':
+                    MoreTableFieldType.multiselect &&
+                    (data as any)[field]?.length === 0,
+                }"
+                >{{ value }}</span
               >
             </span>
             <span
@@ -601,7 +615,10 @@ Licensed under the Elastic License 2.0. */
               v-if="column.type === MoreTableFieldType.binaryIcon"
               class="icon-box eye"
             >
-              <span v-if="(data as any)[field]" class="pi pi-check color-approved" />
+              <span
+                v-if="(data as any)[field]"
+                class="pi pi-check color-approved"
+              />
               <span v-else class="pi pi-times color-important" />
             </span>
           </div>
@@ -610,7 +627,10 @@ Licensed under the Elastic License 2.0. */
 
       <Column key="actions" class="row-actions" :frozen="true">
         <template #body="slotProps">
-          <div v-if="!isRowInEditMode(slotProps.data)" class="flex flex-row gap-0.5">
+          <div
+            v-if="!isRowInEditMode(slotProps.data)"
+            class="flex flex-row gap-0.5"
+          >
             <div v-for="action in rowActions" :key="action.id">
               <Button
                 v-tooltip.bottom="action.tooltip ?? undefined"
@@ -667,7 +687,10 @@ Licensed under the Elastic License 2.0. */
               </Button>
             </div>
           </div>
-          <div v-else-if="isRowInEditMode(slotProps.data)" class="flex flex-row items-center gap-2">
+          <div
+            v-else-if="isRowInEditMode(slotProps.data)"
+            class="flex flex-row items-center gap-2"
+          >
             <div class="error pi pi-exclamation-circle big" />
             <div class="error">{{ $t('moreTable.saveLine') }}</div>
             <Button
@@ -695,98 +718,94 @@ Licensed under the Elastic License 2.0. */
 </template>
 
 <style scoped>
-@import '../../styles/components/eye-checkbox.css';
+  @import '../../styles/components/eye-checkbox.css';
 
-.pi.big {
-  font-size: 1.2rem;
-}
-
-:deep(.dropdown-has-value .p-select-label) {
-  color: var(--text-color);
-}
-
-.more-table {
-  :deep(.p-datatable-loading-overlay) {
-    filter: blur(5px);
-    background-color: #ffffff99;
+  .pi.big {
+    font-size: 1.2rem;
   }
 
-  :deep(.p-datatable .p-datatable-tbody > tr:focus) {
-    outline: none;
+  :deep(.dropdown-has-value .p-select-label) {
+    color: var(--text-color);
   }
 
-  :deep(.pi-exclamation-circle.big:before) {
-    font-size: 30px;
-  }
-
-  table tbody tr {
-    font-size: 0.906rem;
-    @apply cursor-pointer;
-
-    td:last-child {
-      width: 1%;
-      white-space: nowrap;
-    }
-  }
-
-  :deep(td.row-actions) {
-    pointer-events: none;
-
-    div {
-      display: flex;
-      justify-content: flex-end;
+  .more-table {
+    :deep(.p-datatable-loading-overlay) {
+      filter: blur(5px);
+      background-color: #ffffff99;
     }
 
-    button {
-      margin: 0 0.188rem;
+    :deep(.p-datatable .p-datatable-tbody > tr:focus) {
+      outline: none;
     }
 
-    .p-button {
-      pointer-events: all;
+    :deep(.pi-exclamation-circle.big:before) {
+      font-size: 30px;
+    }
 
-      &.p-disabled {
-        pointer-events: none;
+    table tbody tr {
+      font-size: 0.906rem;
+      @apply cursor-pointer;
+
+      td:last-child {
+        width: 1%;
+        white-space: nowrap;
+      }
+    }
+
+    :deep(td.row-actions) {
+      pointer-events: none;
+
+      div {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      button {
+        margin: 0 0.188rem;
+      }
+
+      .p-button {
+        pointer-events: all;
+
+        &.p-disabled {
+          pointer-events: none;
+        }
+      }
+    }
+
+    .placeholder {
+      font-style: italic;
+      color: #ccc;
+    }
+
+    .p-multiselect {
+      width: 100%;
+      z-index: 1000;
+    }
+
+    .p-checkbox .p-checkbox-box {
+      border-radius: 50%;
+    }
+
+    .multiselect-item {
+      &:after {
+        content: ', ';
+      }
+
+      &:last-of-type:after {
+        content: '';
       }
     }
   }
 
-  .placeholder {
-    font-style: italic;
-    color: #ccc;
+  :deep(.icon-checkbox.p-checkbox.show-icon) {
+    height: 100%;
+    padding: 5px;
   }
 
-  .p-multiselect {
-    width: 100%;
-    z-index: 1000;
+  .title-has-warning,
+  .title-has-warning #exclamationIcon {
+    height: 18px;
+    width: auto;
   }
-
-  .p-checkbox .p-checkbox-box {
-    border-radius: 50%;
-  }
-
-  .multiselect-item {
-    &:after {
-      content: ', ';
-    }
-
-    &:last-of-type:after {
-      content: '';
-    }
-  }
-}
-
-.table-title-width .title {
-  max-width: 80%;
-}
-
-:deep(.icon-checkbox.p-checkbox.show-icon) {
-  height: 100%;
-  padding: 5px;
-}
-
-.title-has-warning,
-.title-has-warning #exclamationIcon {
-  height: 18px;
-  width: auto;
-}
 </style>

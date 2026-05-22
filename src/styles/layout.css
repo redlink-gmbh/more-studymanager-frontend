@@ -29,3 +29,9 @@ a {
 .color-primary {
   color: var(--primary-color)
 }
+
+.property-values {
+  color: white;
+  background-color: var(--primary-500);
+  padding: 2px 4px;
+}

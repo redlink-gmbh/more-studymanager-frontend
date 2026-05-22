@@ -32,6 +32,8 @@ export abstract class Property<T> {
     switch (value.type) {
       case 'INTEGER':
         return IntegerProperty.fromJson(value);
+      case 'INTEGER_RANGE':
+        return IntegerRangeProperty.fromJson(value);
       case 'STRING':
         return StringProperty.fromJson(value);
       case 'STRINGTEXT':
@@ -46,8 +48,12 @@ export abstract class Property<T> {
         return DataCheckProperty.fromJson(value);
       case 'OBSERVATION':
         return ObservationProperty.fromJson(value);
+      case 'GROUPING':
+        return GroupingProperty.fromJson(value);
+      case 'STRINGTEMPLATE':
+        return StringTemplateProperty.fromJson(value);
       default:
-        throw new Error('cannot case property');
+        return UnknownProperty.fromJson(value);
     }
   }
 
@@ -57,7 +63,11 @@ export abstract class Property<T> {
     | 'Array'
     | 'String'
     | 'Boolean'
-    | 'Double';
+    | 'Double'
+    | 'StringText'
+    | 'StringTemplate'
+    | 'Grouping'
+    | 'IntegerRange';
 
   static toJson(props: Property<any>[]): any {
     const result: any = {};
@@ -65,6 +75,12 @@ export abstract class Property<T> {
       //TODO kind of workaround
       if (item.getType() === 'Integer') {
         result[item.id] = parseInt(item.getValue());
+      } else if (item.getType() === 'IntegerRange') {
+        const val = item.getValue();
+        result[item.id] = {
+          lower: val && val.lower !== undefined ? parseInt(val.lower.toString()) : 0,
+          upper: val && val.upper !== undefined ? parseInt(val.upper.toString()) : 0,
+        };
       } else {
         result[item.id] = item.getValue();
       }
@@ -125,7 +141,16 @@ export class StringProperty extends Property<string> {
     this.regex = regex;
   }
 
-  getType(): 'Integer' | 'Object' | 'String' | 'Boolean' | 'Double' {
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
     return 'String';
   }
 
@@ -171,8 +196,17 @@ export class StringTextProperty extends Property<string> {
     this.regex = regex;
   }
 
-  getType(): 'Integer' | 'Object' | 'String' | 'Boolean' | 'Double' {
-    return 'String';
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
+    return 'StringText';
   }
 
   validate(): string | undefined {
@@ -241,7 +275,16 @@ export class StringListProperty extends Property<string[]> {
     return this.value?.filter((v) => v !== undefined && v.trim() !== '');
   }
 
-  getType(): 'Integer' | 'Object' | 'Array' | 'String' | 'Boolean' | 'Double' {
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
     return 'Array';
   }
 
@@ -283,7 +326,16 @@ export class IntegerProperty extends Property<number> {
     this.max = max;
   }
 
-  getType(): 'Integer' | 'Object' | 'String' | 'Boolean' | 'Double' {
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
     return 'Integer';
   }
 
@@ -309,6 +361,128 @@ export class IntegerProperty extends Property<number> {
       json.min,
       json.max,
     );
+  }
+}
+
+export class IntegerRangeProperty extends Property<{ lower: number; upper: number }> {
+  minLimit?: number;
+  maxLimit?: number;
+
+  constructor(
+    defaultValue: { lower: number; upper: number },
+    description: string,
+    id: string,
+    immutable: boolean,
+    name: string,
+    required: boolean,
+  ) {
+    super(defaultValue, description, id, immutable, name, required);
+    if (!this.value) {
+      if (this.defaultValue) {
+        this.value = {
+          lower: this.defaultValue.lower ?? 1,
+          upper: this.defaultValue.upper ?? 1,
+        };
+      } else {
+        this.value = { lower: 1, upper: 1 };
+      }
+    }
+  }
+
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
+    return 'IntegerRange';
+  }
+
+  setValue(v: any): Property<{ lower: number; upper: number }> {
+    if (v && typeof v === 'object') {
+      this.value = {
+        lower:
+          v.lower !== undefined
+            ? v.lower
+            : v.min !== undefined
+              ? v.min
+              : (this.value?.lower ?? 1),
+        upper:
+          v.upper !== undefined
+            ? v.upper
+            : v.max !== undefined
+              ? v.max
+              : (this.value?.upper ?? 1),
+      };
+    } else if (v === undefined || v === null) {
+      this.value = this.defaultValue
+        ? {
+            lower: this.defaultValue.lower ?? 1,
+            upper: this.defaultValue.upper ?? 1,
+          }
+        : { lower: 1, upper: 1 };
+    }
+    return this;
+  }
+
+  validate(): string | undefined {
+    if (this.required) {
+      if (
+        this.value?.lower === undefined ||
+        this.value?.lower === null ||
+        this.value?.upper === undefined ||
+        this.value?.upper === null
+      ) {
+        return 'global.error.required';
+      }
+    }
+    return undefined;
+  }
+
+  static fromJson(json: any): IntegerRangeProperty {
+    let defaultValue = { lower: 1, upper: 1 };
+    if (json.defaultValue) {
+      let rawDefault = json.defaultValue;
+      if (typeof json.defaultValue === 'string') {
+        try {
+          rawDefault = JSON.parse(json.defaultValue);
+        } catch (e) {
+          console.error('Error parsing IntegerRange defaultValue', e);
+        }
+      }
+
+      if (typeof rawDefault === 'object' && rawDefault !== null) {
+        defaultValue = {
+          lower:
+            rawDefault.min !== undefined
+              ? rawDefault.min
+              : rawDefault.lower !== undefined
+                ? rawDefault.lower
+                : 1,
+          upper:
+            rawDefault.max !== undefined
+              ? rawDefault.max
+              : rawDefault.upper !== undefined
+                ? rawDefault.upper
+                : 1,
+        };
+      }
+    }
+    const property = new IntegerRangeProperty(
+      defaultValue,
+      json.description,
+      json.id,
+      json.immutable,
+      json.name,
+      json.required,
+    );
+    if (json.min !== undefined) property.minLimit = json.min;
+    if (json.max !== undefined) property.maxLimit = json.max;
+    return property;
   }
 }
 
@@ -366,7 +540,16 @@ export class ObservationProperty extends Property<ObservationPropertyValue> {
     super(defaultValue, description, id, immutable, name, required);
   }
 
-  getType(): 'Integer' | 'Object' | 'Array' | 'String' | 'Boolean' | 'Double' {
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
     return 'Object';
   }
 
@@ -408,7 +591,16 @@ export class CronProperty extends Property<string> {
     );
   }
 
-  getType(): 'Integer' | 'Object' | 'String' | 'Boolean' | 'Double' {
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
     return 'String';
   }
 
@@ -533,5 +725,137 @@ export class QueryObject {
 
   static fromJson(json: any): QueryObject {
     return new QueryObject(json.nextGroupCondition, json.parameter);
+  }
+}
+
+export class GroupingProperty extends Property<any> {
+  constructor(
+    defaultValue: any,
+    description: string,
+    id: string,
+    immutable: boolean,
+    name: string,
+    required: boolean,
+  ) {
+    super(defaultValue, description, id, immutable, name, required);
+  }
+
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
+    return 'Grouping';
+  }
+
+  validate(): string | undefined {
+    return undefined;
+  }
+
+  static fromJson(json: any): GroupingProperty {
+    return new GroupingProperty(
+      json.defaultValue,
+      json.description,
+      json.id,
+      json.immutable,
+      json.name,
+      json.required,
+    );
+  }
+}
+
+export class StringTemplateProperty extends Property<string> {
+  constructor(
+    defaultValue: string,
+    description: string,
+    id: string,
+    immutable: boolean,
+    name: string,
+    required: boolean,
+  ) {
+    super(defaultValue, description, id, immutable, name, required);
+  }
+
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'StringTemplate'
+    | 'Grouping'
+    | 'IntegerRange' {
+    return 'StringTemplate';
+  }
+
+  validate(): string | undefined {
+    if (this.required && !this.value) {
+      return 'Value is required';
+    }
+    return undefined;
+  }
+
+  static fromJson(json: any): StringTemplateProperty {
+    return new StringTemplateProperty(
+      json.defaultValue,
+      json.description,
+      json.id,
+      json.immutable,
+      json.name,
+      json.required,
+    );
+  }
+}
+
+export class UnknownProperty extends Property<any> {
+  rawJson: any;
+
+  constructor(
+    defaultValue: any,
+    description: string,
+    id: string,
+    immutable: boolean,
+    name: string,
+    required: boolean,
+    rawJson: any,
+  ) {
+    super(defaultValue, description, id, immutable, name, required);
+    this.rawJson = rawJson;
+  }
+
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
+    return 'Object';
+  }
+
+  validate(): string | undefined {
+    return undefined;
+  }
+
+  static fromJson(json: any): UnknownProperty {
+    return new UnknownProperty(
+      json.defaultValue,
+      json.description,
+      json.id,
+      json.immutable,
+      json.name,
+      json.required,
+      json,
+    );
   }
 }

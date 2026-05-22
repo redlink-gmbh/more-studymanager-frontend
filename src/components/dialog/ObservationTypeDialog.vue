@@ -33,6 +33,7 @@ Licensed under the Elastic License 2.0. */
   import { useToastService } from '../../composable/toastService';
   import MultiSelect from 'primevue/multiselect';
   import { useObservationGroupStore } from '../../stores/observationGroupStore';
+  import { scrollToFirstError } from '../../utils/componentUtils';
   import ObservationToggle from '../subComponents/ObservationToggle.vue';
 
   const { handleToastErrors, showErrorToast } = useToastService();
@@ -132,6 +133,12 @@ Licensed under the Elastic License 2.0. */
   }
 
   function validate(): void {
+    checkRequiredFields();
+    if (errors.value.length > 0) {
+      scrollToFirstError();
+      return;
+    }
+
     let parsedProps: any;
     try {
       parsedProps = Property.toJson(properties.value);
@@ -208,18 +215,18 @@ Licensed under the Elastic License 2.0. */
     }
   }
 
-  let errors: MoreTableChoice[] = [];
+  const errors: Ref<MoreTableChoice[]> = ref([]);
 
   function checkRequiredFields(): void {
-    errors = [];
+    errors.value = [];
     if (!title.value) {
-      errors.push({
+      errors.value.push({
         label: 'title',
         value: t('observation.error.addTitle'),
       } as MoreTableChoice);
     }
     if (!participantInfo.value) {
-      errors.push({
+      errors.value.push({
         label: 'participantInfo',
         value: t('observation.error.addParticipantInfo'),
       } as MoreTableChoice);
@@ -227,7 +234,7 @@ Licensed under the Elastic License 2.0. */
   }
 
   function getError(label: string): string | null | undefined {
-    return errors.find((el) => el.label === label)?.value;
+    return errors.value.find((el) => el.label === label)?.value;
   }
 
   function cancel(): void {
@@ -271,7 +278,7 @@ Licensed under the Elastic License 2.0. */
         <h5 class="mb-1">
           {{ $t('observation.dialog.label.observationTitle') }}*
         </h5>
-        <div v-if="getError('title')" class="error mb-4">
+        <div v-if="getError('title')" class="error error-label mb-4">
           {{ getError('title') }}
         </div>
         <div class="col-start-0 col-span-8" :class="{ 'pb-4': !editable }">
@@ -308,7 +315,7 @@ Licensed under the Elastic License 2.0. */
         <h5 :class="getError('participantInfo') ? 'mb-1' : 'mb-2'">
           {{ $t('study.props.participantInfo') }}*
         </h5>
-        <div v-if="getError('participantInfo')" class="error mb-4">
+        <div v-if="getError('participantInfo')" class="error error-label mb-4">
           {{ getError('participantInfo') }}
         </div>
         <Textarea

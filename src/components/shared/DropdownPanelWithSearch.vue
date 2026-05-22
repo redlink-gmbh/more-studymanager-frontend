@@ -17,9 +17,7 @@
       default: false,
     },
     dropdownList: {
-      type: Array as PropType<
-        Array<{ label: string; value: any; description: string }>
-      >,
+      type: Array as PropType<Array<any>>,
       required: true,
     },
     searchFieldPlaceholder: {
@@ -51,10 +49,7 @@
   };
 
   const emit = defineEmits<{
-    (
-      e: 'onSelectOption',
-      objectId: { label: string; value: any; description: string },
-    ): void;
+    (e: 'onSelectOption', objectId: any): void;
     (e: 'onQueryChange', query: string): void;
   }>();
 </script>

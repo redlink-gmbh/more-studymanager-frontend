@@ -8,6 +8,7 @@ Licensed under the Elastic License 2.0. */
   import { PropType, watch } from 'vue';
   import InputText from 'primevue/inputtext';
   import { useI18n } from 'vue-i18n';
+  import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
 
   const { t } = useI18n();
 
@@ -15,6 +16,10 @@ Licensed under the Elastic License 2.0. */
     property: {
       type: Object as PropType<StringListProperty>,
       required: true,
+    },
+    isPartOfTemplate: {
+      type: Boolean,
+      default: false,
     },
     editable: {
       type: Boolean,
@@ -32,9 +37,15 @@ Licensed under the Elastic License 2.0. */
     (e: 'onInputChange', stringListProperty: StringListProperty): void;
   }>();
 
-  watch(props.property, () => {
-    emit('onInputChange', props.property);
-  });
+  watch(
+    () => props.property.value,
+    () => {
+      if (props.isPartOfTemplate) {
+        emit('onInputChange', props.property);
+      }
+    },
+    { deep: true },
+  );
 </script>
 
 <template>
@@ -43,6 +54,7 @@ Licensed under the Elastic License 2.0. */
       <label>
         {{ $t(property.name) }}<span v-if="property.required">*</span>
       </label>
+      <PartOfTemplateBadge :visible="isPartOfTemplate" :component-id="property.id" />
     </h6>
     <div>{{ $t(props.property.description) }}</div>
     <div v-if="editable" class="flex w-full flex-col gap-1">
@@ -54,7 +66,7 @@ Licensed under the Elastic License 2.0. */
         :value="property.value?.[index - 1]"
         type="text"
         :required="property.required"
-        :disabled="!editable"
+        :disabled="!editable || property.immutable"
         :placeholder="t('global.labels.option', { value: index })"
         style="display: block"
         @keyup="update($event, index - 1)"

@@ -80,7 +80,8 @@
         "error": "Fehler",
         "info": "Info",
         "warning": "Warnung"
-      }
+      },
+      "unknownPropertyType": "Unbekannter Typ"
     },
     "footer": {
       "aboutMore": "Über More"
@@ -90,6 +91,7 @@
       "logout": "Ausloggen"
     },
     "labels": {
+      "error": "Error",
       "add": "Hinzufügen",
       "apply": "Anwenden",
       "cancel": "Abbrechen",
@@ -109,6 +111,8 @@
       "isRequired": "Erforderlich",
       "lastCollected": "Zuletzt geschickt",
       "lastDataReceived": "Letzte Daten erhalten",
+      "min": "Minimum",
+      "max": "Maximum",
       "lastEdited": "Zuletzt bearbeitet",
       "message": "Nachricht",
       "modules": "Module",
@@ -129,7 +133,8 @@
       "to": "zu",
       "leavePage": "Möchten Sie die Seite wirklich verlassen?",
       "dataHealth": "Datenqualität",
-      "searchPlaceholder": "Suchen..."
+      "searchPlaceholder": "Suchen...",
+      "warning": "Warnung"
     },
     "placeholder": {
       "all": "Alle",
@@ -140,7 +145,8 @@
       "noGroup": "Keine Gruppe",
       "nothingSelected": "Nichts ausgewählt",
       "optionsSelected": "Optionen ausgewählt",
-      "selected": "ausgewählt"
+      "selected": "ausgewählt",
+      "chooseCategory": "Kategorie auswählen"
     }
   },
   "inputModel": {
@@ -562,6 +568,264 @@
       "dataHealth": "Status"
     },
     "singular": "Aufzeichnung"
+  },
+  "goaltemplate": {
+    "property": {
+      "global": {
+        "appTitle": {
+          "name": "App Ziel Titel",
+          "description": "Der Default-Name des Ziels, welcher auf der Teilnehmer:innen App angezeigt wird.",
+          "placeholder": "App Titel eingeben"
+        },
+        "appDescription": {
+          "name": "App Ziel Beschreibung",
+          "description": "Die Beschreibung des Ziels, welche auf der App den Teilnehmer:innen angezeigt wird. Halten Sie die Beschreibung so kurz wie möglich, da diese sonst zu viel Platz einnimmt.",
+          "placeholder": "Füge Kurzbeschreibung des Ziels hinzu"
+        },
+        "goalTitleState": {
+          "name": "Überschreiben des Titels",
+          "description": "Erlaubt den Teilnehmer:innen bei der Personalisierung auf der App den Zieltitel anzupassen.",
+          "placeholder": "Überschreiben erlauben"
+        },
+        "days-of-week": {
+          "name": "Wochentage",
+          "description": "Wochentage Bereich",
+          "placeholder-min": "Mindestwert",
+          "placeholder-max": "Maximalwert"
+        },
+        "self-report-time": {
+          "name": "Sendungs Zeitpunkt",
+          "description": "Dies ist der Zeitpunkt, zu dem die Benachricthigung an die Teilnehmer:innen gesendet wird.",
+          "placeholder": "Zeitpunkte auswählen"
+        }
+      },
+      "amountOfGoal": {
+        "partOfTemplate": "Teil der Vorschau",
+        "section": {
+          "configuration": {
+            "name": "Zielkonfiguration",
+            "description": "Hier können Sie das ZIeltemplate konfigurieren. Die konfigurierten Werte ermöglichen es Teilnehmer:innen, das Ziel auf der App zu personalisieren."
+          },
+          "goal": {
+            "name": "Ziel-Einstellungen konfigurieren",
+            "description": "Die folgenden Zieleinstellungen legen fest, welche Werte die Teilnehmer:innen zur Personalisierung des Ziels zur Verfügung haben."
+          },
+          "status-texts": {
+            "name": "Status Texte",
+            "description": "Diese Texte werden basierend auf einen Algorythmus in der App angezeigt. Dies sollen motivierende Texte sein, die die Teilnehmer:innen anspornen."
+          },
+          "self-report": {
+            "name": "Selbstbericht Benachrichigung",
+            "description": "Hier können Sie zu einer bestimmten Zeit eine Benachrichtigung an die Teilnehmer:innen senden, um die Zielerreichung zu verifizieren."
+          }
+        },
+        "goal-preview": {
+          "name": "Ziel Vorschau",
+          "description": "Das Ziel wird auf der App folgendermaßen angezeigt:",
+          "partOfTemplate": "Teil der Vorschau"
+        },
+        "goal": {
+          "name": "Ziel-Einstellungen",
+          "description": "Dies sind die Optionen für die Ziel-Einstellungen, mit dem die Teilnehmer:innen ihr persönliches Ziel anpassen können.",
+          "amount": {
+            "name": "Anzahl",
+            "description": "Bereich für die Zielerreichung",
+            "placeholder-min": "Mindestwert",
+            "placeholder-max": "Maximalwert"
+          },
+          "unit": {
+            "name": "Einheit",
+            "description": "Die Einheit für Zielwerte (z.B. Glas Wasser)",
+            "placeholder": "Einheit eingeben"
+          }
+        },
+        "status-100-reached": {
+          "name": "100% erreicht",
+          "description": "Text der bei 100% Zielerreichung angezeigt wird.",
+          "placeholder": "Statustext für '100'% eingeben"
+        },
+        "status-75-reached": {
+          "name": "75% erreicht",
+          "description": "Text der bei 75%+ Zielerreichung angezeigt wird.",
+          "placeholder": "Statustext für '75'% eingeben"
+        },
+        "status-not-reached": {
+          "name": "Noch nicht erreicht",
+          "description": "Text der zwischen 0 und 75% Zielerreichung angezeigt wird.",
+          "placeholder": "Statustext für 'noch nicht erreicht' eingeben"
+        },
+        "self-report-question": {
+          "name": "Fargetext",
+          "description": "Dies ist die Nachricht, die an die Teilnehmer:innen gesendet wird.",
+          "placeholder": "Fargetext eingeben"
+        },
+        "status-day-not-consumed": {
+          "name": "Nichts konsumiert",
+          "description": "Dieser Status wird angezeigt, wenn an dem Tag nichts konsumiert wurde.",
+          "placeholder": "Statustext für 'Nichts konsumiert' eingeben"
+        },
+        "status-day-under-limit": {
+          "name": "Unter dem Limit",
+          "description": "Dieser Status wird angezeigt, wenn der/die Teilnehmer:in unter dem Limit liegt.",
+          "placeholder": "Statustext für 'Unter dem Limit' eingeben"
+        },
+        "status-day-over-limit": {
+          "name": "Über dem Limit",
+          "description": "Dieser Status wird angezeigt, wenn das Limit überschritten wurde.",
+          "placeholder": "Statustext für 'Über dem Limit' eingeben"
+        }
+      },
+      "reduceAmountOf": {
+        "goal": {
+          "activity": {
+            "name": "Aktion",
+            "description": "Was wird gemacht?",
+            "placeholder": "Aktion eingeben"
+          }
+        }
+      }
+    },
+    "dialog": {
+      "deleteMsg": {
+        "confirm": "Möchten Sie dieses Zieltemplate wirklich löschen?",
+        "intro": "Sie sind kurz davor folgendes Zieltemplate zu löschen:",
+        "warning": "Ein gelöschtes Zieltemplate kann nicht wiederhergestellt werden. Wenn Sie das Zieltemplate löschen, gehen alle Konfigurationen verloren."
+      },
+      "header": {
+        "clone": "Zieltemplate klonen",
+        "create": "Zieltemplate hinzufügen",
+        "delete": "Zieltemplate löschen",
+        "edit": "Zieltemplate bearbeiten",
+        "view": "Details eines Zieltemplates"
+      },
+      "msg": {
+        "delete": "Ein gelöschtes Zieltemplate kann nicht mehr wiederhergestellt werden! Möchten Sie das Zieltemplate wirklich löschen?"
+      }
+    },
+    "label": {
+      "goalTemplateTitle": "Template-Titel",
+      "goalTitle": "Ziel Titel",
+      "categoryTitle": "Kategorie"
+    },
+    "error": {
+      "addParticipantInfo": "Die Teilnehmerinformationen sind ein erforderliches Feld. Bitte fügen Sie eine Beschreibung hinzu.",
+      "addTitle": "Der Titel des Zieltemplates ist ein erforderliches Feld. Bitte fügen Sie einen Titel hinzu.",
+      "addCategory": "Die Kategorie ist ein erforderliches Feld. Bitte wählen Sie mindestens eine Kategorie aus.",
+      "noValidField": "Fehler im Wert {key}: {message}",
+      "addSchedule": "Bitte wählen Sie mindestens eine Messzeit aus.",
+      "integerRange": "Der Minimum-Wert darf nicht größer als der Maximum-Wert sein.",
+      "integerRangeMinLimit": "Der Wert darf nicht kleiner als {min} sein.",
+      "integerRangeMaxLimit": "Der Wert darf nicht größer als {max} sein.",
+      "noSimpleSchedulerOptions": "Es wurden noch keine Messzeiten gesetzt. Bitte schließen Sie den Dialog und konfigurieren Sie mindestens eine Messzeit, um ein Zieltemplate anzulegen."
+    },
+    "factory": {
+      "trink-amount-of": {
+        "description": "Dieses Ziel legt die tägliche Flüssigkeitsaufnahme fest. Es unterstützt dabei, eine gesunde Trinkgewohnheit aufzubauen und regelmäßig ausreichend zu trinken.",
+        "name": "Flüssigkeitsaufnahme"
+      },
+      "eat-amount-of": {
+        "description": "Dieses Ziel legt die tägliche Essensaufnahme eines Produktes fest. Es unterstützt dabei, ein gesundes Essverhalten aufzubauen.",
+        "name": "Essensaufnahme"
+      },
+      "reduce-amount-of": {
+        "description": "Dieses Ziel hilft bei der Limitierung eines ungesunden Konsums (z.B. Rauchen, Alkohol).",
+        "name": "Konsum reduzieren"
+      },
+      "smoking": {
+        "description": "Dieses Ziel hilft dabei, den Zigarettenkonsum zu reduzieren und schrittweise eine geringere Rauchmenge im Alltag zu erreichen.",
+        "title": "Rauchen minimieren"
+      },
+      "type": {
+        "behavioralGoal": "Verhaltensziel",
+        "outcomeGoal": "Ergebnisziel"
+      },
+      "category": {
+        "nutrition": "Ernährung",
+        "smoking": "Rauchen"
+      }
+    },
+    "goalTemplateList": {
+      "action": {
+        "add": "Zieltemplate hinzufügen"
+      },
+      "description": "Ein Zieltemplate wird aus einem Zieltypen erstellt und für die Studie und Teilnehmer:innen kontkretisiert. Es besteht aus Zieldefinition, personalisierbaren Werten und einer Messbaren Komponente. Diese Templates werden auf der App dafür verwendet, der:dem Teilnehmer:in die konfiguration und Erstellung eines persönlichen Ziels zu ermöglichen.",
+      "emptyListMsg": "Verwalten oder fügen Sie ein Zieltemplate hinzu. Diese werden hier angezeigt.",
+      "title": "Zielvorlagen",
+      "configuration": "Globale Vorlagen-Konfiguration",
+      "meassurementTimes": {
+        "title": "Mess- und Reminder-Zeite",
+        "description": "Hier definierte Zeiten werden dafür verwendet die gesammelten Daten für die Zielerreichung an einem bestimmten Zeitpunkt gegenzuchekcne. Dies kann ein Vergleich mit verknüpften Daten wie z.B. Garmin Schrittdaten sein, oder aber auch die Ausschickung eines Reminders zum Eintragen von einfachen Zielen wie z.B. Wasserkonsum pro Tag.",
+        "notSet": "Es wurden noch keine Mess- und Reminder-Zeiten festgelegt.",
+        "adaptMeassurment": "Messungszeiten anpassen",
+        "meassurements": "Messzeiten",
+        "set": "Festgelegte Messzeiten",
+        "meassurementsDescription": "Zudiesen Zieten werden mit Zielen zusammenhängende Messungen kontrolliert, um die Erreichung eines Ziels abzugleichen.",
+        "times": {
+          "morning": "Morgens",
+          "noon": "Mittags",
+          "afternoon": "Nachmittags",
+          "evening": "Abends",
+          "night": "Nachts"
+        },
+        "planer": "Die hier eingestellte Zeiten triggern eine Messungsabfrage, die direkt an die App der Teilnehmer:innen gesehendet werden."
+      },
+      "categories": {
+        "title": "Vorlagen-Kategorien",
+        "description": "Vorlagen-Kategorien werden auf der App als Gruppen für die Ziele angezeigt. Sie können diese verwenden um Ihre Ziele zu organisieren und zu gruppieren.",
+        "edit": "Kategorien bearbeiten",
+        "add": "Kategorie hinzufügen",
+        "delete": "Kategorie löschen",
+        "namePlaceholder": "Name der Kategorie",
+        "descriptionPlaceholder": "Optionale Beschreibung",
+        "noCategoriesAvailable": "Noch keine Kategorien vorhanden"
+      },
+      "error": {
+        "invalidCategoryTopics": "Eine oder mehrere Zielkategorien sind ungültig."
+      }
+    },
+    "goalTemplateTopicList": {
+      "emptyListMessage": "Es wurden noch keine Kategorien hinzugefügt. Sobald welche vorhanden sind, scheinen sie in dieser Liste auf.",
+      "labels": {
+        "delete": "Zielkategorie löschen",
+        "add": "Zielkategorie hinzufügen"
+      },
+      "dialog": {
+        "header": {
+          "delete": "Zielkategorie löschen"
+        },
+        "msg": {
+          "delete": "Sind Sie sicher, dass Sie diese Zielkategorie löschen möchten? Alle zugehörigen Ziele werden ebenfalls gelöscht."
+        },
+        "deleteMsg": {
+          "intro": "Sie sind kurz davor folgende Zielkategorie zu löschen:",
+          "warning": "Eine gelöschte Zielkategorie kann nicht wiederhergestellt werden. Wenn Sie die Zielkategorie löschen, gehen alle Konfigurationen verloren.",
+          "confirm": "Möchten Sie diese Zielkategorie wirklich löschen?"
+        }
+      }
+    },
+    "placeholder": {
+      "chooseTemplateType": "Zieltemplatetyp auswählen",
+      "enterMainPurpose": "Fügen Sie die Ziele der Studie hinzu."
+    },
+    "plural": "Zieltemplates",
+    "props": {
+      "categoryTitle": "Kategorie",
+      "description": "Beschreibung",
+      "goalType": "Zieltyp",
+      "goalCategory": "Zielkategorie",
+      "adhearanceCheck": "Messungszeiten",
+      "reminder": {
+        "false": "Keine Erinnerung",
+        "true": "Erinnerung"
+      },
+      "goalTemplateType": {
+        "liquidity": "Flüssigkeitsaufnahme",
+        "smoking": "Rauchen abgewöhnen"
+      },
+      "type": "Typ",
+      "dataHealth": "Status"
+    },
+    "singular": "Zieltemplate"
   },
   "participants": {
     "applicationAccess": {
@@ -1261,6 +1525,7 @@
       "interventions": "Interventionen",
       "monitoringAndData": "Monitoring & Data",
       "observations": "Datenerhebungen",
+      "goals": "Ziele",
       "overview": "Studie",
       "participants": "Teilnehmer:innen",
       "timeline": "Kalender"
@@ -1292,15 +1557,18 @@
       "cloneIntegration": "Integration klonen",
       "cloneIntervention": "Intervention klonen",
       "cloneObservation": "Datenerhebung klonen",
+      "cloneGoalTemplate": "Zielvorlage klonen",
       "copyStudyUrl": "Studie teilen",
       "deleteCollaborator": "Studien-Mitarbeiter löschen",
       "deleteIntegration": "Integration löschen",
       "deleteIntervention": "Intervention löschen",
       "deleteObservation": "Datenerhebung löschen",
+      "deleteGoalTemplate": "Zielvorlage löschen",
       "deleteParticipantBtn": "Teilnehmer:in löschen",
       "deleteStudyBtn": "Studie löschen",
       "deleteStudyGroupBtn": "Studiengruppe löschen",
       "deleteObservationGroupBtn": "Datenerhebungs-Gruppe löschen",
+      "deleteGoalCategory": "Zielkategorie löschen",
       "editBtn": "Bearbeiten Sie die gezeigten Eckdaten.",
       "goToStudy": "Studie öffnen",
       "saveChanges": "Änderungen speichern",
