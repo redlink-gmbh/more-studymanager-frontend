@@ -36,6 +36,7 @@ Licensed under the Elastic License 2.0. */
   import { extractCurrentLimeDomain } from '@/utils/limeSurveyUtils';
   import { scrollToFirstError } from '@/utils/componentUtils';
   import InfoWarningErrorSection from '@/components/shared/InfoWarningErrorSection.vue';
+  import PillItem from '@/components/shared/PillItem.vue';
 
   const { handleToastErrors, showErrorToast } = useToastService();
   const dialog = useDialog();
@@ -65,6 +66,7 @@ Licensed under the Elastic License 2.0. */
   const simpleSchedulerValues = dialogRef.value.data.simpleSchedulerValues;
   const hasComponentCategories = dialogRef.value.data
     .hasComponentCategories as MoreTableChoice[];
+  const hasComponentKind = dialogRef.value.data.hasComponentKind as string;
   const editable =
     studyStore.study.status === StudyStatus.Draft ||
     studyStore.study.status === StudyStatus.Paused ||
@@ -265,7 +267,7 @@ Licensed under the Elastic License 2.0. */
             .map((s) => s.key) ?? [],
         studyGroupId: studyGroupId.value,
         categories: {
-          kind: component.categories?.kind ?? 'behavioral',
+          kind: hasComponentKind ?? 'behavioral',
           topics: categories.value,
         },
       };
@@ -339,7 +341,7 @@ Licensed under the Elastic License 2.0. */
 
     <info-warning-error-section
       class="mb-4"
-      :error-message="errorMessage"
+      :error-message="errorMessage || undefined"
       :error-label="t('global.labels.error')"
     />
 
@@ -379,16 +381,30 @@ Licensed under the Elastic License 2.0. */
         <div v-if="getError('categories')" class="error error-label mb-4">
           {{ getError('categories') }}
         </div>
-        <MultiSelect
-          v-model="categories"
-          :options="hasComponentCategories"
-          option-label="label"
-          option-value="value"
-          class="w-full"
-          :show-toggle-all="false"
-          :disabled="!editable"
-          :placeholder="$t('global.placeholder.chooseDropdownOptionDefault')"
-        ></MultiSelect>
+        <div class="flex flex-row flex-nowrap items-center gap-6 text-nowrap">
+          <div class="flex w-full min-w-0 items-center gap-2">
+            <span class="font-bold whitespace-nowrap">{{t('goaltemplate.props.categoryTitle')}}:</span>
+            <MultiSelect
+              v-model="categories"
+              :options="hasComponentCategories"
+              option-label="label"
+              option-value="value"
+              class="w-full"
+              :show-toggle-all="false"
+              :disabled="!editable"
+              :placeholder="
+                $t('global.placeholder.chooseDropdownOptionDefault')
+              "
+            ></MultiSelect>
+          </div>
+          <div
+            v-if="hasComponentCategories"
+            class="flex items-center gap-2 whitespace-nowrap"
+          >
+            <span class="font-bold">{{t('goaltemplate..props.goalType')}}: </span>
+            <pill-item :label="hasComponentKind" />
+          </div>
+        </div>
       </div>
       <div v-if="hasSimpleScheduler" class="col-span-8 col-start-0">
         <h5 class="mb-1">{{ $t('scheduler.singular') }}*</h5>
