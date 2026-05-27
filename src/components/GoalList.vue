@@ -419,6 +419,7 @@
         factory: factoryForType(component?.type),
         componentType: 'goalTemplate',
         hasComponentCategories: categoryTopicOptions.value,
+        hasComponentKind: component?.categoryKind,
         errorMessage: component?.errorMessage,
         hasSimpleScheduler: goalConfig.value?.schedule?.map((item) => {
           return {
@@ -513,11 +514,15 @@
         </div>
       </div>
       <div class="global-goal-settings">
-        <GoalTemplateMessurementSection :study-id="studyId" class="mb-8" />
+        <GoalTemplateMessurementSection
+          :study-id="studyId"
+          class="mb-8"
+          :actions-disabled="!actionsVisible" />
         <GoalTemplateCategorySection
           class="mb-8"
           :study-id="studyId"
           :study-status="studyStatus"
+          :actions-disabled="!actionsVisible"
         />
       </div>
     </div>

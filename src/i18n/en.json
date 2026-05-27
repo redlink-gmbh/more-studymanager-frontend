@@ -780,7 +780,9 @@
         "noCategoriesAvailable": "No categories available"
       },
       "error": {
-        "invalidCategoryTopics": "One or more target categories are invalid."
+        "invalidCategoryTopics": "One or more target categories are invalid.",
+        "conflictUsedElement": "Selected elements could not be changed because at least one of them is used in the templates",
+        "conflictUsedCategory": "This category cannot be deleted because it is used in the templates."
       }
     },
     "goalTemplateTopicList": {

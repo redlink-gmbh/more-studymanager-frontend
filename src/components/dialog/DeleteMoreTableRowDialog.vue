@@ -4,8 +4,9 @@ Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Elastic License 2.0. */
 <script setup lang="ts">
-  import { inject } from 'vue';
+  import { inject, ref } from 'vue';
   import Button from 'primevue/button';
+  import InfoWarningErrorSection from '@/components/shared/InfoWarningErrorSection.vue';
   import WarningSection from './shared/WarningSection.vue';
 
   const dialogRef: any = inject('dialogRef');
@@ -16,9 +17,31 @@ Licensed under the Elastic License 2.0. */
   const elTitle: string = dialogRef?.value?.data?.elTitle;
   const elInfoTitle: string = dialogRef?.value?.data?.elInfoTitle;
   const elInfoDesc: string = dialogRef?.value?.data?.elInfoDesc;
+  const onDelete: ((row: any) => Promise<void>) | undefined =
+    dialogRef?.value?.data?.onDelete;
 
-  function deleteRowEl(): void {
-    dialogRef.value.close(row);
+  const errorMessage = ref<string | null>(null);
+  const isLoading = ref(false);
+
+  async function deleteRowEl(): Promise<void> {
+    if (onDelete) {
+      errorMessage.value = null;
+      isLoading.value = true;
+      try {
+        await onDelete(row);
+        dialogRef.value.close(row);
+      } catch (error: any) {
+        if (error.response?.status === 409) {
+          errorMessage.value = error.errorMessage || 'Conflict';
+        } else {
+          errorMessage.value = 'An error occurred';
+        }
+      } finally {
+        isLoading.value = false;
+      }
+    } else {
+      dialogRef.value.close(row);
+    }
   }
 
   function closeDialog(): void {
@@ -37,6 +60,12 @@ Licensed under the Elastic License 2.0. */
       <div>{{ elInfoDesc }}</div>
     </div>
 
+    <info-warning-error-section
+      v-if="errorMessage"
+      class="mt-4"
+      :error-message="errorMessage || undefined"
+    />
+
     <WarningSection :confirm-msg="confirmMsg" :warning-msg="warningMsg" />
 
     <div class="flex flex-row items-center justify-end">
@@ -44,12 +73,14 @@ Licensed under the Elastic License 2.0. */
         type="button"
         class="p-button btn-gray !mr-3"
         :label="$t('global.labels.close')"
+        :disabled="isLoading"
         @click="closeDialog"
       />
       <Button
         type="button"
         class="p-button btn-important ml-2"
         :label="$t('global.labels.delete')"
+        :loading="isLoading"
         @click="deleteRowEl"
       />
     </div>

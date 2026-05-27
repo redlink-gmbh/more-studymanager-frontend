@@ -780,7 +780,9 @@
         "noCategoriesAvailable": "Noch keine Kategorien vorhanden"
       },
       "error": {
-        "invalidCategoryTopics": "Eine oder mehrere Zielkategorien sind ungültig."
+        "invalidCategoryTopics": "Eine oder mehrere Zielkategorien sind ungültig.",
+        "conflictUsedElement": "Ausgewählte Elemente konnten nicht geändert werden, da mind. 1ne davon bei den Templates verwendet werden",
+        "conflictUsedCategory": "Diese Kategorie kann nicht gelöscht werden, da sie bei den Templates verwendet wird."
       }
     },
     "goalTemplateTopicList": {

@@ -7,16 +7,17 @@
   import { AdherenceCheckScheduleEnum, StudyGoalConfig } from '@gs';
   import { useGoalConfig, useSetGoalConfig } from '@/api/goalQueries';
   import { useI18n } from 'vue-i18n';
+  import InfoWarningErrorSection from '@/components/shared/InfoWarningErrorSection.vue';
 
   const { t } = useI18n();
 
   interface Props {
     studyId: number;
-    isButtonDisabled?: boolean;
+    actionsDisabled?: boolean;
   }
 
   const props = withDefaults(defineProps<Props>(), {
-    isButtonDisabled: false,
+    actionsDisabled: false,
   });
 
   const { data: goalConfig } = useGoalConfig(props.studyId);
@@ -27,9 +28,16 @@
   );
   const isOpen = ref(false);
   const overlayPanel = ref<InstanceType<typeof Popover> | null>(null);
+  const errorMessage = ref<string | null>(null);
   const toggleOverlay = (event: MouseEvent): void => {
     overlayPanel.value?.toggle(event);
     isOpen.value = !isOpen.value;
+  };
+
+  const handleHide = (): void => {
+    isOpen.value = false;
+    errorMessage.value = null;
+    initTimeSlots();
   };
 
   const timeSlots = ref(
@@ -58,6 +66,7 @@
   watch(() => goalConfig.value, initTimeSlots, { deep: true });
 
   const handleSave = async (): Promise<void> => {
+    errorMessage.value = null;
     const newSchedule = timeSlots.value
       .filter((slot) => slot.isActive && slot.inputValue)
       .map((slot) => ({
@@ -76,9 +85,18 @@
     } as StudyGoalConfig;
 
     await setGoalConfigMutation({ studyId: props.studyId, config: newConfig })
-      .then(() => (isOpen.value = false));
-    overlayPanel.value?.hide();
-    isOpen.value = false;
+      .then(() => {
+        isOpen.value = false;
+        overlayPanel.value?.hide();
+      })
+      .catch((error) => {
+        if (error.response?.status === 409) {
+          errorMessage.value = t(
+            'goaltemplate.goalTemplateList.error.conflictUsedElement',
+          );
+          initTimeSlots();
+        }
+      });
   };
 </script>
 
@@ -95,7 +113,7 @@
         <Button
           type="button"
           class="flex shrink-0 items-center justify-between text-nowrap"
-          :disabled="isButtonDisabled"
+          :disabled="actionsDisabled"
           @click="toggleOverlay($event)"
         >
           <span>{{
@@ -108,7 +126,11 @@
             :class="{ 'rotate-180 transition-all ease-in-out': isOpen }"
           />
         </Button>
-        <Popover ref="overlayPanel" :class="['w-[50vw] min-w-lg']">
+        <Popover
+          ref="overlayPanel"
+          :class="['w-[50vw] min-w-lg']"
+          @hide="handleHide"
+        >
           <div class="flex flex-col gap-4">
             <div>
               <h4 class="p-text-secondary text-lg font-bold">
@@ -125,6 +147,12 @@
                   )
                 }}
               </div>
+
+              <info-warning-error-section
+                v-if="errorMessage"
+                class="mt-2 mb-4"
+                :error-message="errorMessage"
+              />
             </div>
             <div class="flex flex-col gap-3">
               <div

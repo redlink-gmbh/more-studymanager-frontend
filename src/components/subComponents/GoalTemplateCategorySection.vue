@@ -13,6 +13,7 @@
   import InputText from 'primevue/inputtext';
   import { GoalTopic, StudyRole, StudyStatus } from '@gs';
   import MoreTable from '@/components/shared/MoreTable.vue';
+  import { useToastService } from '@/composable/toastService';
   import {
     MoreTableAction,
     MoreTableColumn,
@@ -26,11 +27,17 @@
   interface Props {
     studyId: number;
     studyStatus: StudyStatus;
+    actionsDisabled?: boolean;
   }
 
-  const props = defineProps<Props>();
+  const props = withDefaults(defineProps<Props>(), {
+    actionsDisabled: false,
+  });
+  const { showErrorToast } = useToastService();
 
-  const { data: goalConfig } = useGoalConfig(props.studyId) as { data: { value: StudyGoalConfigData | undefined } };
+  const { data: goalConfig } = useGoalConfig(props.studyId) as {
+    data: { value: StudyGoalConfigData | undefined };
+  };
   const { mutateAsync: createGoalTopicMutation } = useCreateGoalTopic();
   const { mutateAsync: updateGoalTopicMutation } = useUpdateGoalTopic();
   const { mutateAsync: deleteGoalTopicMutation } = useDeleteGoalTopic();
@@ -56,18 +63,31 @@
       description: newTopicDescription.value,
     } as any;
 
-    await createGoalTopicMutation({ studyId: props.studyId, topic: topic as GoalTopic })
-      .then(() => {
-        isOpen.value = false;
-        overlayPanel.value?.hide();
-      });
+    await createGoalTopicMutation({
+      studyId: props.studyId,
+      topic: topic as GoalTopic,
+    }).then(() => {
+      isOpen.value = false;
+      overlayPanel.value?.hide();
+    });
     newTopicName.value = '';
     newTopicDescription.value = '';
   };
 
   async function deleteTopic(topic: GoalTopic): Promise<void> {
     if (!topic.key) return;
-    await deleteGoalTopicMutation({ studyId: props.studyId, key: topic.key });
+    try {
+      await deleteGoalTopicMutation({ studyId: props.studyId, key: topic.key });
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        error.errorMessage = t(
+          'goaltemplate.goalTemplateList.error.conflictUsedCategory',
+        );
+      } else {
+        error.errorMessage = t('global.error.generic');
+      }
+      throw error;
+    }
   }
 
   const goalCategoryColumns: MoreTableColumn[] = [
@@ -108,7 +128,17 @@
 
   function changeValueInPlace(topic: GoalTopic): void {
     if (topic && !!topic?.key) {
-      updateGoalTopicMutation({ studyId: props.studyId, key: topic.key, topic: topic });
+      updateGoalTopicMutation({
+        studyId: props.studyId,
+        key: topic.key,
+        topic: topic,
+      }).catch((error) => {
+        if (error.response?.status === 409) {
+          showErrorToast(
+            t('goaltemplate.goalTemplateList.error.conflictUsedElement'),
+          );
+        }
+      });
     }
   }
 
@@ -138,6 +168,7 @@
               elTitle: row.title,
               elInfoTitle: t('global.labels.description'),
               elInfoDesc: row.description,
+              onDelete: deleteTopic,
             },
             props: {
               header: t('goaltemplate.dialog.header.delete'),
@@ -152,11 +183,8 @@
               draggable: false,
             },
             onClose: (options) => {
-              if (options?.data) {
-                executeAction({
-                  id: 'delete',
-                  row: options.data,
-                } as MoreTableRowActionResult);
+              if (options?.data && !options?.data?.key) {
+                console.info('category section was closed successfully')
               }
             },
           }),
@@ -174,6 +202,7 @@
       <Button
         type="button"
         class="flex shrink-0 items-center justify-between text-nowrap"
+        :disabled="actionsDisabled"
         @click="toggleOverlay($event)"
       >
         <span>{{ t('goaltemplate.goalTemplateList.categories.add') }}</span>
