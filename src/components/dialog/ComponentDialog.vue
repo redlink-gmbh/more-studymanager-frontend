@@ -66,7 +66,8 @@ Licensed under the Elastic License 2.0. */
   const simpleSchedulerValues = dialogRef.value.data.simpleSchedulerValues;
   const hasComponentCategories = dialogRef.value.data
     .hasComponentCategories as MoreTableChoice[];
-  const hasComponentKind = dialogRef.value.data.hasComponentKind as string;
+  const hasComponentKind =
+    (dialogRef.value.data.hasComponentKind as string) ?? 'behavioral';
   const editable =
     studyStore.study.status === StudyStatus.Draft ||
     studyStore.study.status === StudyStatus.Paused ||
@@ -383,7 +384,9 @@ Licensed under the Elastic License 2.0. */
         </div>
         <div class="flex flex-row flex-nowrap items-center gap-6 text-nowrap">
           <div class="flex w-full min-w-0 items-center gap-2">
-            <span class="font-bold whitespace-nowrap">{{t('goaltemplate.props.categoryTitle')}}:</span>
+            <span class="font-bold whitespace-nowrap"
+              >{{ t('goaltemplate.props.categoryTitle') }}:</span
+            >
             <MultiSelect
               v-model="categories"
               :options="hasComponentCategories"
@@ -398,11 +401,15 @@ Licensed under the Elastic License 2.0. */
             ></MultiSelect>
           </div>
           <div
-            v-if="hasComponentCategories"
+            v-if="hasComponentKind"
             class="flex items-center gap-2 whitespace-nowrap"
           >
-            <span class="font-bold">{{t('goaltemplate..props.goalType')}}: </span>
-            <pill-item :label="hasComponentKind" />
+            <span class="font-bold"
+              >{{ t('goaltemplate.props.goalType') }}:
+            </span>
+            <pill-item
+              :label="t(`goaltemplate.factory.type.${hasComponentKind}Goal`)"
+            />
           </div>
         </div>
       </div>
