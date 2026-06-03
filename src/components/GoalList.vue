@@ -106,7 +106,7 @@
         return {
           ...mapped,
           goalTypeLabel: t(mapped.goalTypeLabel),
-          categoryKind: t(`goaltemplate.factory.type.${mapped.categoryKind}Goal`),
+          categoryKind: mapped.categoryKind,
           categoryTopics: getTopicNames(
             mapped.categoryTopics ?? [],
             goalConfig.value?.topics ?? [],
