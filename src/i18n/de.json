@@ -572,35 +572,6 @@
   "goaltemplate": {
     "property": {
       "global": {
-        "appTitle": {
-          "name": "App Ziel Titel",
-          "description": "Der Default-Name des Ziels, welcher auf der Teilnehmer:innen App angezeigt wird.",
-          "placeholder": "App Titel eingeben"
-        },
-        "appDescription": {
-          "name": "App Ziel Beschreibung",
-          "description": "Die Beschreibung des Ziels, welche auf der App den Teilnehmer:innen angezeigt wird. Halten Sie die Beschreibung so kurz wie möglich, da diese sonst zu viel Platz einnimmt.",
-          "placeholder": "Füge Kurzbeschreibung des Ziels hinzu"
-        },
-        "goalTitleState": {
-          "name": "Überschreiben des Titels",
-          "description": "Erlaubt den Teilnehmer:innen bei der Personalisierung auf der App den Zieltitel anzupassen.",
-          "placeholder": "Überschreiben erlauben"
-        },
-        "days-of-week": {
-          "name": "Wochentage",
-          "description": "Wochentage Bereich",
-          "placeholder-min": "Mindestwert",
-          "placeholder-max": "Maximalwert"
-        },
-        "self-report-time": {
-          "name": "Sendungs Zeitpunkt",
-          "description": "Dies ist der Zeitpunkt, zu dem die Benachricthigung an die Teilnehmer:innen gesendet wird.",
-          "placeholder": "Zeitpunkte auswählen"
-        }
-      },
-      "amountOfGoal": {
-        "partOfTemplate": "Teil der Vorschau",
         "section": {
           "configuration": {
             "name": "Zielkonfiguration",
@@ -619,6 +590,38 @@
             "description": "Hier können Sie zu einer bestimmten Zeit eine Benachrichtigung an die Teilnehmer:innen senden, um die Zielerreichung zu verifizieren."
           }
         },
+        "appTitle": {
+          "name": "App Ziel Titel",
+          "description": "Der Default-Name des Ziels, welcher auf der Teilnehmer:innen App angezeigt wird.",
+          "placeholder": "App Titel eingeben"
+        },
+        "appDescription": {
+          "name": "App Ziel Beschreibung",
+          "description": "Die Beschreibung des Ziels, welche auf der App den Teilnehmer:innen angezeigt wird. Halten Sie die Beschreibung so kurz wie möglich, da diese sonst zu viel Platz einnimmt.",
+          "placeholder": "Füge Kurzbeschreibung des Ziels hinzu"
+        },
+        "goalTitleState": {
+          "name": "Überschreiben des Titels",
+          "description": "Erlaubt den Teilnehmer:innen bei der Personalisierung auf der App den Zieltitel anzupassen.",
+          "placeholder": "Überschreiben erlauben"
+        },
+        "showAsTodoItemState": {
+          "name": "Verpflichtendes Ziel",
+          "description": "Dies ist ein verpflichtendes Ziel, das von den Teilnehmer:innen abgeschlossen werden muss."
+        },
+        "customShowAsTodoItemState": {
+          "name": "Benutzerdefiniertes verpflichtendes Ziel",
+          "description": "Dies ist ein benutzerdefiniertes verpflichtendes Ziel, das von den Teilnehmer:innen abgeschlossen werden muss."
+        },
+        "days-of-week": {
+          "name": "Wochentage",
+          "description": "Wochentage Bereich",
+          "placeholder-min": "Mindestwert",
+          "placeholder-max": "Maximalwert"
+        }
+      },
+      "amountOfGoal": {
+        "partOfTemplate": "Teil der Vorschau",
         "goal-preview": {
           "name": "Ziel Vorschau",
           "description": "Das Ziel wird auf der App folgendermaßen angezeigt:",
@@ -638,6 +641,28 @@
             "description": "Die Einheit für Zielwerte (z.B. Glas Wasser)",
             "placeholder": "Einheit eingeben"
           }
+        }
+      },
+      "boolean": {
+        "goal": {
+          "question": {
+            "name": "Zieltext",
+            "description": "Dies ist der Text, der den Patienten in der App angezeigt wird (z. B. wie die Vorschau von anderen Zielen mit komplexeren Eigenschaften).",
+            "placeholder": "Zieltext eingeben"
+          },
+          "desired": {
+            "name": "Gewünschtes Ergebnis",
+            "description": "Dies ist das gewünschte Ergebnis der Adhärenzprüfung (wahr, falsch)"
+          }
+        }
+      },
+      "reduceAmountOf": {
+        "goal": {
+          "activity": {
+            "name": "Aktion",
+            "description": "Was wird gemacht?",
+            "placeholder": "Aktion eingeben"
+          }
         },
         "status-100-reached": {
           "name": "100% erreicht",
@@ -654,11 +679,6 @@
           "description": "Text der zwischen 0 und 75% Zielerreichung angezeigt wird.",
           "placeholder": "Statustext für 'noch nicht erreicht' eingeben"
         },
-        "self-report-question": {
-          "name": "Fargetext",
-          "description": "Dies ist die Nachricht, die an die Teilnehmer:innen gesendet wird.",
-          "placeholder": "Fargetext eingeben"
-        },
         "status-day-not-consumed": {
           "name": "Nichts konsumiert",
           "description": "Dieser Status wird angezeigt, wenn an dem Tag nichts konsumiert wurde.",
@@ -673,15 +693,24 @@
           "name": "Über dem Limit",
           "description": "Dieser Status wird angezeigt, wenn das Limit überschritten wurde.",
           "placeholder": "Statustext für 'Über dem Limit' eingeben"
-        }
-      },
-      "reduceAmountOf": {
-        "goal": {
-          "activity": {
-            "name": "Aktion",
-            "description": "Was wird gemacht?",
-            "placeholder": "Aktion eingeben"
-          }
+        },
+        "self-report-time": {
+          "name": "Benachrichtigungszeitpunkt",
+          "description": "Dies ist der Zeitpunkt, zu dem die Benachrichtigung an die Teilnehmer:innen gesendet wird.",
+          "placeholder": "Zeitpunkte auswählen"
+        },
+        "customAdherenceChecksState": {
+          "name": "Benutzerdefinierte Adhärenzprüfung",
+          "description": "Ermöglicht es dem Patienten, die Standardeinstellungen für Adhärenzprüfungen zu überschreiben."
+        },
+        "adherenceChecksScheduleState": {
+          "name": "Benutzerdefinierte Adhärenzprüfung",
+          "description": "Ermöglicht es dem Patienten, die Standardeinstellungen für Adhärenzprüfungen zu überschreiben."
+        },
+        "self-report-question": {
+          "name": "Fragetext",
+          "description": "Dies ist die Nachricht, die an die Teilnehmer:innen gesendet wird.",
+          "placeholder": "Fragetext eingeben"
         }
       }
     },
@@ -741,7 +770,16 @@
       },
       "category": {
         "nutrition": "Ernährung",
-        "smoking": "Rauchen"
+        "smoking": "Rauchen",
+        "medication": "Medikamente"
+      },
+      "medication": {
+        "description": "Dieses Ziel hilft dabei, die Einnahme von Medikamenten zu verfolgen.",
+        "name": "Medikament"
+      },
+      "boolean": {
+        "description": "Dieses Ziel ist eine einfache Ja/Nein-Bedingung für ein benutzerdefiniertes Ziel.",
+        "name": "Ja/Nein-Bedingung"
       }
     },
     "goalTemplateList": {

@@ -572,35 +572,6 @@
   "goaltemplate": {
     "property": {
       "global": {
-        "appTitle": {
-          "name": "App Goal Title",
-          "description": "The default name of the goal displayed in the participant app.",
-          "placeholder": "Enter app title"
-        },
-        "appDescription": {
-          "name": "App Goal Description",
-          "description": "The description of the goal displayed to participants in the app. Keep the description as short as possible, otherwise it will take up too much space.",
-          "placeholder": "Add a short goal description"
-        },
-        "goalTitleState": {
-          "name": "Allow Title Override",
-          "description": "Allows participants to customize the goal title during personalization in the app.",
-          "placeholder": "Allow overriding"
-        },
-        "days-of-week": {
-          "name": "Days of the Week",
-          "description": "Days of the week range",
-          "placeholder-min": "Minimum value",
-          "placeholder-max": "Maximum value"
-        },
-        "self-report-time": {
-          "name": "Notification Time",
-          "description": "This is the time at which the notification is sent to participants.",
-          "placeholder": "Select times"
-        }
-      },
-      "amountOfGoal": {
-        "partOfTemplate": "Part of the preview",
         "section": {
           "configuration": {
             "name": "Goal Configuration",
@@ -619,6 +590,86 @@
             "description": "Here you can send a notification to participants at a specific time to verify goal achievement."
           }
         },
+        "appTitle": {
+          "name": "App Goal Title",
+          "description": "The default name of the goal displayed in the participant app.",
+          "placeholder": "Enter app title"
+        },
+        "appDescription": {
+          "name": "App Goal Description",
+          "description": "The description of the goal displayed to participants in the app. Keep the description as short as possible, otherwise it will take up too much space.",
+          "placeholder": "Add a short goal description"
+        },
+        "goalTitleState": {
+          "name": "Allow Title Override",
+          "description": "Allows participants to customize the goal title during personalization in the app.",
+          "placeholder": "Allow overriding"
+        },
+        "showAsTodoItemState": {
+          "name": "Mendatory Goal",
+          "description": "This is a mandatory goal that must be completed by the participant."
+        },
+        "customShowAsTodoItemState": {
+          "name": "Custom Mendatory Goal",
+          "description": "This is a custom mandatory goal that must be completed by the participant."
+        },
+        "days-of-week": {
+          "name": "Days of the Week",
+          "description": "Days of the week range",
+          "placeholder-min": "Minimum value",
+          "placeholder-max": "Maximum value"
+        },
+        "status-100-reached": {
+          "name": "100% Reached",
+          "description": "Text displayed when 100% of the goal is achieved.",
+          "placeholder": "Enter status text for '100%'"
+        },
+        "status-75-reached": {
+          "name": "75% Reached",
+          "description": "Text displayed when 75%+ of the goal is achieved.",
+          "placeholder": "Enter status text for '75%'"
+        },
+        "status-not-reached": {
+          "name": "Not Yet Reached",
+          "description": "Text displayed between 0 and 75% goal achievement.",
+          "placeholder": "Enter status text for 'not yet reached'"
+        },
+        "status-day-not-consumed": {
+          "name": "Nothing Consumed",
+          "description": "This status is displayed when nothing was consumed that day.",
+          "placeholder": "Enter status text for 'nothing consumed'"
+        },
+        "status-day-under-limit": {
+          "name": "Below the Limit",
+          "description": "This status is displayed when the participant is below the limit.",
+          "placeholder": "Enter status text for 'below the limit'"
+        },
+        "status-day-over-limit": {
+          "name": "Above the Limit",
+          "description": "This status is displayed when the limit has been exceeded.",
+          "placeholder": "Enter status text for 'above the limit'"
+        },
+        "self-report-time": {
+          "name": "Notification Time",
+          "description": "This is the time at which the notification is sent to participants.",
+          "placeholder": "Select times"
+        },
+        "customAdherenceChecksState": {
+          "name": "Custom Adherence Check",
+          "description": "Lets the patient overwrite the goals default settings for adherence checks."
+        },
+        "adherenceChecksScheduleState": {
+          "name": "Custom Adherence Check",
+          "description": "Lets the patient overwrite the goals default settings for adherence checks."
+        },
+        "self-report-question": {
+          "name": "Question Text",
+          "description": "This is the message sent to participants.",
+          "placeholder": "Enter question text"
+        }
+      },
+      "amountOfGoal": {
+        "partOfTemplate": "Part of the preview",
         "goal-preview": {
           "name": "Goal Preview",
           "description": "The goal is displayed in the app as follows:",
@@ -638,41 +689,19 @@
             "description": "The unit for goal values (e.g. glass of water)",
             "placeholder": "Enter unit"
           }
-        },
-        "status-100-reached": {
-          "name": "100% Reached",
-          "description": "Text displayed when 100% of the goal is achieved.",
-          "placeholder": "Enter status text for '100%'"
-        },
-        "status-75-reached": {
-          "name": "75% Reached",
-          "description": "Text displayed when 75%+ of the goal is achieved.",
-          "placeholder": "Enter status text for '75%'"
-        },
-        "status-not-reached": {
-          "name": "Not Yet Reached",
-          "description": "Text displayed between 0 and 75% goal achievement.",
-          "placeholder": "Enter status text for 'not yet reached'"
-        },
-        "self-report-question": {
-          "name": "Question Text",
-          "description": "This is the message sent to participants.",
-          "placeholder": "Enter question text"
-        },
-        "status-day-not-consumed": {
-          "name": "Nothing Consumed",
-          "description": "This status is displayed when nothing was consumed that day.",
-          "placeholder": "Enter status text for 'nothing consumed'"
-        },
-        "status-day-under-limit": {
-          "name": "Below the Limit",
-          "description": "This status is displayed when the participant is below the limit.",
-          "placeholder": "Enter status text for 'below the limit'"
-        },
-        "status-day-over-limit": {
-          "name": "Above the Limit",
-          "description": "This status is displayed when the limit has been exceeded.",
-          "placeholder": "Enter status text for 'above the limit'"
+        }
+      },
+      "boolean": {
+        "goal": {
+          "question": {
+            "name": "Goal Text",
+            "description": "This is the text displayed to patients in the app (e.g. like the Previewf from other goals with more complex properties)",
+            "placeholder": "Enter goal text"
+          },
+          "desired": {
+            "name": "Desired outcome",
+            "description": "This is the desired outcome of the adhearance check (true, false)"
+          }
         }
       },
       "reduceAmountOf": {
@@ -741,7 +770,16 @@
       },
       "category": {
         "nutrition": "Nutrition",
-        "smoking": "Smoking"
+        "smoking": "Smoking",
+        "medication": "Medication"
+      },
+      "medication": {
+        "description": "This goal helps to track adherance for medication.",
+        "name": "Medication"
+      },
+      "boolean": {
+        "description": "This goal is a simple yes/no condition, for defining a custom goal.",
+        "name": "Yes/No condition"
       }
     },
     "goalTemplateList": {
