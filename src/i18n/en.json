@@ -605,14 +605,6 @@
           "description": "Allows participants to customize the goal title during personalization in the app.",
           "placeholder": "Allow overriding"
         },
-        "showAsTodoItemState": {
-          "name": "Mendatory Goal",
-          "description": "When enabled, this goal will be displayed in the activity list of the Today tab in the app."
-        },
-        "customShowAsTodoItemState": {
-          "name": "Custom Mendatory Goal",
-          "description": "This is a custom mandatory goal that must be completed by the participant."
-        },
         "days-of-week": {
           "name": "Days of the Week",
           "description": "Days of the week range",
@@ -656,16 +648,20 @@
         },
         "customAdherenceChecksState": {
           "name": "Custom Adherence Check",
-          "description": "Lets the patient overwrite the goals default settings for adherence checks."
+          "description": "If enabled, the adherence checks can be overwritten by the participant in the app. The adherence checks  configured by the template are used as default."
         },
         "adherenceChecksScheduleState": {
-          "name": "Custom Adherence Check",
-          "description": "Lets the patient overwrite the goals default settings for adherence checks."
+          "name": "Schedule goal",
+          "description": "If enabled, the scheduled for the goal is calculated based on the adherence checks. If disabled, the goal is active during the whole day."
         },
         "self-report-question": {
           "name": "Question Text",
           "description": "This is the message sent to participants.",
           "placeholder": "Enter question text"
+        },
+        "instanceState": {
+          "name": "Allow duplicates",
+          "description": "If enabled the user is allowed to configure multiple goals for this template (e.g. for different medications)"
         }
       },
       "amountOfGoal": {
