@@ -4,8 +4,8 @@ Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Elastic License 2.0. */
 <script setup lang="ts">
-  import { StringListProperty } from '../../../models/InputModels';
-  import { PropType, watch } from 'vue';
+  import { StringListProperty } from '@/models/InputModels';
+  import { PropType, ref, watch } from 'vue';
   import InputText from 'primevue/inputtext';
   import { useI18n } from 'vue-i18n';
   import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
@@ -27,10 +27,17 @@ Licensed under the Elastic License 2.0. */
     },
   });
 
-  const update = (event: KeyboardEvent, index: number): void => {
-    if (props.property.value) {
-      props.property.value[index] = (event.target as HTMLInputElement).value;
-    }
+  const inputValues = ref<string[]>(
+    Array.from(
+      { length: props.property.maxSize },
+      (_, i) => props.property.value?.[i] ?? '',
+    ),
+  );
+
+  const update = (value: string, index: number): void => {
+    inputValues.value[index] = value;
+    props.property.value = [...inputValues.value];
+    emit('onInputChange', props.property);
   };
 
   const emit = defineEmits<{
@@ -44,7 +51,7 @@ Licensed under the Elastic License 2.0. */
         emit('onInputChange', props.property);
       }
     },
-    { deep: true },
+    { deep: true, immediate: true },
   );
 </script>
 
@@ -54,22 +61,24 @@ Licensed under the Elastic License 2.0. */
       <label>
         {{ $t(property.name) }}<span v-if="property.required">*</span>
       </label>
-      <PartOfTemplateBadge :visible="isPartOfTemplate" :component-id="property.id" />
+      <PartOfTemplateBadge
+        :visible="isPartOfTemplate"
+        :component-id="property.id"
+      />
     </h6>
     <div>{{ $t(props.property.description) }}</div>
     <div v-if="editable" class="flex w-full flex-col gap-1">
       <InputText
-        v-for="index in property.maxSize"
+        v-for="(_item, index) in inputValues"
         :key="index"
         class="w-full"
-        :class="!editable && property.value?.[index - 1] ? 'w-fit' : 'hidden'"
-        :value="property.value?.[index - 1]"
+        :value="inputValues[index]"
         type="text"
         :required="property.required"
         :disabled="!editable || property.immutable"
-        :placeholder="t('global.labels.option', { value: index })"
+        :placeholder="t('global.labels.option', { value: index + 1 })"
         style="display: block"
-        @keyup="update($event, index - 1)"
+        @input="update(($event.target as HTMLInputElement).value, index)"
       />
     </div>
     <div v-else-if="!editable" class="space-around flex flex-row">

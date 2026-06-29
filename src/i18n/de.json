@@ -607,7 +607,7 @@
         },
         "showAsTodoItemState": {
           "name": "Verpflichtendes Ziel",
-          "description": "Dies ist ein verpflichtendes Ziel, das von den Teilnehmer:innen abgeschlossen werden muss."
+          "description": "Wenn aktiviert, wird dieses Ziel in der Aktivitätenliste im Heute-Tab der Applikation angezeigt."
         },
         "customShowAsTodoItemState": {
           "name": "Benutzerdefiniertes verpflichtendes Ziel",
