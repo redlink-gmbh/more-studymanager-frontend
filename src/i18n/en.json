@@ -607,7 +607,7 @@
         },
         "showAsTodoItemState": {
           "name": "Mendatory Goal",
-          "description": "This is a mandatory goal that must be completed by the participant."
+          "description": "When enabled, this goal will be displayed in the activity list of the Today tab in the app."
         },
         "customShowAsTodoItemState": {
           "name": "Custom Mendatory Goal",
