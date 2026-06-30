@@ -47,9 +47,7 @@ Licensed under the Elastic License 2.0. */
   watch(
     () => props.property.value,
     () => {
-      if (props.isPartOfTemplate) {
-        emit('onInputChange', props.property);
-      }
+      emit('onInputChange', props.property);
     },
     { deep: true, immediate: true },
   );
