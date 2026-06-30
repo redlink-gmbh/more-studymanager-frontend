@@ -137,7 +137,14 @@
         {{ $t(property.name) }}
       </h6>
     </div>
-
+    <div
+      v-if="
+        property.description && property.description !== 'inputModel.enterValue'
+      "
+      class="text-xs text-gray-500"
+    >
+      {{ $t(property.description) }}
+    </div>
     <div v-if="isEditing" class="mb-4">
       <div
         class="relative mb-2 flex items-center justify-between rounded border border-gray-300 bg-gray-50 p-4"
@@ -196,14 +203,6 @@
           @click="startEditing"
         />
       </div>
-    </div>
-    <div
-      v-if="
-        property.description && property.description !== 'inputModel.enterValue'
-      "
-      class="text-xs text-gray-500"
-    >
-      {{ $t(property.description) }}
     </div>
   </div>
 </template>

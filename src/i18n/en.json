@@ -134,7 +134,9 @@
       "leavePage": "Do you really want to leave the page?",
       "dataHealth": "Data health",
       "searchPlaceholder": "Search...",
-      "warning": "Warning"
+      "warning": "Warning",
+      "goalTemplate": "Goal",
+      "observation": "Observation"
     },
     "placeholder": {
       "all": "All",
@@ -1333,7 +1335,8 @@
       "participantInfoInput": "Please provide information for your studies participants. This description will be visible on the participant's app.",
       "purposeInput": "Please provide a short description of your research purpose for your collaborators.",
       "selectLanguage": "Select a language",
-      "titleInput": "Please provide a short title."
+      "titleInput": "Please provide a short title.",
+      "participantTitle": "This title is shown as {type}-title on the app."
     },
     "plural": "Studies",
     "props": {
@@ -1352,7 +1355,8 @@
       "studyGroup": "Study group {size}",
       "observationGroup": "Observation group {size}",
       "studyId": "Study ID",
-      "title": "Title"
+      "title": "Title",
+      "participantTitle": "App title"
     },
     "roles": {
       "admin": "Study Administrator",
