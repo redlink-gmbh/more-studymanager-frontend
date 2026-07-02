@@ -605,19 +605,63 @@
           "description": "Erlaubt den Teilnehmer:innen bei der Personalisierung auf der App den Zieltitel anzupassen.",
           "placeholder": "Überschreiben erlauben"
         },
-        "showAsTodoItemState": {
-          "name": "Verpflichtendes Ziel",
-          "description": "Wenn aktiviert, wird dieses Ziel in der Aktivitätenliste im Heute-Tab der Applikation angezeigt."
-        },
-        "customShowAsTodoItemState": {
-          "name": "Benutzerdefiniertes verpflichtendes Ziel",
-          "description": "Dies ist ein benutzerdefiniertes verpflichtendes Ziel, das von den Teilnehmer:innen abgeschlossen werden muss."
-        },
         "days-of-week": {
           "name": "Wochentage",
           "description": "Wochentage Bereich",
           "placeholder-min": "Mindestwert",
           "placeholder-max": "Maximalwert"
+        },
+        "status-100-reached": {
+          "name": "100% erreicht",
+          "description": "Text der bei 100% Zielerreichung angezeigt wird.",
+          "placeholder": "Statustext für '100'% eingeben"
+        },
+        "status-75-reached": {
+          "name": "75% erreicht",
+          "description": "Text der bei 75%+ Zielerreichung angezeigt wird.",
+          "placeholder": "Statustext für '75'% eingeben"
+        },
+        "status-not-reached": {
+          "name": "Noch nicht erreicht",
+          "description": "Text der zwischen 0 und 75% Zielerreichung angezeigt wird.",
+          "placeholder": "Statustext für 'noch nicht erreicht' eingeben"
+        },
+        "status-day-not-consumed": {
+          "name": "Nichts konsumiert",
+          "description": "Dieser Status wird angezeigt, wenn an dem Tag nichts konsumiert wurde.",
+          "placeholder": "Statustext für 'Nichts konsumiert' eingeben"
+        },
+        "status-day-under-limit": {
+          "name": "Unter dem Limit",
+          "description": "Dieser Status wird angezeigt, wenn der/die Teilnehmer:in unter dem Limit liegt.",
+          "placeholder": "Statustext für 'Unter dem Limit' eingeben"
+        },
+        "status-day-over-limit": {
+          "name": "Über dem Limit",
+          "description": "Dieser Status wird angezeigt, wenn das Limit überschritten wurde.",
+          "placeholder": "Statustext für 'Über dem Limit' eingeben"
+        },
+        "self-report-time": {
+          "name": "Benachrichtigungszeitpunkt",
+          "description": "Dies ist der Zeitpunkt, zu dem die Benachrichtigung an die Teilnehmer:innen gesendet wird.",
+          "placeholder": "Zeitpunkte auswählen"
+        },
+        "customAdherenceChecksState": {
+          "name": "Kontrollabfrage anpassbar",
+          "description": "Wenn aktiviert, können Teilnehmer:innen die Kontrollabfrage in der App anpassen. Die im Template konfigurierten Abfragen werden als Standard verwendet."
+        },
+        "adherenceChecksScheduleState": {
+          "name": "Ziel nach Abfragen planen",
+          "description": "Wenn aktiviert, wird der Zeitplan des Ziels anhand der Kontrollabfrage berechnet. Wenn deaktiviert, ist das Ziel ganztägig aktiv."
+        },
+        "self-report-question": {
+          "name": "Fragetext",
+          "description": "Dies ist die Nachricht, die an die Teilnehmer:innen gesendet wird.",
+          "placeholder": "Fragetext eingeben"
+        },
+        "instanceState": {
+          "name": "Duplikation ermöglichen",
+          "description": "Wenn aktiviert, dürfen Teilnehmer:innen mehrere Ziele für dieses Template konfigurieren, zum Beispiel für unterschiedliche Medikamente."
         }
       },
       "amountOfGoal": {
@@ -663,54 +707,6 @@
             "description": "Was wird gemacht?",
             "placeholder": "Aktion eingeben"
           }
-        },
-        "status-100-reached": {
-          "name": "100% erreicht",
-          "description": "Text der bei 100% Zielerreichung angezeigt wird.",
-          "placeholder": "Statustext für '100'% eingeben"
-        },
-        "status-75-reached": {
-          "name": "75% erreicht",
-          "description": "Text der bei 75%+ Zielerreichung angezeigt wird.",
-          "placeholder": "Statustext für '75'% eingeben"
-        },
-        "status-not-reached": {
-          "name": "Noch nicht erreicht",
-          "description": "Text der zwischen 0 und 75% Zielerreichung angezeigt wird.",
-          "placeholder": "Statustext für 'noch nicht erreicht' eingeben"
-        },
-        "status-day-not-consumed": {
-          "name": "Nichts konsumiert",
-          "description": "Dieser Status wird angezeigt, wenn an dem Tag nichts konsumiert wurde.",
-          "placeholder": "Statustext für 'Nichts konsumiert' eingeben"
-        },
-        "status-day-under-limit": {
-          "name": "Unter dem Limit",
-          "description": "Dieser Status wird angezeigt, wenn der/die Teilnehmer:in unter dem Limit liegt.",
-          "placeholder": "Statustext für 'Unter dem Limit' eingeben"
-        },
-        "status-day-over-limit": {
-          "name": "Über dem Limit",
-          "description": "Dieser Status wird angezeigt, wenn das Limit überschritten wurde.",
-          "placeholder": "Statustext für 'Über dem Limit' eingeben"
-        },
-        "self-report-time": {
-          "name": "Benachrichtigungszeitpunkt",
-          "description": "Dies ist der Zeitpunkt, zu dem die Benachrichtigung an die Teilnehmer:innen gesendet wird.",
-          "placeholder": "Zeitpunkte auswählen"
-        },
-        "customAdherenceChecksState": {
-          "name": "Benutzerdefinierte Adhärenzprüfung",
-          "description": "Ermöglicht es dem Patienten, die Standardeinstellungen für Adhärenzprüfungen zu überschreiben."
-        },
-        "adherenceChecksScheduleState": {
-          "name": "Benutzerdefinierte Adhärenzprüfung",
-          "description": "Ermöglicht es dem Patienten, die Standardeinstellungen für Adhärenzprüfungen zu überschreiben."
-        },
-        "self-report-question": {
-          "name": "Fragetext",
-          "description": "Dies ist die Nachricht, die an die Teilnehmer:innen gesendet wird.",
-          "placeholder": "Fragetext eingeben"
         }
       }
     },
