@@ -36,38 +36,34 @@
   watch(
     () => props.property.value?.lower,
     (newLower) => {
-      if (
-        newLower !== undefined &&
-        newLower !== null &&
-        props.property.value?.upper !== undefined &&
-        props.property.value.upper !== null
-      ) {
-        if (newLower > props.property.value.upper) {
-          props.property.value.upper = newLower;
+      if (newLower !== undefined && newLower !== null) {
+        if (
+          props.property.value?.upper !== undefined &&
+          props.property.value.upper !== null
+        ) {
+          if (newLower > props.property.value.upper) {
+            props.property.value.upper = newLower;
+          }
         }
       }
-      if (props.isPartOfTemplate) {
-        emit('onInputChange', props.property);
-      }
+      emit('onInputChange', props.property);
     },
   );
 
   watch(
     () => props.property.value?.upper,
     (newUpper) => {
-      if (
-        newUpper !== undefined &&
-        newUpper !== null &&
-        props.property.value?.lower !== undefined &&
-        props.property.value.lower !== null
-      ) {
-        if (newUpper < props.property.value.lower) {
-          props.property.value.lower = newUpper;
+      if (newUpper !== undefined && newUpper !== null) {
+        if (
+          props.property.value?.lower !== undefined &&
+          props.property.value.lower !== null
+        ) {
+          if (newUpper < props.property.value.lower) {
+            props.property.value.lower = newUpper;
+          }
         }
       }
-      if (props.isPartOfTemplate) {
-        emit('onInputChange', props.property);
-      }
+      emit('onInputChange', props.property);
     },
   );
 </script>

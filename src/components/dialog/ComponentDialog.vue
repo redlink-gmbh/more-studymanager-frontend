@@ -76,6 +76,7 @@ Licensed under the Elastic License 2.0. */
 
   const title = ref(component.title);
   const purpose = ref(component.purpose);
+   const participantTitle = ref(component.participantTitle);
   const participantInfo = ref(component.participantInfo);
   const properties: Ref<Property<any>[]> = ref(
     factory.properties
@@ -255,7 +256,7 @@ Licensed under the Elastic License 2.0. */
       const returnComponent = {
         templateId: component.templateId,
         title: title.value,
-        purpose: purpose.value,
+        participantTitle: participantTitle.value,
         participantInfo: participantInfo.value,
         observationGroupIds: selectedObservationGroups.value?.length
           ? selectedObservationGroups.value.map((id: string) => parseInt(id))
@@ -475,7 +476,10 @@ Licensed under the Elastic License 2.0. */
         @remove-scheduler="removeScheduler"
       />
 
-      <div class="col-span-8 col-start-0">
+      <div
+        v-if="componentType === 'observation'"
+        class="col-span-8 col-start-0"
+      >
         <h5 class="mb-2">{{ $t('study.props.purpose') }}</h5>
         <Textarea
           v-model="purpose"
@@ -484,6 +488,23 @@ Licensed under the Elastic License 2.0. */
           :auto-resize="true"
           :disabled="!editable"
         ></Textarea>
+      </div>
+      <div
+        v-if="componentType === 'goalTemplate'"
+        class="col-span-8 mt-6 mb-3 h-[1px] w-full bg-gray-300"
+      />
+      <div v-if="componentType === 'goalTemplate'" class="col-span-8 col-start-0">
+        <h5 class="mb-2">{{ $t('study.props.participantTitle') }}*</h5>
+        <InputText
+          v-model="participantTitle"
+          type="text"
+          required
+          :placeholder="$t('study.placeholder.participantTitle', {
+            type: $t(`global.labels.${componentType}`),
+          })"
+          class="w-full"
+          :disabled="!editable"
+        ></InputText>
       </div>
       <div class="col-span-8 col-start-0">
         <h5 :class="getError('participantInfo') ? 'mb-1' : 'mb-2'">

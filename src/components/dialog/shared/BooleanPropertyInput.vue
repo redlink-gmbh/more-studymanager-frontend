@@ -31,9 +31,7 @@ Licensed under the Elastic License 2.0. */
   watch(
     () => props.property.value,
     () => {
-      if (props.isPartOfTemplate) {
-        emit('onBooleanChange', props.property.value);
-      }
+      emit('onBooleanChange', props.property.value);
     },
   );
 </script>

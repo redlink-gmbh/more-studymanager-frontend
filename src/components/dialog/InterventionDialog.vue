@@ -43,21 +43,22 @@ Licensed under the Elastic License 2.0. */
   const triggerData: Trigger = dialogRef.value.data?.triggerData;
   const groupStates: MoreTableChoice[] =
     dialogRef.value.data?.groupStates || [];
-  const observationGroupStates: MoreTableChoice[] = observationGroupStore.observationGroups.map(
-    (observationGroup) =>
-      ({
-        label: observationGroup.title,
-        value: observationGroup.observationGroupId?.toString(),
-      }) as MoreTableChoice,
-  );
+  const observationGroupStates: MoreTableChoice[] =
+    observationGroupStore.observationGroups.map(
+      (observationGroup) =>
+        ({
+          label: observationGroup.title,
+          value: observationGroup.observationGroupId?.toString(),
+        }) as MoreTableChoice,
+    );
   const groupPlaceholder =
     dialogRef.value.data?.groupPlaceholder ||
     t('global.placeholder.entireStudy');
   const actionFactories = dialogRef.value.data?.actionFactories;
   const triggerFactories = dialogRef.value.data?.triggerFactories;
   const selectedObservationGroups = ref(
-    intervention.observationGroupIds?.map((id: number) => id.toString()) ?? []
-  )
+    intervention.observationGroupIds?.map((id: number) => id.toString()) ?? [],
+  );
 
   let propInputError: string = '';
 
@@ -244,7 +245,11 @@ Licensed under the Elastic License 2.0. */
             trigger: {},
             actions: [],
             studyGroupId: studyGroupId.value,
-            observationGroupIds: selectedObservationGroups.value?.length ? selectedObservationGroups.value.map((id: string) => parseInt(id)) : [],
+            observationGroupIds: selectedObservationGroups.value?.length
+              ? selectedObservationGroups.value.map((id: string) =>
+                  parseInt(id),
+                )
+              : [],
             schedule: intervention.schedule,
           } as Intervention;
 
@@ -394,7 +399,7 @@ Licensed under the Elastic License 2.0. */
       :class="{ 'gap-y-2': !editable }"
       @submit.prevent="save()"
     >
-      <div class="col-start-0 col-span-8 mt-2" :class="{ 'pb-4': !editable }">
+      <div class="col-span-8 col-start-0 mt-2" :class="{ 'pb-4': !editable }">
         <h5>{{ $t('intervention.dialog.label.interventionTitle') }}*</h5>
         <div v-if="getError('title')" class="error error-label col-span-8 mb-2">
           {{ getError('title') }}
@@ -409,7 +414,7 @@ Licensed under the Elastic License 2.0. */
         ></InputText>
       </div>
 
-      <div class="col-start-0 col-span-8">
+      <div class="col-span-8 col-start-0">
         <h5 class="mb-2">{{ $t('study.props.purpose') }}</h5>
         <Textarea
           v-model="purpose"
@@ -420,7 +425,7 @@ Licensed under the Elastic License 2.0. */
         ></Textarea>
       </div>
       <div
-        class="section-group col-start-0 col-span-8 mt-4 grid grid-cols-2 items-end lg:grid-cols-3"
+        class="section-group col-span-8 col-start-0 mt-4 grid grid-cols-2 items-end lg:grid-cols-3"
       >
         <h5 class="col-span-2">{{ $t('intervention.props.trigger') }}*</h5>
         <div class="col-span-3 col-start-3" :class="{ 'text-end': !editable }">
@@ -467,7 +472,7 @@ Licensed under the Elastic License 2.0. */
           >
             {{ getTriggerTypeDescription(triggerType) }}
           </div>
-          <div class="col-start-0 col-span-3">
+          <div class="col-span-3 col-start-0">
             <div v-if="triggerJsonError && editable" class="error mb-4">
               {{ triggerJsonError }}
             </div>
@@ -488,7 +493,7 @@ Licensed under the Elastic License 2.0. */
         </div>
       </div>
 
-      <div class="section-group col-start-0 col-span-8 mt-8 grid grid-cols-9">
+      <div class="section-group col-span-8 col-start-0 mt-8 grid grid-cols-9">
         <div class="col-span-9 grid grid-cols-2 items-end lg:grid-cols-3">
           <h5 class="lg:col-span-2">{{ $t('intervention.props.action') }}*</h5>
           <Button
@@ -528,7 +533,7 @@ Licensed under the Elastic License 2.0. */
             <div
               v-for="(action, index) in actionsArray"
               :key="index"
-              class="col-start-0 js-action col-span-9"
+              class="js-action col-span-9 col-start-0"
               :class="{ 'mb-4': index < actionsArray.length - 1 }"
             >
               <hr v-if="index !== 0" class="my-4" />
@@ -570,38 +575,46 @@ Licensed under the Elastic License 2.0. */
         </div>
       </div>
 
-      <div class="col-start-0 col-span-8">
+      <div class="col-span-8 col-start-0">
         <h5 v-if="editable" class="pb-2 font-bold">
-          {{ editable ? $t('study.dialog.label.chooseGroups') : $t('study.props.groups') }}
+          {{
+            editable
+              ? $t('study.dialog.label.chooseGroups')
+              : $t('study.props.groups')
+          }}
         </h5>
         <div v-if="editable" class="mb-2">
-          {{ $t('study.dialog.description.howToCreateGroups', {for: $t('intervention.plural')}) }}
+          {{
+            $t('study.dialog.description.howToCreateGroups', {
+              for: $t('intervention.plural'),
+            })
+          }}
         </div>
         <div class="flex gap-5">
-        <div>
-          <div class="mb-1">{{ $t('studyGroup.plural')}}</div>
+          <div>
+            <div class="mb-1">{{ $t('studyGroup.plural') }}</div>
             <Dropdown
-            v-model="studyGroupId"
-            :options="groupStates"
-            option-label="label"
-            option-value="value"
-            :disabled="!editable"
-            class="w-fit"
-            :class="{ 'dropdown-has-value': studyGroupId }"
-            :placeholder="
-              studyGroupId
-                ? getLabelForChoiceValue(studyGroupId as number, groupStates)
-                : groupPlaceholder
-                  ? (groupPlaceholder as string)
-                  : $t('global.placeholder.entireStudy')
-            "
-          >
-            <template #option="optionProps">
-              <div class="p-select-car-option">
-                <span>{{ optionProps.option.label }}</span>
-              </div>
-            </template>
-          </Dropdown>
+              v-model="studyGroupId"
+              :options="groupStates"
+              option-label="label"
+              option-value="value"
+              :disabled="!editable"
+              class="w-fit"
+              :class="{ 'dropdown-has-value': studyGroupId }"
+              :placeholder="
+                studyGroupId
+                  ? getLabelForChoiceValue(studyGroupId as number, groupStates)
+                  : groupPlaceholder
+                    ? (groupPlaceholder as string)
+                    : $t('global.placeholder.entireStudy')
+              "
+            >
+              <template #option="optionProps">
+                <div class="p-select-car-option">
+                  <span>{{ optionProps.option.label }}</span>
+                </div>
+              </template>
+            </Dropdown>
           </div>
           <div>
             <div class="mb-1">{{ $t('observationGroup.plural') }}</div>
@@ -611,27 +624,35 @@ Licensed under the Elastic License 2.0. */
               :disabled="!editable"
               option-label="label"
               option-value="value"
-              :placeholder="$t('global.placeholder.chooseDropdownOptionDefault')"
+              :placeholder="
+                $t('global.placeholder.chooseDropdownOptionDefault')
+              "
               :show-toggle-all="false"
               class="z-top custom-multiselect-root"
               :panel-class="'custom-multiselect-panel'"
             >
               <template #value="{ value }">
-                      <span v-if="value?.length > 0">{{ value.map((item: string) => observationGroupStates.find(
-                        (group: MoreTableChoice) => group.value === item
-                      )?.label).join(', ')  }}</span>
+                <span v-if="value?.length > 0">{{
+                  value
+                    .map(
+                      (item: string) =>
+                        observationGroupStates.find(
+                          (group: MoreTableChoice) => group.value === item,
+                        )?.label,
+                    )
+                    .join(', ')
+                }}</span>
                 <span v-else class="text-gray-400">
-                        {{ $t('global.placeholder.chooseDropdownOptionDefault') }}
-                      </span>
+                  {{ $t('global.placeholder.chooseDropdownOptionDefault') }}
+                </span>
               </template>
-
             </MultiSelect>
           </div>
         </div>
       </div>
 
       <div
-        class="col-start-0 buttons col-span-8 mt-1 flex flex-row items-center justify-end text-right"
+        class="buttons col-span-8 col-start-0 mt-1 flex flex-row items-center justify-end text-right"
       >
         <Button class="btn-gray" @click="cancel()">
           <span v-if="editable">{{ $t('global.labels.cancel') }}</span>
@@ -650,22 +671,22 @@ Licensed under the Elastic License 2.0. */
 </template>
 
 <style scoped>
-@import '../../styles/components/moreTable-dialogs.css';
+  @import '../../styles/components/moreTable-dialogs.css';
 
-:deep(.dropdown-btn .p-select-label) {
-  color: white!important;
-}
-
-.dropdown-btn {
-  background-color: var(--primary-color);
-  color: white;
-  :deep(.p-select-label),
-  :deep(.p-select-trigger-icon) {
-    color: white;
+  :deep(.dropdown-btn .p-select-label) {
+    color: white !important;
   }
-}
 
-.dialog #interventionDialogForm .section-group .section-content {
-  border: 1px solid var(--bluegray-50);
-}
+  .dropdown-btn {
+    background-color: var(--primary-color);
+    color: white;
+    :deep(.p-select-label),
+    :deep(.p-select-trigger-icon) {
+      color: white;
+    }
+  }
+
+  .dialog #interventionDialogForm .section-group .section-content {
+    border: 1px solid var(--bluegray-50);
+  }
 </style>

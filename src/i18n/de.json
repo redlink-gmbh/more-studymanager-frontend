@@ -134,7 +134,9 @@
       "leavePage": "Möchten Sie die Seite wirklich verlassen?",
       "dataHealth": "Datenqualität",
       "searchPlaceholder": "Suchen...",
-      "warning": "Warnung"
+      "warning": "Warnung",
+      "goalTemplate": "Ziel",
+      "observation": "Datenerhebung"
     },
     "placeholder": {
       "all": "Alle",
@@ -265,6 +267,7 @@
       "emptyTriggerConditions": "Bitte fügen Sie mindesetens eine Auslöserkondition zu ihrem Trigger hinzu.",
       "interventionRowIsOpen": "Bitte speichern Sie alle Konfigurationszeilen, bevor Sie die Intervention speichern.",
       "triggerProp": "Ein Trigger-Property hat einen Fehler.",
+      "actionProp": "Ein Action-Property hat einen Fehler.",
       "observationDeleted": "Die verlinkte Datenerhebung (ID: {observationId}, Type: {observationType}) wurde gelöscht und kann nicht mehr referenziert werden. Bitte verlinke eine andere Datenerhebung, entferne diese Aktion oder lösche die Intervention komplett. Beachte, dass eine Intervention stets mindestens eine Aktion enthalten muss."
     },
     "factory": {
@@ -668,7 +671,7 @@
         "partOfTemplate": "Teil der Vorschau",
         "goal-preview": {
           "name": "Ziel Vorschau",
-          "description": "Das Ziel wird auf der App folgendermaßen angezeigt:",
+          "description": "Das Ziel wird auf der App folgendermaßen angezeigt",
           "partOfTemplate": "Teil der Vorschau"
         },
         "goal": {
@@ -1329,7 +1332,8 @@
       "participantInfoInput": "Stellen Sie Informationen für Ihre Studienteilnehmer:innen bereit. Dies Beschreibung wird den Teilnehmern:innen auf der App angezeigt.",
       "purposeInput": "Stellen Sie eine kurze Beschreibung Ihres Forschungszwecks für Ihre Studien-Mitarbeiter bereit.",
       "selectLanguage": "Sprache auswählen",
-      "titleInput": "Bitte geben Sie einen kurzen Titel ein."
+      "titleInput": "Bitte geben Sie einen kurzen Titel ein.",
+      "participantTitle": "Dieser Titel scheint als {type}-Titel für die Teilnehmer:innen auf der App auf."
     },
     "plural": "Studien",
     "props": {
@@ -1349,7 +1353,8 @@
       "groups": "Gruppen",
       "observationGroup": "Datenerhebungs-Gruppe {size}",
       "studyId": "Studien-ID",
-      "title": "Titel"
+      "title": "Titel",
+      "participantTitle": "App Titel"
     },
     "roles": {
       "admin": "Studien-Administrator",
