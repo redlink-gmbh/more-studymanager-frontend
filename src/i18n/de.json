@@ -665,6 +665,10 @@
         "instanceState": {
           "name": "Duplikation ermöglichen",
           "description": "Wenn aktiviert, dürfen Teilnehmer:innen mehrere Ziele für dieses Template konfigurieren, zum Beispiel für unterschiedliche Medikamente."
+        },
+        "baselineTrackingState": {
+          "name": "Baseline-Tracking",
+          "description": "Wenn aktiviert, wird dieses Ziel in der Baseline-Tracking-Phase als mögliches Element zur Datensammlung berücksichtigt. In dieser ersten Phase werden noch keine Ziele festgelegt, sondern Daten zu den verschiedenen Verhaltensweisen gesammelt."
         }
       },
       "amountOfGoal": {
@@ -709,6 +713,29 @@
             "name": "Aktion",
             "description": "Was wird gemacht?",
             "placeholder": "Aktion eingeben"
+          }
+        }
+      },
+      "steps": {
+        "goal": {
+          "stepRange": {
+            "name": "Schrittziel Bereich festlegen",
+            "description": "Hier kann festgelegt werden, innerhalb welcher Mindest- und Höchstanzahl an Schritten die Teilnehmer:innen ihr Ziel personalisieren dürfen."
+          },
+          "question": {
+            "name": "Frage konfigurieren",
+            "description": "Diese Frage wird zusätzlich bei den Adherence Checks mitgesendet, um weitere qualitative Informationen zu erhalten. Wenn das Feld nicht ausgefüllt ist, ist die Frage automatisch deaktiviert.",
+            "placeholder": "Frage eingeben"
+          },
+          "answer": {
+            "name": "Antworten",
+            "description": "Hier können Antwortmöglichkeiten für die Frage festgelegt werden. Nicht ausgefüllte Felder werden nicht mitgesendet."
+          },
+          "singleChoiceState": {
+            "description": {
+              "name": "Einfachauswahl aktivieren",
+              "description": "Die obige Frage ist standardmäßig auf Mehrfachauswahl gesetzt. Durch Aktivieren dieser Funktion wird sie zu einer Einfachauswahl."
+            }
           }
         }
       }
@@ -779,6 +806,10 @@
       "boolean": {
         "description": "Dieses Ziel ist eine einfache Ja/Nein-Bedingung für ein benutzerdefiniertes Ziel.",
         "name": "Ja/Nein-Bedingung"
+      },
+      "steps": {
+        "name": "Schritte",
+        "description": "Dieses Ziel ermöglicht es den Teilnehmer:innen, ein persönliches tägliches Schritteziel festzulegen."
       }
     },
     "goalTemplateList": {
