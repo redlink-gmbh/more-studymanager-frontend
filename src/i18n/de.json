@@ -719,12 +719,12 @@
       "steps": {
         "goal": {
           "stepRange": {
-            "name": "Schrittbereich",
+            "name": "Schrittziel Bereich festlegen",
             "description": "Hier kann festgelegt werden, innerhalb welcher Mindest- und Höchstanzahl an Schritten die Teilnehmer:innen ihr Ziel personalisieren dürfen."
           },
           "question": {
             "name": "Frage konfigurieren",
-            "description": "Diese Frage wird zusätzlich bei den Adherence Checks mitgesendet, um weitere qualitative Informationen zu erhalten.",
+            "description": "Diese Frage wird zusätzlich bei den Adherence Checks mitgesendet, um weitere qualitative Informationen zu erhalten. Wenn das Feld nicht ausgefüllt ist, ist die Frage automatisch deaktiviert.",
             "placeholder": "Frage eingeben"
           },
           "answer": {

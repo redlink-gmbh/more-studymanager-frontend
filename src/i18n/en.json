@@ -719,12 +719,12 @@
       "steps": {
         "goal": {
           "stepRange": {
-            "name": "Step Range",
+            "name": "Stepgoal Range configuration",
             "description": "Here you can define the minimum and maximum number of steps within which participants may personalize their goal."
           },
           "question": {
             "name": "Configure Question",
-            "description": "This question is also sent with the adherence checks to collect additional qualitative information.",
+            "description": "This question is also sent with the adherence checks to collect additional qualitative information. If the question field isn't set, the question is automatically deactivated.",
             "placeholder": "Enter question"
           },
           "answer": {
