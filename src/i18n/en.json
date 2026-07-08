@@ -665,6 +665,10 @@
         "instanceState": {
           "name": "Allow duplicates",
           "description": "If enabled the user is allowed to configure multiple goals for this template (e.g. for different medications)"
+        },
+        "baselineTrackingState": {
+          "name": "Baseline Tracking",
+          "description": "When enabled, this goal is considered a possible data collection element during the baseline tracking phase. In this initial phase, no goals are set yet; instead, data on different behaviors is collected."
         }
       },
       "amountOfGoal": {
@@ -709,6 +713,29 @@
             "name": "Activity",
             "description": "What is being done?",
             "placeholder": "Enter activity"
+          }
+        }
+      },
+      "steps": {
+        "goal": {
+          "stepRange": {
+            "name": "Step Range",
+            "description": "Here you can define the minimum and maximum number of steps within which participants may personalize their goal."
+          },
+          "question": {
+            "name": "Configure Question",
+            "description": "This question is also sent with the adherence checks to collect additional qualitative information.",
+            "placeholder": "Enter question"
+          },
+          "answer": {
+            "name": "Answers",
+            "description": "Here you can define answer options for the question. Empty fields will not be sent."
+          },
+          "singleChoiceState": {
+            "description": {
+              "name": "Enable Single Choice",
+              "description": "The question above is set to multiple choice by default. Enabling this function changes it to single choice."
+            }
           }
         }
       }
@@ -779,6 +806,10 @@
       "boolean": {
         "description": "This goal is a simple yes/no condition, for defining a custom goal.",
         "name": "Yes/No condition"
+      },
+      "steps": {
+        "name": "Steps",
+        "description": "This goal allows participants to set a personal daily step goal."
       }
     },
     "goalTemplateList": {
