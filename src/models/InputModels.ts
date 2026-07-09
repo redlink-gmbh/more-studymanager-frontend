@@ -503,13 +503,25 @@ export class BooleanProperty extends Property<boolean> {
   }
 
   validate(): string | undefined {
-    if (this.required && this.value === undefined) {
+    if (this.required && (this.value === undefined || this.value === null)) {
       return 'Value is required';
-    } else if (typeof this.value !== 'boolean') {
+    } else if (
+      this.value !== undefined &&
+      this.value !== null &&
+      typeof this.value !== 'boolean'
+    ) {
       return 'Value has wrong value';
     } else {
       return undefined;
     }
+  }
+
+  public getValue(): boolean | undefined {
+    const error = this.validate();
+    if (error) {
+      throw new ValidationError(this.name, error);
+    }
+    return this.value ?? false;
   }
   static fromJson(json: any): BooleanProperty {
     return new BooleanProperty(

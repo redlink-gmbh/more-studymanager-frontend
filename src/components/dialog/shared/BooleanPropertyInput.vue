@@ -5,44 +5,50 @@ Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Elastic License 2.0. */
 <script setup lang="ts">
   import { BooleanProperty } from '../../../models/InputModels';
-  import { PropType, watch } from 'vue';
+  import { PropType, ref, watch } from 'vue';
   import Checkbox from 'primevue/checkbox';
   import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
 
-  const props = defineProps({
-    property: {
-      type: Object as PropType<BooleanProperty>,
-      required: true,
-    },
-    isPartOfTemplate: {
-      type: Boolean,
-      default: false,
-    },
-    editable: {
-      type: Boolean,
-      default: true,
-    },
-  });
+  const props =
+    defineProps({
+      property: {
+        type: Object as PropType<BooleanProperty>,
+        required: true,
+      },
+      isPartOfTemplate: {
+        type: Boolean,
+        default: false,
+      },
+      editable: {
+        type: Boolean,
+        default: true,
+      },
+    });
+
+  const tempValue = ref(props.property.value ?? false);
 
   const emit = defineEmits<{
-    (e: 'onBooleanChange', boolean: boolean | undefined): void;
+    (e: 'onBooleanChange', boolean: boolean): void;
   }>();
 
   watch(
-    () => props.property.value,
+    () => tempValue.value,
     () => {
-      emit('onBooleanChange', props.property.value);
+      emit('onBooleanChange', !!tempValue.value);
     },
   );
 </script>
 
 <template>
   <div class="flex flex-col gap-1">
-    <h6 class="font-bold flex items-center gap-1">
+    <h6 class="flex items-center gap-1 font-bold">
       <label v-if="property.name" :for="property.id">
         {{ $t(property.name) }}<span v-if="property.required">*</span>
       </label>
-      <PartOfTemplateBadge :visible="isPartOfTemplate" :component-id="property.id" />
+      <PartOfTemplateBadge
+        :visible="isPartOfTemplate"
+        :component-id="property.id"
+      />
     </h6>
     <div v-if="props.property.description" :id="`${property.id}-help`">
       {{ $t(props.property.description) }}
@@ -50,7 +56,7 @@ Licensed under the Elastic License 2.0. */
 
     <div class="flex items-center">
       <Checkbox
-        v-model="props.property.value"
+        v-model="tempValue"
         :label="property.name"
         class="mr-2"
         :required="property.required"
