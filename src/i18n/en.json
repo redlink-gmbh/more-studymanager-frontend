@@ -732,10 +732,8 @@
             "description": "Here you can define answer options for the question. Empty fields will not be sent."
           },
           "singleChoiceState": {
-            "description": {
-              "name": "Enable Single Choice",
-              "description": "The question above is set to multiple choice by default. Enabling this function changes it to single choice."
-            }
+            "name": "Enable Single Choice",
+            "description": "The question above is set to multiple choice by default. Enabling this function changes it to single choice."
           }
         }
       }

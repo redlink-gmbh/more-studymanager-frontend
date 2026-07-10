@@ -732,10 +732,8 @@
             "description": "Hier können Antwortmöglichkeiten für die Frage festgelegt werden. Nicht ausgefüllte Felder werden nicht mitgesendet."
           },
           "singleChoiceState": {
-            "description": {
-              "name": "Einfachauswahl aktivieren",
-              "description": "Die obige Frage ist standardmäßig auf Mehrfachauswahl gesetzt. Durch Aktivieren dieser Funktion wird sie zu einer Einfachauswahl."
-            }
+            "name": "Einfachauswahl aktivieren",
+            "description": "Die obige Frage ist standardmäßig auf Mehrfachauswahl gesetzt. Durch Aktivieren dieser Funktion wird sie zu einer Einfachauswahl."
           }
         }
       }
