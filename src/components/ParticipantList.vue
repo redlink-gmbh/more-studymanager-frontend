@@ -5,6 +5,7 @@ Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Elastic License 2.0. */
 <script setup lang="ts">
   import { computed, ref, watch } from 'vue';
+  import { useRoute } from 'vue-router';
   import { useImportExportApi } from '@/composable/useApi';
 
   import {
@@ -64,6 +65,7 @@ Licensed under the Elastic License 2.0. */
   const { t } = useI18n();
   const { handleIndividualError } = useErrorHandling();
   const dialog = useDialog();
+  const route = useRoute();
   const moreTableRef = ref();
 
   const studyStore = useStudyStore();
@@ -257,6 +259,25 @@ Licensed under the Elastic License 2.0. */
         handleIndividualError(error as AxiosError, 'cannot list participants');
       }
     },
+  );
+
+  const hasOpenedInitialDialog = ref(false);
+  watch(
+    [(): MoreParticipantListTableRow[] => participantsList.value, (): any => route.query.id],
+    ([newList, participantIdFromUrl]): void => {
+      if (
+        participantIdFromUrl &&
+        newList.length > 0 &&
+        !hasOpenedInitialDialog.value
+      ) {
+        openParticipantInfoDialog(participantIdFromUrl as string);
+        hasOpenedInitialDialog.value = true;
+        setTimeout(() => {
+          moreTableRef.value?.scrollToRow(participantIdFromUrl as string);
+        }, 500);
+      }
+    },
+    { immediate: true },
   );
 
   function getObservationGroupItem(id: number): MoreTableChoice | undefined {
