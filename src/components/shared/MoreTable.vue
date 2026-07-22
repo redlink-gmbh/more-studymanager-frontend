@@ -319,8 +319,17 @@ Licensed under the Elastic License 2.0. */
       }
     }
   }
+
+  function scrollToRow(id: string | number): void {
+    const element = document.getElementById(`row-${id}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
   defineExpose({
     setRowToEditMode,
+    scrollToRow,
   });
 </script>
 
@@ -338,7 +347,7 @@ Licensed under the Elastic License 2.0. */
     </div>
 
     <div
-      class="actions table-actions ml-2.5 flex flex-row items-center justify-end gap-2 mb-2"
+      class="actions table-actions mb-2 ml-2.5 flex flex-row items-center justify-end gap-2"
     >
       <slot
         name="tableActions"
@@ -518,7 +527,7 @@ Licensed under the Elastic License 2.0. */
           <div v-if="(data as any)[field] === null" class="placeholder">
             {{ column.placeholder ?? $t('global.labels.noValue') }}
           </div>
-          <div v-else>
+          <div v-else :id="rowId === field ? `row-${data[rowId]}` : ''">
             <span
               v-if="field === 'title'"
               class="align-center flex flex-row gap-1.5"
