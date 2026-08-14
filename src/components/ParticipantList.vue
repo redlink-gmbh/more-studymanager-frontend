@@ -118,7 +118,7 @@ Licensed under the Elastic License 2.0. */
       field: 'studyGroupId',
       header: t('study.props.studyGroup'),
       type: MoreTableFieldType.choice,
-      editable: { enabled: studyStore.studyIsEditable, values: groupStatuses },
+      editable: { enabled: true, values: groupStatuses },
       sortable: true,
       filterable: true,
       placeholder: t('global.placeholder.noGroup'),
@@ -130,7 +130,7 @@ Licensed under the Elastic License 2.0. */
       type: MoreTableFieldType.multiselect,
       arrayLabels: observationGroupStatuses,
       editable: {
-        enabled: studyStore.studyIsEditable,
+        enabled: true,
         values: observationGroupStatuses,
       },
       sortable: true,
@@ -575,7 +575,6 @@ Licensed under the Elastic License 2.0. */
       :row-edit-btn="studyStore.hasCriticalRoles"
       :loading="loader.isLoading.value"
       :editable-access="studyStore.studyStatus !== StudyStatus.Closed"
-      :editable="() => studyStore.studyIsEditable"
       :editable-user-roles="[StudyRole.StudyAdmin, StudyRole.StudyOperator]"
       :empty-message="$t('participants.participantsList.emptyListMsg')"
       class="width-50"
