@@ -2,11 +2,12 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <template>
   <header class="bg-white shadow">
     <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      <h1 class="text-3xl font-bold leading-tight text-gray-900">
+      <h1 class="text-3xl leading-tight font-bold text-gray-900">
         {{ $t('global.labels.notFound') }}
       </h1>
     </div>

@@ -1,9 +1,14 @@
+/* Copyright LBI-DHP and/or licensed to LBI-DHP under one or more contributor
+license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
+Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
+Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
-
   defineProps({
     imageStyleModifier: {
       type: String,
-      default: "",
+      default: '',
     },
   });
 </script>
@@ -20,12 +25,7 @@
   >
     <defs>
       <clipPath id="clip-path">
-        <rect
-          id="Rechteck_148158"
-          width="61.127"
-          height="54"
-          fill="none"
-        />
+        <rect id="Rechteck_148158" width="61.127" height="54" fill="none" />
       </clipPath>
     </defs>
     <g id="Gruppe_161928" clip-path="url(#clip-path)">

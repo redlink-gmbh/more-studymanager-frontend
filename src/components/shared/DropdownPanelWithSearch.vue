@@ -1,8 +1,14 @@
+/* Copyright LBI-DHP and/or licensed to LBI-DHP under one or more contributor
+license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
+Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
+Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import Popover from 'primevue/popover';
   import Button from 'primevue/button';
   import InputText from 'primevue/inputtext';
-  import { ref, computed, PropType } from 'vue';
+  import { computed, PropType, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
 
   const { t } = useI18n();

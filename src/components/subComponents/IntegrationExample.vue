@@ -2,7 +2,8 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   const props = defineProps({
     token: {
@@ -14,7 +15,7 @@ Licensed under the Elastic License 2.0. */
 
 <template>
   <div class="integration-example">
-    <h6 class="mb-2 mt-6 font-bold">
+    <h6 class="mt-6 mb-2 font-bold">
       {{ $t('integration.dialog.example.title') }}
     </h6>
     <div class="example-box mb-4 p-2">
@@ -39,7 +40,7 @@ Licensed under the Elastic License 2.0. */
           >}'
         </small>
       </code>
-      <h6 class="mb-1.5 mt-5 font-bold">
+      <h6 class="mt-5 mb-1.5 font-bold">
         {{ $t('integration.dialog.example.filledExample') }}
       </h6>
       <code>
@@ -71,7 +72,7 @@ Licensed under the Elastic License 2.0. */
           >"
         </small>
       </code>
-      <h6 class="mb-1.5 mt-5 font-bold">
+      <h6 class="mt-5 mb-1.5 font-bold">
         {{ $t('integration.dialog.example.filledExample') }}
       </h6>
       <code>

@@ -2,7 +2,8 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import { inject, ref, Ref } from 'vue';
   import RadioButton from 'primevue/radiobutton';
@@ -53,14 +54,20 @@ Licensed under the Elastic License 2.0. */
 
     <h6 class="mb-2">{{ $t('studyCollaborator.dialog.chooseRoles') }}</h6>
     <div v-if="warning" class="error mb-3">{{ warning }}</div>
-    <div v-for="role in roleList" :key="role.value!" class="mb-2 flex items-center">
+    <div
+      v-for="role in roleList"
+      :key="role.value!"
+      class="mb-2 flex items-center"
+    >
       <RadioButton
         v-model="roleValue"
         name="roles"
         :input-id="role.value!"
         :value="role"
       ></RadioButton>
-      <label :for="role.value!" class="ml-2 cursor-pointer">{{ role.label }}</label>
+      <label :for="role.value!" class="ml-2 cursor-pointer">{{
+        role.label
+      }}</label>
     </div>
 
     <div class="buttons mt-1 flex flex-row items-center justify-end">

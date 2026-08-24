@@ -2,13 +2,15 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import DataTable from 'primevue/datatable';
   import Column from 'primevue/column';
   import Accordion from 'primevue/accordion';
   import AccordionTab from 'primevue/accordiontab';
   import { useI18n } from 'vue-i18n';
+
   const { t } = useI18n();
 
   const tableColumns = [
@@ -126,50 +128,50 @@ Licensed under the Elastic License 2.0. */
 </template>
 
 <style scoped>
-.cron-schedule-examples .examples {
-  border: 1px solid var(--surface-50);
-  border-radius: 6px;
-  background-color: var(--surface-50);
-}
-
-:deep(.p-accordion) {
-  .p-accordion-header-link {
-    border: 1px solid var(--surface-100);
-    background: var(--surface-50);
-    transition: ease-in-out 0.35s;
-
-    &:hover {
-      background: var(--surface-100);
-    }
-  }
-  .p-accordion-content {
-    background: var(--surface-50);
+  .cron-schedule-examples .examples {
     border: 1px solid var(--surface-50);
-    padding: 1rem 1.5rem 1.5rem;
+    border-radius: 6px;
+    background-color: var(--surface-50);
   }
-}
 
-:deep(.p-datatable-wrapper tr) {
-  th {
-    padding-top: 0;
-    padding-bottom: 7px;
+  :deep(.p-accordion) {
+    .p-accordion-header-link {
+      border: 1px solid var(--surface-100);
+      background: var(--surface-50);
+      transition: ease-in-out 0.35s;
 
-    .p-datatable-column-title {
-      width: 100%;
+      &:hover {
+        background: var(--surface-100);
+      }
+    }
+    .p-accordion-content {
+      background: var(--surface-50);
+      border: 1px solid var(--surface-50);
+      padding: 1rem 1.5rem 1.5rem;
     }
   }
-  td,
-  th {
-    text-align: center;
 
-    &:first-of-type {
-      font-weight: 500;
-      text-align: left;
+  :deep(.p-datatable-wrapper tr) {
+    th {
+      padding-top: 0;
+      padding-bottom: 7px;
+
+      .p-datatable-column-title {
+        width: 100%;
+      }
+    }
+    td,
+    th {
+      text-align: center;
+
+      &:first-of-type {
+        font-weight: 500;
+        text-align: left;
+      }
+    }
+
+    td:first-of-type {
+      color: var(--primary-color);
     }
   }
-
-  td:first-of-type {
-    color: var(--primary-color);
-  }
-}
 </style>

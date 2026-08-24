@@ -4,14 +4,9 @@
  for Digital Health and Prevention -- A research institute of the
  Ludwig Boltzmann Gesellschaft, Oesterreichische Vereinigung zur
  Foerderung der wissenschaftlichen Forschung).
- Licensed under the Elastic License 2.0.
+ Licensed under the Apache 2.0 license (see https://www.apache.org/licenses/LICENSE-2.0).
  */
-import {
-  createI18n,
-  FallbackLocale,
-  IntlDateTimeFormats,
-  Locale,
-} from 'vue-i18n';
+import { createI18n, FallbackLocale, IntlDateTimeFormats, Locale } from 'vue-i18n';
 import en from './en.json';
 import de from './de.json';
 

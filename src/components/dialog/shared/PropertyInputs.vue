@@ -2,9 +2,10 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
-  import { PropType, computed } from 'vue';
+  import { computed, PropType } from 'vue';
   import {
     BooleanProperty,
     CronProperty,
@@ -79,7 +80,10 @@ Licensed under the Elastic License 2.0. */
   });
 
   const isPartOfTemplate = (property: Property<any>): boolean => {
-    return usedInTemplate.value.has(property.id) || usedInTemplate.value.has(property.name || '');
+    return (
+      usedInTemplate.value.has(property.id) ||
+      usedInTemplate.value.has(property.name || '')
+    );
   };
 
   interface PropertyGroup {
@@ -93,7 +97,8 @@ Licensed under the Elastic License 2.0. */
 
     props.propertyList.forEach((property, index) => {
       const dotIndex = property.id.indexOf('.');
-      const prefix = dotIndex !== -1 ? property.id.substring(0, dotIndex) : null;
+      const prefix =
+        dotIndex !== -1 ? property.id.substring(0, dotIndex) : null;
 
       if (prefix && currentGroup && currentGroup.prefix === prefix) {
         currentGroup.properties.push({ property, originalIndex: index });
@@ -116,8 +121,9 @@ Licensed under the Elastic License 2.0. */
       v-for="(group, groupIndex) in groupedProperties"
       :key="groupIndex"
       :class="{
-        'flex flex-col md:flex-row gap-4': group.prefix && group.properties.length > 1,
-        'mb-4': groupIndex < groupedProperties.length - 1
+        'flex flex-col gap-4 md:flex-row':
+          group.prefix && group.properties.length > 1,
+        'mb-4': groupIndex < groupedProperties.length - 1,
       }"
     >
       <div
@@ -131,7 +137,10 @@ Licensed under the Elastic License 2.0. */
           :editable="editable"
           :is-part-of-template="isPartOfTemplate(property)"
           @on-input-change="
-            emit('onPropertyChange', { value: $event.value, index: originalIndex })
+            emit('onPropertyChange', {
+              value: $event.value,
+              index: originalIndex,
+            })
           "
         />
 
@@ -141,7 +150,10 @@ Licensed under the Elastic License 2.0. */
           :all-properties="propertyList"
           :editable="editable"
           @on-input-change="
-            emit('onPropertyChange', { value: $event.value, index: originalIndex })
+            emit('onPropertyChange', {
+              value: $event.value,
+              index: originalIndex,
+            })
           "
         />
 
@@ -151,7 +163,10 @@ Licensed under the Elastic License 2.0. */
           :editable="editable"
           :is-part-of-template="isPartOfTemplate(property)"
           @on-input-change="
-            emit('onPropertyChange', { value: $event.value, index: originalIndex })
+            emit('onPropertyChange', {
+              value: $event.value,
+              index: originalIndex,
+            })
           "
         />
 
@@ -161,7 +176,10 @@ Licensed under the Elastic License 2.0. */
           :editable="editable"
           :is-part-of-template="isPartOfTemplate(property)"
           @on-input-change="
-            emit('onPropertyChange', { value: $event.value, index: originalIndex })
+            emit('onPropertyChange', {
+              value: $event.value,
+              index: originalIndex,
+            })
           "
         />
 
@@ -171,7 +189,10 @@ Licensed under the Elastic License 2.0. */
           :editable="editable"
           :is-part-of-template="isPartOfTemplate(property)"
           @on-input-change="
-            emit('onPropertyChange', { value: $event.value, index: originalIndex })
+            emit('onPropertyChange', {
+              value: $event.value,
+              index: originalIndex,
+            })
           "
         />
 
@@ -181,7 +202,10 @@ Licensed under the Elastic License 2.0. */
           :editable="editable"
           :is-part-of-template="isPartOfTemplate(property)"
           @on-input-change="
-            emit('onPropertyChange', { value: $event.value, index: originalIndex })
+            emit('onPropertyChange', {
+              value: $event.value,
+              index: originalIndex,
+            })
           "
         />
 
@@ -213,7 +237,10 @@ Licensed under the Elastic License 2.0. */
             emit('onPropertyChange', { value: $event, index: originalIndex })
           "
           @on-error="
-            emit('onError', { value: $event ? $event : '', index: originalIndex })
+            emit('onError', {
+              value: $event ? $event : '',
+              index: originalIndex,
+            })
           "
         />
 
@@ -225,7 +252,10 @@ Licensed under the Elastic License 2.0. */
             emit('onPropertyChange', { value: $event, index: originalIndex })
           "
           @on-error="
-            emit('onError', { value: $event ? $event : '', index: originalIndex })
+            emit('onError', {
+              value: $event ? $event : '',
+              index: originalIndex,
+            })
           "
         />
 

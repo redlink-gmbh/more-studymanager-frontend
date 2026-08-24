@@ -1,3 +1,9 @@
+/* Copyright LBI-DHP and/or licensed to LBI-DHP under one or more contributor
+license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
+Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
+Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import { useErrorQueue } from '../../../composable/useErrorHandling';
   import { Contact } from '../../../generated-sources';
@@ -23,7 +29,7 @@
 </script>
 
 <template>
-  <div class="col-span-6 mb-4 mt-2">
+  <div class="col-span-6 mt-2 mb-4">
     <h5 class="mb-2 text-lg font-bold">
       {{ $t('study.dialog.label.contactInfo') }}*
     </h5>

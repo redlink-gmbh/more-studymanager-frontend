@@ -1,3 +1,9 @@
+/* Copyright LBI-DHP and/or licensed to LBI-DHP under one or more contributor
+license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
+Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
+Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import { computed, inject, ref, Ref, watch } from 'vue';
   import Calendar from 'primevue/calendar';
@@ -478,7 +484,7 @@
         <div class="col-span-1">
           {{ $t('scheduler.dialog.relativeSchedule.endValue') }}
         </div>
-        <div class="border-gray-300 col-span-2 border-l-2 py-3 pl-3">
+        <div class="col-span-2 border-l-2 border-gray-300 py-3 pl-3">
           <InputNumber
             v-model="endOffset.value"
             :placeholder="

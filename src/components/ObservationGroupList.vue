@@ -1,3 +1,9 @@
+/* Copyright LBI-DHP and/or licensed to LBI-DHP under one or more contributor
+license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
+Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
+Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import { useObservationGroupStore } from '../stores/observationGroupStore';
   import { useDialog } from 'primevue/usedialog';
@@ -7,7 +13,7 @@
   import {
     MoreTableAction,
     MoreTableColumn,
-    MoreTableRowActionResult
+    MoreTableRowActionResult,
   } from '../models/MoreTableModel';
   import DeleteMoreTableRowDialog from './dialog/DeleteMoreTableRowDialog.vue';
   import Button from 'primevue/button';
@@ -21,7 +27,7 @@
   const props = defineProps({
     studyId: {
       type: Number,
-      required: true
+      required: true,
     },
     userRoles: {
       type: Array as PropType<Array<StudyRole>>,
@@ -31,9 +37,11 @@
       type: String as PropType<StudyStatus>,
       required: true,
     },
-  })
+  });
 
-  const observationGroups = computed(() => observationGroupStore.observationGroups);
+  const observationGroups = computed(
+    () => observationGroupStore.observationGroups,
+  );
 
   const editableRoles: StudyRole[] = [
     StudyRole.StudyAdmin,
@@ -52,7 +60,7 @@
     {
       field: 'observationGroupId',
       header: t('global.labels.id'),
-      sortable: true
+      sortable: true,
     },
     {
       field: 'title',
@@ -72,21 +80,21 @@
       field: 'numberOfParticipants',
       header: t('participants.plural'),
       placeholder: '0',
-      columnWidth: '5vw'
+      columnWidth: '5vw',
     },
     {
       field: 'numberOfObservations',
       header: t('studyNavigation.tabs.observations'),
       placeholder: '0',
-      columnWidth: '5vw'
+      columnWidth: '5vw',
     },
     {
       field: 'numberOfInterventions',
       header: t('studyNavigation.tabs.interventions'),
       placeholder: '0',
-      columnWidth: '5vw'
-    }
-  ]
+      columnWidth: '5vw',
+    },
+  ];
 
   const rowActions: MoreTableAction[] = [
     {
@@ -135,7 +143,7 @@
   ];
 
   function executeAction(action: MoreTableRowActionResult): void {
-    const row = action.row
+    const row = action.row;
 
     switch (action.id) {
       case 'delete':
@@ -148,7 +156,8 @@
 
   function changeValueInPlace(observationGroup: ObservationGroup): void {
     observationGroupStore.updateObservationGroup(
-      props.studyId, observationGroup
+      props.studyId,
+      observationGroup,
     );
   }
 </script>
@@ -164,7 +173,9 @@
       :editable-access="actionsVisible"
       :row-actions="rowActions"
       :edit-access-roles="editableRoles"
-      :empty-message="$t('observationGroup.groupList.placeholder.emptyGroupList')"
+      :empty-message="
+        $t('observationGroup.groupList.placeholder.emptyGroupList')
+      "
       class="table-title-width"
       @on-action="executeAction($event)"
       @on-change="changeValueInPlace($event)"
@@ -176,7 +187,9 @@
             icon="pi pi-plus"
             :label="t('observationGroup.dialog.header.create')"
             :disabled="!actionsVisible"
-            @click="observationGroupStore.createObservationGroups(props.studyId)"
+            @click="
+              observationGroupStore.createObservationGroups(props.studyId)
+            "
           />
         </div>
       </template>

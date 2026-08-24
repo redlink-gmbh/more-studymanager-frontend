@@ -2,7 +2,8 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import DataTable from 'primevue/datatable';
   import Column from 'primevue/column';
@@ -320,7 +321,7 @@ Licensed under the Elastic License 2.0. */
         :field="column.field"
         :header="column.header"
       >
-        <template #body="{ data, field }: { data: any, field: any }">
+        <template #body="{ data, field }: { data: any; field: any }">
           <span v-if="field === 'observationId'">
             <span v-if="(data as any)[field] === undefined">{{
               $t('intervention.dialog.label.chooseObservation')
@@ -333,7 +334,7 @@ Licensed under the Elastic License 2.0. */
             {{ (data as any)[field] }}
           </span>
         </template>
-        <template #editor="{ data, field }: { data: any, field: any }">
+        <template #editor="{ data, field }: { data: any; field: any }">
           <Dropdown
             v-if="field === 'observationId'"
             v-model="(data as any)[field]"
@@ -360,7 +361,9 @@ Licensed under the Elastic License 2.0. */
           />
 
           <Dropdown
-            v-else-if="column.field === 'operator' && (data as any)['observationType']"
+            v-else-if="
+              column.field === 'operator' && (data as any)['observationType']
+            "
             v-model="(data as any)[field]"
             :options="getOperatorOptions(data)"
             option-label="label"
@@ -447,7 +450,7 @@ Licensed under the Elastic License 2.0. */
     <div v-if="rowOpenError" class="error my-4">
       {{ rowOpenError }}
     </div>
-    <div class="mt-5 text-center flex justify-center">
+    <div class="mt-5 flex justify-center text-center">
       <Button
         v-if="!nextGroupCondition"
         type="button"

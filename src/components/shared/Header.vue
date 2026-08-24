@@ -2,7 +2,8 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import { inject } from 'vue';
   import AuthService from '../../service/AuthService';
@@ -128,108 +129,108 @@ Licensed under the Elastic License 2.0. */
 </template>
 
 <style scoped>
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: white;
-  z-index: 1000;
-
-  &.draft,
-  &.preview,
-  &.paused-preview,
-  &.active,
-  &.paused,
-  &.closed {
-    border-bottom: 2px solid;
-  }
-
-  &.draft {
-    border-color: var(--gray-400);
-  }
-  &.preview {
-    border-color: var(--green-400);
-    border-style: dashed;
-  }
-  &.paused-preview {
-    border-color: var(--red-400);
-    border-style: dashed;
-  }
-  &.active {
-    border-color: var(--green-400);
-  }
-  &.paused {
-    border-color: var(--red-400);
-  }
-  &.closed {
-    border-color: var(--blue-400);
-  }
-
-  .loader {
+  header {
     position: fixed;
-    z-index: 1000;
+    top: 0;
+    left: 0;
     width: 100%;
-    top: 62px;
-  }
+    background-color: white;
+    z-index: 1000;
 
-  .logo {
-    svg {
-      transition: ease-in-out 0.2s;
-      fill: var(--primary-color);
+    &.draft,
+    &.preview,
+    &.paused-preview,
+    &.active,
+    &.paused,
+    &.closed {
+      border-bottom: 2px solid;
     }
 
-    &:hover svg {
-      fill: var(--primary-700);
+    &.draft {
+      border-color: var(--gray-400);
     }
-  }
-  .logo svg,
-  .user svg {
-    height: 2.813rem;
-    width: auto;
-  }
-  .logout,
-  .back-to-dashboard {
-    color: var(--text-color);
-    padding: 0 7px;
-
-    a,
-    button {
-      color: var(--text-color);
-      position: relative;
-
-      &:hover,
-      &:active,
-      &:focus {
-        color: var(--primary-color);
-
-        &:after {
-          opacity: 1;
-        }
-      }
-
-      &:after {
-        position: absolute;
-        content: '';
-        height: 2px;
-        width: 100%;
-        background-color: var(--primary-color);
-        bottom: 0;
-        left: 0;
-        opacity: 0;
-      }
+    &.preview {
+      border-color: var(--green-400);
+      border-style: dashed;
     }
-
+    &.paused-preview {
+      border-color: var(--red-400);
+      border-style: dashed;
+    }
     &.active {
+      border-color: var(--green-400);
+    }
+    &.paused {
+      border-color: var(--red-400);
+    }
+    &.closed {
+      border-color: var(--blue-400);
+    }
+
+    .loader {
+      position: fixed;
+      z-index: 1000;
+      width: 100%;
+      top: 62px;
+    }
+
+    .logo {
+      svg {
+        transition: ease-in-out 0.2s;
+        fill: var(--primary-color);
+      }
+
+      &:hover svg {
+        fill: var(--primary-700);
+      }
+    }
+    .logo svg,
+    .user svg {
+      height: 2.813rem;
+      width: auto;
+    }
+    .logout,
+    .back-to-dashboard {
+      color: var(--text-color);
+      padding: 0 7px;
+
       a,
       button {
-        color: var(--primary-color);
+        color: var(--text-color);
+        position: relative;
+
+        &:hover,
+        &:active,
+        &:focus {
+          color: var(--primary-color);
+
+          &:after {
+            opacity: 1;
+          }
+        }
 
         &:after {
-          opacity: 1;
+          position: absolute;
+          content: '';
+          height: 2px;
+          width: 100%;
+          background-color: var(--primary-color);
+          bottom: 0;
+          left: 0;
+          opacity: 0;
+        }
+      }
+
+      &.active {
+        a,
+        button {
+          color: var(--primary-color);
+
+          &:after {
+            opacity: 1;
+          }
         }
       }
     }
   }
-}
 </style>

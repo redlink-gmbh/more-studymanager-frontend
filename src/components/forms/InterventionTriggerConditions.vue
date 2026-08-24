@@ -2,7 +2,8 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import { MoreTableColumn } from '../../models/MoreTableModel';
   import InterventionTriggerConditionTable from './InterventionTriggerConditionTable.vue';
@@ -328,7 +329,7 @@ Licensed under the Elastic License 2.0. */
         />
       </div>
       <div v-else>
-        <div class="error mb-4 mt-2">
+        <div class="error mt-2 mb-4">
           {{ $t('intervention.error.emptyTriggerConditions') }}
         </div>
         <div class="flex justify-center">

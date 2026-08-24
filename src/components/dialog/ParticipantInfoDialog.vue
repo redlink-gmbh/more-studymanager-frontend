@@ -1,9 +1,15 @@
+/* Copyright LBI-DHP and/or licensed to LBI-DHP under one or more contributor
+license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
+Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
+Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import { computed, inject, ref, watch } from 'vue';
   import {
     Participant,
     ParticipantApplicationAccess as ParticipantApplicationAccessModel,
-    ParticipantStatus
+    ParticipantStatus,
   } from '@gs';
   import { useI18n } from 'vue-i18n';
   import Button from 'primevue/button';
@@ -13,7 +19,10 @@
   import Select from 'primevue/select';
   import ProgressSpinner from 'primevue/progressspinner';
   import { useToast } from 'primevue/usetoast';
-  import { useParticipant, useUpdateParticipant } from '@/api/participantQueries';
+  import {
+    useParticipant,
+    useUpdateParticipant,
+  } from '@/api/participantQueries';
   import { useParticipantApplications } from '@/api/participantApplicationAccessQueries';
   import ParticipantApplicationAccess from '../ParticipantApplicationAccess.vue';
   import { useStudyStore } from '@/stores/studyStore';
@@ -76,11 +85,7 @@
 
   const updateParticipant = (): void => {
     const participantData = participant?.value;
-    if (
-      !participantData ||
-      !participantData.participantId
-    )
-      return;
+    if (!participantData || !participantData.participantId) return;
 
     if (!participantData.alias || participantData.alias.trim() === '') {
       toast.add({

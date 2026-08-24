@@ -2,7 +2,8 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import MoreTabNav from '../components/shared/MoreTabNav.vue';
   import StudyHeader from '../components/shared/StudyHeader.vue';
@@ -21,11 +22,9 @@ Licensed under the Elastic License 2.0. */
     StudyRole.StudyAdmin,
     StudyRole.StudyViewer,
   ];
-  const auditLogAccessRoles: StudyRole[] = [
-    StudyRole.StudyAdmin,
-  ];
+  const auditLogAccessRoles: StudyRole[] = [StudyRole.StudyAdmin];
 
-  const activeIndex = ref(0)
+  const activeIndex = ref(0);
 </script>
 
 <template>
@@ -47,8 +46,14 @@ Licensed under the Elastic License 2.0. */
         <TabPanel value="0" :header="$t('monitoringData.tabs.lastDataPoints')">
           <DatapointList :study-id="studyStore.studyId" class="mb-14" />
         </TabPanel>
-        <TabPanel value="1" :header="$t('monitoringData.tabs.recordedObservation')">
-          <ParticipationDataList :study-id="studyStore.studyId" :pause-data-refresh="activeIndex !== 1"/>
+        <TabPanel
+          value="1"
+          :header="$t('monitoringData.tabs.recordedObservation')"
+        >
+          <ParticipationDataList
+            :study-id="studyStore.studyId"
+            :pause-data-refresh="activeIndex !== 1"
+          />
         </TabPanel>
         <TabPanel value="2" :header="$t('monitoringData.tabs.dataDownload')">
           <Suspense>
@@ -58,11 +63,16 @@ Licensed under the Elastic License 2.0. */
         <TabPanel
           v-if="
             studyStore.studyUserRoles.some((r: StudyRole) =>
-            auditLogAccessRoles.includes(r),
-            )"
+              auditLogAccessRoles.includes(r),
+            )
+          "
           value="3"
-          :header="$t('monitoringData.tabs.auditLog')">
-          <AuditLogDownload :study-id="studyStore.studyId" :is-active="activeIndex === 3"/>
+          :header="$t('monitoringData.tabs.auditLog')"
+        >
+          <AuditLogDownload
+            :study-id="studyStore.studyId"
+            :is-active="activeIndex === 3"
+          />
         </TabPanel>
       </TabView>
     </div>

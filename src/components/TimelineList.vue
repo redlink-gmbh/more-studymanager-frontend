@@ -2,7 +2,8 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import VueCal, { Event, VueCalEvent } from 'vue-cal';
   import 'vue-cal/dist/vuecal.css';
@@ -13,8 +14,7 @@ Licensed under the Elastic License 2.0. */
   import { useDialog } from 'primevue/usedialog';
   import MultiSelect from 'primevue/multiselect';
   import Button from 'primevue/button';
-  import Dropdown from 'primevue/dropdown';
-  import { DropdownChangeEvent } from 'primevue/dropdown';
+  import Dropdown, { DropdownChangeEvent } from 'primevue/dropdown';
   import {
     ComponentFactory,
     InterventionTimelineEvent,
@@ -35,9 +35,10 @@ Licensed under the Elastic License 2.0. */
   import { useErrorHandling } from '../composable/useErrorHandling';
   import { dateToDateString } from '../utils/dateUtils';
   import TimelineDialog from './dialog/TimelineDialog.vue';
-  import { GroupOption, EventDetail, EventOptions } from '../models/Timeline';
+  import { EventDetail, EventOptions, GroupOption } from '../models/Timeline';
   import { useGlobalStore } from '../stores/globalStore';
   import { DropdownOption } from '../models/Common';
+
   const dialog = useDialog();
   const dateFormat = useGlobalStore().getDateFormat;
   const { t, locale } = useI18n();
@@ -686,30 +687,30 @@ Licensed under the Elastic License 2.0. */
 </template>
 
 <style scoped>
-.flex-row-center {
-  @apply flex flex-row items-center;
-}
+  .flex-row-center {
+    @apply flex flex-row items-center;
+  }
 
-.vuecal :deep(.vuecal__event) {
-  &.observation {
-    background-color: var(--green-100);
-    border: 1px solid var(--primary-200);
+  .vuecal :deep(.vuecal__event) {
+    &.observation {
+      background-color: var(--green-100);
+      border: 1px solid var(--primary-200);
+    }
+    &.intervention {
+      background-color: var(--yellow-100);
+      border: 1px solid var(--primary-200);
+    }
+    &.study-date {
+      background-color: var(--primary-500);
+      color: white;
+    }
+    &.study-range {
+      background-color: var(--primary-200);
+      color: white;
+    }
+    &.participant-joined {
+      background-color: var(--red-600);
+      color: white;
+    }
   }
-  &.intervention {
-    background-color: var(--yellow-100);
-    border: 1px solid var(--primary-200);
-  }
-  &.study-date {
-    background-color: var(--primary-500);
-    color: white;
-  }
-  &.study-range {
-    background-color: var(--primary-200);
-    color: white;
-  }
-  &.participant-joined {
-    background-color: var(--red-600);
-    color: white;
-  }
-}
 </style>

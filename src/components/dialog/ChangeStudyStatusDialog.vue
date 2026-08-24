@@ -2,7 +2,8 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import { inject } from 'vue';
   import Button from 'primevue/button';
@@ -49,13 +50,13 @@ Licensed under the Elastic License 2.0. */
       <h5 class="text-lg font-bold">{{ $t('study.props.purpose') }}</h5>
       <div>{{ study.purpose }}</div>
     </div>
-    <div class="mb-8 mt-10 px-14">
+    <div class="mt-10 mb-8 px-14">
       <div
         v-if="te(i18nKey)"
         class="grid grid-cols-12 place-items-center gap-4"
       >
         <div class="col-span-2">
-          <ExclamationIcon id="exclamation"/>
+          <ExclamationIcon id="exclamation" />
         </div>
         <div class="col-span-10">
           <div v-if="te(`${i18nKey}.warning`)" class="mb-2">

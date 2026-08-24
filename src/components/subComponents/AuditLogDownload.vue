@@ -1,6 +1,12 @@
+/* Copyright LBI-DHP and/or licensed to LBI-DHP under one or more contributor
+license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
+Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
+Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import { useI18n } from 'vue-i18n';
-  import { watch, computed, ref } from 'vue';
+  import { computed, ref, watch } from 'vue';
   import { useStudyStore } from '../../stores/studyStore';
   import Button from 'primevue/button';
   import ProgressSpinner from 'primevue/progressspinner';
@@ -12,44 +18,54 @@
   const props = defineProps({
     studyId: {
       type: Number,
-      required: true
+      required: true,
     },
     isActive: {
       type: Boolean,
-      required: true
-    }
-  })
+      required: true,
+    },
+  });
 
-  const auditLogMetadataLength = computed(() => studyStore.auditLogMetadata?.length)
+  const auditLogMetadataLength = computed(
+    () => studyStore.auditLogMetadata?.length,
+  );
 
-  watch(() => props.isActive,
+  watch(
+    () => props.isActive,
     (active) => {
-    if(active) {
-      getAuditlogMetadata()
-    }
-    }, {immediate: true})
+      if (active) {
+        getAuditlogMetadata();
+      }
+    },
+    { immediate: true },
+  );
 
   async function getAuditlogMetadata(): Promise<void> {
-
-     await studyStore.getAuditLogMetadata(studyStore.studyId)
-
+    await studyStore.getAuditLogMetadata(studyStore.studyId);
   }
 
   function downloadCurrentAuditlog(): void {
-    isLoading.value = true
-    studyStore.exportAuditLog(studyStore.studyId)
-      .finally(() => isLoading.value = false);
+    isLoading.value = true;
+    studyStore
+      .exportAuditLog(studyStore.studyId)
+      .finally(() => (isLoading.value = false));
   }
 </script>
 
 <template>
   <div>
-    <h3 class="mb-1 font-bold">{{t('data.auditLogDownload.title')}}</h3>
-    <div v-if="!auditLogMetadataLength">{{t('data.auditLogDownload.notStartedInfo')}}</div>
-    <div v-else-if="auditLogMetadataLength">
-      {{t('data.auditLogDownload.description', { length: auditLogMetadataLength || 0 } )}}
+    <h3 class="mb-1 font-bold">{{ t('data.auditLogDownload.title') }}</h3>
+    <div v-if="!auditLogMetadataLength">
+      {{ t('data.auditLogDownload.notStartedInfo') }}
     </div>
-    <div v-else>{{t('data.auditLogDownload.noDataInfo')}}</div>
+    <div v-else-if="auditLogMetadataLength">
+      {{
+        t('data.auditLogDownload.description', {
+          length: auditLogMetadataLength || 0,
+        })
+      }}
+    </div>
+    <div v-else>{{ t('data.auditLogDownload.noDataInfo') }}</div>
   </div>
 
   <div v-if="auditLogMetadataLength" class="flex justify-end">
@@ -61,10 +77,10 @@
       @click="downloadCurrentAuditlog()"
     >
       <span class="p-button-icon p-button-icon-left pi pi-download"></span>
-      <span>{{t('data.auditLogDownload.btnLabel')}}</span>
+      <span>{{ t('data.auditLogDownload.btnLabel') }}</span>
       <ProgressSpinner
         v-if="isLoading"
-        class="!text-white ml-2"
+        class="ml-2 !text-white"
         style="width: 25px; height: 25px"
         stroke-width="6"
         fill="transparent"

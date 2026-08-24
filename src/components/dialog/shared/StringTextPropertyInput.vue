@@ -2,13 +2,11 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
-  import {
-    StringTextProperty,
-    StringProperty,
-  } from '@/models/InputModels';
-  import { PropType, watch, computed } from 'vue';
+  import { StringProperty, StringTextProperty } from '@/models/InputModels';
+  import { computed, PropType, watch } from 'vue';
   import Textarea from 'primevue/textarea';
   import PartOfTemplateBadge from './PartOfTemplateBadge.vue';
   import { useI18n } from 'vue-i18n';
@@ -36,7 +34,10 @@ Licensed under the Elastic License 2.0. */
   }>();
 
   const placeholder = computed(() => {
-    const placeholder = varifyPlaceholderText(props.property.description, 'placeholder');
+    const placeholder = varifyPlaceholderText(
+      props.property.description,
+      'placeholder',
+    );
     return placeholder ? t(placeholder) : undefined;
   });
 

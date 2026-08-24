@@ -4,27 +4,27 @@
  for Digital Health and Prevention -- A research institute of the
  Ludwig Boltzmann Gesellschaft, Oesterreichische Vereinigung zur
  Foerderung der wissenschaftlichen Forschung).
- Licensed under the Elastic License 2.0.
+ Licensed under the Apache 2.0 license (see https://www.apache.org/licenses/LICENSE-2.0).
  */
 import {
+  ApplicationsApi,
+  AuditLogApi,
+  CalendarApi,
+  CollaboratorsApi,
+  ComponentsApi,
   Configuration,
+  ConfigurationApi,
+  DataApi,
+  GoalsApi,
+  ImportExportApi,
+  InterventionsApi,
+  ObservationGroupsApi,
+  ObservationsApi,
+  OccurredObservationsApi,
   ParticipantsApi,
   StudiesApi,
   StudyGroupsApi,
-  UsersApi,
-  ObservationsApi,
-  ComponentsApi,
-  InterventionsApi,
-  CollaboratorsApi,
-  ImportExportApi,
-  DataApi,
-  ConfigurationApi,
-  CalendarApi,
-  AuditLogApi,
-  OccurredObservationsApi,
-  ObservationGroupsApi,
-  ApplicationsApi,
-  GoalsApi
+  UsersApi
 } from '@gs';
 
 const apiConfig = {

@@ -2,7 +2,8 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import { inject, ref, Ref } from 'vue';
   import { ComponentFactory, Observation, StudyStatus } from '@gs';
@@ -84,7 +85,7 @@ Licensed under the Elastic License 2.0. */
         :class="{ 'gap-y-2': !editable }"
         @submit.prevent="save()"
       >
-        <div class="col-start-0 col-span-8" :class="{ 'pb-4': !editable }">
+        <div class="col-span-8 col-start-0" :class="{ 'pb-4': !editable }">
           <h5 class="my-1 text-base font-bold">
             {{ $t('integration.dialog.label.integrationTitle') }}
           </h5>
@@ -102,8 +103,8 @@ Licensed under the Elastic License 2.0. */
             :disabled="!editable"
           ></InputText>
         </div>
-        <div class="col-start-0 col-span-8">
-          <h5 class="mb-0.5 mt-1 text-base font-bold">
+        <div class="col-span-8 col-start-0">
+          <h5 class="mt-1 mb-0.5 text-base font-bold">
             {{ $t('integration.dialog.label.chooseObservation') }}
           </h5>
           <div class="mb-2">
@@ -126,7 +127,7 @@ Licensed under the Elastic License 2.0. */
         </div>
 
         <div
-          class="buttons col-start-0 col-span-8 mt-1 flex flex-row items-center justify-end"
+          class="buttons col-span-8 col-start-0 mt-1 flex flex-row items-center justify-end"
         >
           <Button
             class="btn-gray"
