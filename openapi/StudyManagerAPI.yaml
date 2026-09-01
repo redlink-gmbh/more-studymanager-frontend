@@ -825,6 +825,81 @@ paths:
         '409':
           description: study already closed
 
+  /studies/{studyId}/participants/{participantId}/milestones:
+    parameters:
+      - $ref: '#/components/parameters/StudyId'
+      - $ref: '#/components/parameters/ParticipantId'
+    get:
+      tags:
+        - milestones
+      description: List all milestones for a participant
+      operationId: listParticipantMilestones
+      responses:
+        '200':
+          $ref: '#/components/responses/ParticipantMilestoneListResponse'
+        '404':
+          description: not found
+    put:
+      tags:
+        - milestones
+      description: Create a new participant milestone
+      operationId: createParticipantMilestone
+      requestBody:
+        $ref: '#/components/requestBodies/ParticipantMilestoneCreation'
+      responses:
+        '201':
+          $ref: '#/components/responses/ParticipantMilestoneResponse'
+        '400':
+          description: bad request
+        '404':
+          description: not found
+        '409':
+          description: a participant milestone for the given milestoneId already exists for this participant
+
+  /studies/{studyId}/participants/{participantId}/milestones/{milestoneId}:
+    parameters:
+      - $ref: '#/components/parameters/StudyId'
+      - $ref: '#/components/parameters/ParticipantId'
+      - $ref: '#/components/parameters/MilestoneId'
+    get:
+      tags:
+        - milestones
+      description: Get a single participant milestone
+      operationId: getParticipantMilestone
+      responses:
+        '200':
+          $ref: '#/components/responses/ParticipantMilestoneResponse'
+        '404':
+          description: not found
+    post:
+      tags:
+        - milestones
+      description: Update a participant milestone
+      operationId: updateParticipantMilestone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParticipantMilestone'
+      responses:
+        '200':
+          $ref: '#/components/responses/ParticipantMilestoneResponse'
+        '400':
+          description: bad request
+        '404':
+          description: not found
+    delete:
+      tags:
+        - milestones
+      description: Delete a participant milestone
+      operationId: deleteParticipantMilestone
+      responses:
+        '204':
+          description: participant milestone deleted
+        '404':
+          description: not found
+
   /studies/{studyId}/occurredObservations:
     get:
       tags:
@@ -1360,6 +1435,8 @@ paths:
           description: The referenced study does not exist
         '400':
           description: The parsed study goal configuration or study id was invalid
+        '409':
+          description: If an adherence check is removed that was still used by some GoalTemplate
 
   /studies/{studyId}/goals/config/categories/topic:
     post:
@@ -1423,6 +1500,8 @@ paths:
           description: action deleted successfully
         '400':
           description: bad request
+        '409':
+          description: conflict - deleting the goal topic is not possible while it is used by a goal template
 
 
   /studies/{studyId}/goals/templates:
@@ -1515,6 +1594,82 @@ paths:
 
   # ---- END GOALS -----
 
+  /studies/{studyId}/milestones:
+    parameters:
+      - $ref: '#/components/parameters/StudyId'
+    get:
+      tags:
+        - milestones
+      description: Lists all study milestones
+      operationId: listMilestones
+      responses:
+        '200':
+          $ref: '#/components/responses/MilestoneListResponse'
+        '400':
+          description: bad request
+        '500':
+          description: Error
+    put:
+      tags:
+        - milestones
+      description: Create a new milestone
+      operationId: createMilestone
+      requestBody:
+        $ref: '#/components/requestBodies/MilestoneCreation'
+      responses:
+        '201':
+          $ref: '#/components/responses/MilestoneResponse'
+        '400':
+          description: bad request
+        '500':
+          description: Error
+
+  /studies/{studyId}/milestones/{milestoneId}:
+    parameters:
+      - $ref: '#/components/parameters/StudyId'
+      - $ref: '#/components/parameters/MilestoneId'
+    get:
+      tags:
+        - milestones
+      description: Get a single milestone
+      operationId: getMilestone
+      responses:
+        '200':
+          $ref: '#/components/responses/MilestoneResponse'
+        '404':
+          description: not found
+    post:
+      tags:
+        - milestones
+      description: Update a milestone
+      operationId: updateMilestone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Milestone'
+      responses:
+        '200':
+          $ref: '#/components/responses/MilestoneResponse'
+        '400':
+          description: bad request
+        '404':
+          description: not found
+    delete:
+      tags:
+        - milestones
+      description: Delete a milestone
+      operationId: deleteMilestone
+      responses:
+        '204':
+          description: milestone deleted
+        '404':
+          description: not found
+        '409':
+          description: milestone could not be deleted because it is still referenced by existing participant milestones
+        '500':
+          description: Error
 
   /studies/{studyId}/export/study:
     parameters:
@@ -2242,6 +2397,8 @@ components:
           items:
             $ref: '#/components/schemas/IdReference'
           uniqueItems: true
+        milestoneId:
+          $ref: '#/components/schemas/IdReference'
 
     OccurredObservation:
       type: object
@@ -2628,6 +2785,9 @@ components:
         - schedule
         - topics
 
+
+
+
     AdherenceCheckScheduleEnum:
       type: string
       enum:
@@ -2636,6 +2796,7 @@ components:
         - afternoon
         - evening
         - night
+
 
     GoalTopic:
       type: object
@@ -2693,6 +2854,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IntegrationInfo'
+        goalConfiguration:
+          $ref: '#/components/schemas/GoalConfiguration'
+        goalTemplates:
+          type: array
+          items:
+            $ref: '#/components/schemas/GoalTemplate'
 
     ParticipantInfo:
       type: object
@@ -2712,6 +2879,104 @@ components:
           type: string
         observationId:
           $ref: '#/components/schemas/Id'
+
+    GoalConfiguration:
+      type: object
+      properties:
+        consent:
+          $ref: '#/components/schemas/GoalConsent'
+        topics:
+          type: array
+          items:
+            $ref: '#/components/schemas/GoalTopic'
+        adherenceChecks:
+          type: array
+          items:
+            $ref: '#/components/schemas/GoalAdherenceCheck'
+      required:
+        - topics
+        - adherenceChecks
+
+    GoalConsent:
+      type: object
+      properties:
+        commitment:
+          type: string
+        achievability:
+          type: string
+        understandability:
+          type: string
+
+    GoalAdherenceCheck:
+      type: object
+      description: aktivates an adherence check enum member for the study and assigns a time to it
+      properties:
+        check:
+          $ref: '#/components/schemas/AdherenceCheckScheduleEnum'
+        time:
+          type: string
+          format: time
+      required:
+        - check
+        - time
+
+    Milestone:
+      type: object
+      description: A Milestone defines a point in a study which an observation can leverage to schedule for on a participants needs
+      properties:
+        milestoneId:
+          $ref: '#/components/schemas/Id'
+        studyId:
+          $ref: '#/components/schemas/StudyId'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          type: string
+        orderIndex:
+          type: integer
+      required:
+        - milestoneId
+        - studyId
+        - createdAt
+        - name
+        - orderIndex
+
+    ParticipantMilestone:
+      type: object
+      description: This is the extension for the Milestone, custom for each participant including an exact date-time stamp on which the milestone is set to be
+      properties:
+        participantMilestoneId:
+          $ref: '#/components/schemas/Id'
+        studyId:
+          $ref: '#/components/schemas/StudyId'
+        participantId:
+          $ref: '#/components/schemas/Id'
+        milestoneId:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+          readOnly: true
+          description: The name of the referenced Milestone
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        modifiedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        dateTime:
+          type: string
+          format: date-time
+      required:
+        - participantMilestoneId
+        - studyId
+        - participantId
+        - milestoneId
+        - name
+        - dateTime
 
     UserSearchResultList:
       type: object
@@ -3120,6 +3385,13 @@ components:
         type: integer
         format: int32
       required: true
+    MilestoneId:
+      name: milestoneId
+      in: path
+      schema:
+        type: integer
+        format: int32
+      required: true
     DateTime:
       name: dateTime
       in: query
@@ -3138,6 +3410,66 @@ components:
       schema:
         type: string
         format: date-time
+
+  requestBodies:
+    MilestoneCreation:
+      description: Create a single new study milestone
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+    ParticipantMilestoneCreation:
+      description: Create a single new participant milestone
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              milestoneId:
+                $ref: '#/components/schemas/Id'
+                description: The milestone to be set
+              dateTime:
+                type: string
+                format: date-time
+                description: The date-time stamp on which the milestone is set to be
+
+  responses:
+    MilestoneListResponse:
+      description: A list of Milestones
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Milestone'
+
+    MilestoneResponse:
+      description: A single Milestone as response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Milestone'
+
+    ParticipantMilestoneListResponse:
+      description: A list of participant milestones
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ParticipantMilestone'
+
+    ParticipantMilestoneResponse:
+      description: A single ParticipantMilestone as response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ParticipantMilestone'
 
   securitySchemes:
     OAuth:

@@ -9,6 +9,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
   import {
     Participant,
     ParticipantApplicationAccess as ParticipantApplicationAccessModel,
+    ParticipantMilestone,
     ParticipantStatus,
   } from '@gs';
   import { useI18n } from 'vue-i18n';
@@ -24,15 +25,19 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     useUpdateParticipant,
   } from '@/api/participantQueries';
   import { useParticipantApplications } from '@/api/participantApplicationAccessQueries';
+  import { useParticipantMilestones } from '@/api/participantMilestoneQueries';
   import ParticipantApplicationAccess from '../ParticipantApplicationAccess.vue';
+  import ParticipantMilestoneRow from '../ParticipantMilestoneRow.vue';
   import { useStudyStore } from '@/stores/studyStore';
   import { useStudyGroupStore } from '@/stores/studyGroupStore';
   import { useObservationGroupStore } from '@/stores/observationGroupStore';
+  import { useMilestoneStore } from '@/stores/milestoneStore';
 
   const { t, d } = useI18n();
   const studyStore = useStudyStore();
   const studyGroupStore = useStudyGroupStore();
   const observationGroupStore = useObservationGroupStore();
+  const milestoneStore = useMilestoneStore();
   const toast = useToast();
   const dialogRef: any = inject('dialogRef');
 
@@ -67,6 +72,25 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       studyStore.studyId,
       dialogRef.value.data?.participant?.participantId,
     );
+
+  const { data: participantMilestones } = useParticipantMilestones(
+    studyStore.studyId,
+    dialogRef.value.data?.participant?.participantId,
+  );
+
+  const milestoneEditableStatuses: ParticipantStatus[] = [
+    ParticipantStatus.New,
+    ParticipantStatus.Invited,
+    ParticipantStatus.Active,
+  ];
+
+  function findParticipantMilestone(
+    milestoneId?: number,
+  ): ParticipantMilestone | undefined {
+    return participantMilestones.value?.find(
+      (pm) => pm.milestoneId === milestoneId,
+    );
+  }
 
   const handleDeletedApps = (): void => {
     refetchApps();
@@ -267,7 +291,30 @@ https://www.apache.org/licenses/LICENSE-2.0). */
         @click="updateParticipant"
       />
     </div>
-
+    <div
+      v-if="
+        milestoneStore.milestones.length > 0 &&
+        milestoneEditableStatuses.includes(
+          participant.status as ParticipantStatus,
+        )
+      "
+      class="no-print mt-8 mb-8 border-t pt-8"
+    >
+      <h3 class="mx-2 mb-4 text-lg font-bold">
+        {{ $t('participants.milestones.title') }}
+      </h3>
+      <div class="flex flex-col gap-4">
+        <ParticipantMilestoneRow
+          v-for="(milestone, index) in milestoneStore.milestones"
+          :key="milestone.milestoneId"
+          :study-id="studyStore.studyId"
+          :participant-id="participant.participantId as number"
+          :milestone="milestone"
+          :index="index"
+          :existing="findParticipantMilestone(milestone.milestoneId)"
+        />
+      </div>
+    </div>
     <div class="no-print mt-8 mb-8 border-t pt-8">
       <div class="mx-2 mb-4 flex items-center justify-between">
         <h3 class="m-0 text-lg font-bold">
