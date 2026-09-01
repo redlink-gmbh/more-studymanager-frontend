@@ -1072,7 +1072,8 @@
     },
     "dialog": {
       "absoluteSchedule": {
-        "description": "An absolute Schedule includes absolute date times. Observations can be timed by absolute dates and timeframes."
+        "description": "An absolute Schedule includes absolute date times. Observations can be timed by absolute dates and timeframes.",
+        "milestoneWarning": "A milestone is selected, but it only has an effect on relative schedules. It will be ignored for this absolute schedule."
       },
       "description": "An absolute Schedule includes absolute date times. A relativ schedule collects data based on participant login and individual study starts.",
       "endAfter": "End after",

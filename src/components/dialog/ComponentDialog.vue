@@ -507,6 +507,15 @@ Licensed under the Apache License, Version 2.0. */
           @open-dialog="openScheduler($event)"
           @remove-scheduler="removeScheduler"
         />
+        <info-warning-error-section
+          v-if="milestoneId && scheduler.type === ScheduleType.Event"
+          :is-warning="true"
+          :error-message="
+            $t('scheduler.dialog.absoluteSchedule.milestoneWarning')
+          "
+          :error-label="$t('global.labels.warning')"
+          class="col-span-8 mb-2"
+        />
       </template>
 
       <div

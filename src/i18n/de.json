@@ -1072,7 +1072,8 @@
     },
     "dialog": {
       "absoluteSchedule": {
-        "description": "Eine absolute Zeitplanung umfasst absolute Datum und Zeit Angaben. Beobachtungen können durch absolute Daten und Zeitfenster zeitlich festgelegt werden."
+        "description": "Eine absolute Zeitplanung umfasst absolute Datum und Zeit Angaben. Beobachtungen können durch absolute Daten und Zeitfenster zeitlich festgelegt werden.",
+        "milestoneWarning": "Es ist ein Meilenstein ausgewählt, dieser wirkt sich jedoch nur auf relative Zeitpläne aus. Er wird für diesen absoluten Zeitplan ignoriert."
       },
       "description": "Ein relativer Zeitplan richtet sich nach dem individuellen Studienstart jedes Teilnehmers, basierend auf das App-Login Datum. Die Teilnehmer:innen können jederzeit zwischen Beginn und Ende der Studie starten, und die Studiendauer umfasst den Zeitraum, indem aktiv Daten erhoben werden.",
       "endAfter": "Ende nach",
