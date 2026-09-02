@@ -18,6 +18,7 @@ import {
   GoalsApi,
   ImportExportApi,
   InterventionsApi,
+  MilestonesApi,
   ObservationGroupsApi,
   ObservationsApi,
   OccurredObservationsApi,
@@ -51,6 +52,7 @@ let occurredObservationsApi: OccurredObservationsApi;
 let observationGroupsApi: ObservationGroupsApi;
 let applicationsApi: ApplicationsApi;
 let goalsApi: GoalsApi
+let milestonesApi: MilestonesApi;
 
 export function useStudiesApi(): {
   studiesApi: StudiesApi;
@@ -202,5 +204,14 @@ export function useGoalsApi(): {
   goalsApi = goalsApi || new GoalsApi(apiConfig);
   return {
     goalsApi,
+  };
+}
+
+export function useMilestonesApi(): {
+  milestonesApi: MilestonesApi;
+} {
+  milestonesApi = milestonesApi || new MilestonesApi(apiConfig);
+  return {
+    milestonesApi,
   };
 }

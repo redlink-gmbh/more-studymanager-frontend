@@ -69,6 +69,12 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       access: [StudyRole.StudyAdmin, StudyRole.StudyOperator],
     },
     {
+      title: t('studyNavigation.tabs.milestones'),
+      name: 'Milestones',
+      params: { studyId: props.studyId },
+      access: [StudyRole.StudyAdmin, StudyRole.StudyOperator],
+    },
+    {
       title: t('studyNavigation.tabs.integration'),
       name: 'Integrations',
       params: { studyId: props.studyId },

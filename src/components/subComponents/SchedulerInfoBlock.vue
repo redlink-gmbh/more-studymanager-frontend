@@ -7,8 +7,10 @@ https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import { PropType } from 'vue';
   import {
+    Duration,
     Event,
     Frequency,
+    Milestone,
     ObservationSchedule,
     RelativeEvent,
   } from '@gs/models';
@@ -33,6 +35,10 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       type: Boolean,
       default: true,
     },
+    milestone: {
+      type: Object as PropType<Milestone | undefined>,
+      default: undefined,
+    },
   });
 
   const emit = defineEmits<{
@@ -49,6 +55,25 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       default:
         return t('scheduler.dialog.description');
     }
+  }
+
+  function getMilestoneOffsetLabel(offset?: Duration): string | undefined {
+    if (!offset || offset.value === undefined || !offset.unit) {
+      return undefined;
+    }
+    const unit = t(`scheduler.preview.unit.${offset.unit}`);
+    if (offset.value === 0) {
+      return t('scheduler.dialog.relativeSchedule.milestone.at');
+    }
+    return offset.value < 0
+      ? t('scheduler.dialog.relativeSchedule.milestone.before', {
+          value: Math.abs(offset.value),
+          unit,
+        })
+      : t('scheduler.dialog.relativeSchedule.milestone.after', {
+          value: offset.value,
+          unit,
+        });
   }
 
   function getDateValues(prop: string): string | undefined {
@@ -71,6 +96,28 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       }
       case ScheduleType.RelativeEvent: {
         const schedule = props.scheduler as RelativeEvent;
+        if (props.milestone) {
+          switch (prop) {
+            case 'dtstart': {
+              const offsetLabel = getMilestoneOffsetLabel(
+                schedule.dtstart.offset,
+              );
+              return offsetLabel
+                ? `${props.milestone.name} (${offsetLabel}), ${timeToHourMinuteString(schedule.dtstart.time)}`
+                : undefined;
+            }
+            case 'dtend': {
+              const offsetLabel = getMilestoneOffsetLabel(
+                schedule.dtend.offset,
+              );
+              return offsetLabel
+                ? `${props.milestone.name} (${offsetLabel}), ${timeToHourMinuteString(schedule.dtend.time)}`
+                : undefined;
+            }
+            default:
+              return undefined;
+          }
+        }
         switch (prop) {
           case 'dtstart': {
             return schedule.dtstart.offset?.value &&

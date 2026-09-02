@@ -2,9 +2,9 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Elastic License 2.0. */
+Licensed under the Apache License, Version 2.0. */
 <script setup lang="ts">
-  import { inject, ref, Ref } from 'vue';
+  import { computed, inject, ref, Ref } from 'vue';
   import InputText from 'primevue/inputtext';
   import Textarea from 'primevue/textarea';
   import Button from 'primevue/button';
@@ -32,6 +32,7 @@ Licensed under the Elastic License 2.0. */
   import { useToastService } from '@/composable/toastService';
   import MultiSelect from 'primevue/multiselect';
   import { useObservationGroupStore } from '@/stores/observationGroupStore';
+  import { useMilestoneStore } from '@/stores/milestoneStore';
   import ObservationToggle from '../subComponents/ObservationToggle.vue';
   import { extractCurrentLimeDomain } from '@/utils/limeSurveyUtils';
   import { scrollToFirstError } from '@/utils/componentUtils';
@@ -44,6 +45,7 @@ Licensed under the Elastic License 2.0. */
   const { handleIndividualError } = useErrorHandling();
   const studyStore = useStudyStore();
   const observationGroupStore = useObservationGroupStore();
+  const milestoneStore = useMilestoneStore();
   const { t } = useI18n();
 
   const dialogRef: any = inject('dialogRef');
@@ -76,7 +78,7 @@ Licensed under the Elastic License 2.0. */
 
   const title = ref(component.title);
   const purpose = ref(component.purpose);
-   const participantTitle = ref(component.participantTitle);
+  const participantTitle = ref(component.participantTitle);
   const participantInfo = ref(component.participantInfo);
   const properties: Ref<Property<any>[]> = ref(
     factory.properties
@@ -115,6 +117,11 @@ Licensed under the Elastic License 2.0. */
     component.schedule ? component.schedule : {},
   );
 
+  const milestoneId: Ref<number | undefined> = ref(component.milestoneId);
+  const selectedMilestone = computed(() =>
+    milestoneStore.milestones.find((m) => m.milestoneId === milestoneId.value),
+  );
+
   const simpleSchedulerSelection = ref(
     simpleSchedulerValues ||
       (Array.isArray(component.schedule)
@@ -143,6 +150,7 @@ Licensed under the Elastic License 2.0. */
         data: {
           scheduler: scheduler.value,
           schedulerType: scheduler.value.type,
+          milestone: selectedMilestone.value,
         },
         props: {
           header:
@@ -247,6 +255,7 @@ Licensed under the Elastic License 2.0. */
         studyGroupId: studyGroupId.value,
         hidden: hidden.value,
         reminder: reminder.value,
+        milestoneId: milestoneId.value,
       };
 
       if (!isObjectEmpty(scheduler.value)) {
@@ -466,15 +475,48 @@ Licensed under the Elastic License 2.0. */
           :error-label="$t('global.labels.warning')"
         />
       </div>
-      <SchedulerInfoBlock
-        v-else
-        :scheduler="scheduler"
-        :editable="editable"
-        :error="getError('scheduler') ? (getError('scheduler') as string) : ''"
-        class="mb-2"
-        @open-dialog="openScheduler($event)"
-        @remove-scheduler="removeScheduler"
-      />
+      <template v-else>
+        <div
+          v-if="
+            componentType === 'observation' &&
+            milestoneStore.milestones.length > 0
+          "
+          class="col-span-8 col-start-0 mb-2"
+        >
+          <h5 class="mb-1">{{ $t('milestone.singular') }}</h5>
+          <Dropdown
+            v-model="milestoneId"
+            :options="milestoneStore.milestones"
+            option-label="name"
+            option-value="milestoneId"
+            show-clear
+            :disabled="!editable"
+            :placeholder="
+              $t('scheduler.dialog.relativeSchedule.milestone.placeholder')
+            "
+          />
+        </div>
+        <SchedulerInfoBlock
+          :scheduler="scheduler"
+          :editable="editable"
+          :error="
+            getError('scheduler') ? (getError('scheduler') as string) : ''
+          "
+          :milestone="selectedMilestone"
+          class="mb-2"
+          @open-dialog="openScheduler($event)"
+          @remove-scheduler="removeScheduler"
+        />
+        <info-warning-error-section
+          v-if="milestoneId && scheduler.type === ScheduleType.Event"
+          :is-warning="true"
+          :error-message="
+            $t('scheduler.dialog.absoluteSchedule.milestoneWarning')
+          "
+          :error-label="$t('global.labels.warning')"
+          class="col-span-8 mb-2"
+        />
+      </template>
 
       <div
         v-if="componentType === 'observation'"
@@ -493,15 +535,20 @@ Licensed under the Elastic License 2.0. */
         v-if="componentType === 'goalTemplate'"
         class="col-span-8 mt-6 mb-3 h-[1px] w-full bg-gray-300"
       />
-      <div v-if="componentType === 'goalTemplate'" class="col-span-8 col-start-0">
+      <div
+        v-if="componentType === 'goalTemplate'"
+        class="col-span-8 col-start-0"
+      >
         <h5 class="mb-2">{{ $t('study.props.participantTitle') }}*</h5>
         <InputText
           v-model="participantTitle"
           type="text"
           required
-          :placeholder="$t('study.placeholder.participantTitle', {
-            type: $t(`global.labels.${componentType}`),
-          })"
+          :placeholder="
+            $t('study.placeholder.participantTitle', {
+              type: $t(`global.labels.${componentType}`),
+            })
+          "
           class="w-full"
           :disabled="!editable"
         ></InputText>

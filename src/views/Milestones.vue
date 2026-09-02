@@ -2,24 +2,16 @@
 license agreements (LBI-DHP: Ludwig Boltzmann Institute for Digital Health and
 Prevention -- A research institute of the Ludwig Boltzmann Gesellschaft,
 Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
-Licensed under the Apache License, Version 2.0. */
+Licensed under the Apache 2.0 license (see
+https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
   import MoreTabNav from '../components/shared/MoreTabNav.vue';
   import StudyHeader from '../components/shared/StudyHeader.vue';
   import { StudyRole } from '@gs';
-  import { useStudyStore } from '../stores/studyStore';
-  import { useStudyGroupStore } from '../stores/studyGroupStore';
-  import { useObservationGroupStore } from '../stores/observationGroupStore';
-  import GoalList from '@/components/GoalList.vue';
+  import { useStudyStore } from '@/stores/studyStore';
+  import MilestoneList from '@/components/MilestoneList.vue';
 
   const studyStore = useStudyStore();
-  const studyGroupStore = useStudyGroupStore();
-  const observationGroupStore = useObservationGroupStore();
-
-  // ToDo
-  // const studyGoalsStore = useStudyGoalsStore();
-  // const studyGoalTypeFactory
-  // const studyGoalCategoryFactory
 
   const accessRoles: StudyRole[] = [
     StudyRole.StudyAdmin,
@@ -28,7 +20,7 @@ Licensed under the Apache License, Version 2.0. */
 </script>
 
 <template>
-  <div class="goal-view container m-auto mt-10">
+  <div class="milestone-view container m-auto mt-10">
     <StudyHeader :study="studyStore.study" />
     <MoreTabNav
       :study-id="studyStore.studyId"
@@ -42,14 +34,10 @@ Licensed under the Apache License, Version 2.0. */
       "
       class="container rounded-lg bg-white p-10"
     >
-      <Suspense>
-        <GoalList
-          :study-groups="studyGroupStore.studyGroups"
-          :study-id="studyStore.studyId"
-          :study-status="studyStore.studyStatus"
-          :observation-groups="observationGroupStore.observationGroups"
-        />
-      </Suspense>
+      <MilestoneList
+        :study-id="studyStore.studyId"
+        :study-status="studyStore.studyStatus"
+      />
     </div>
   </div>
 </template>
