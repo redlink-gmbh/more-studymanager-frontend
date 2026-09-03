@@ -5,7 +5,7 @@ Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Apache 2.0 license (see
 https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
-  import { inject, ref, Ref } from 'vue';
+  import { computed, inject, ref, Ref } from 'vue';
   import InputText from 'primevue/inputtext';
   import Textarea from 'primevue/textarea';
   import Button from 'primevue/button';
@@ -17,6 +17,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     ComponentFactory,
     Intervention,
     ListComponentsComponentTypeEnum,
+    ObservationSchedule,
     StudyStatus,
     Trigger,
     ValidationReport,
@@ -31,11 +32,21 @@ https://www.apache.org/licenses/LICENSE-2.0). */
   import { PropertyEmit, StringEmit } from '../../models/PropertyInputModels';
   import MultiSelect from 'primevue/multiselect';
   import { useObservationGroupStore } from '../../stores/observationGroupStore';
+  import { useMilestoneStore } from '../../stores/milestoneStore';
   import { scrollToFirstError } from '../../utils/componentUtils';
+  import { isObjectEmpty } from '../../utils/commonUtils';
+  import { ScheduleType } from '../../models/Scheduler';
+  import { useDialog } from 'primevue/usedialog';
+  import RelativeScheduler from '../shared/RelativeScheduler.vue';
+  import AbsoluteScheduler from '../shared/Scheduler.vue';
+  import SchedulerInfoBlock from '../subComponents/SchedulerInfoBlock.vue';
+  import InfoWarningErrorSection from '@/components/shared/InfoWarningErrorSection.vue';
 
   const { componentsApi } = useComponentsApi();
   const studyStore = useStudyStore();
   const observationGroupStore = useObservationGroupStore();
+  const milestoneStore = useMilestoneStore();
+  const dialog = useDialog();
   const { t } = useI18n();
 
   const dialogRef: any = inject('dialogRef');
@@ -91,6 +102,11 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     return properties;
   }
 
+  // the backend's dedicated relative-time trigger (day/hour-of-day, relative to the
+  // participant's individual study start); its day/hour fields are replaced below by
+  // the milestone + relative/absolute scheduler UI also used for Observations
+  const RELATIVE_TIME_TRIGGER_ID = 'relative-time-trigger';
+
   /*trigger type options are used for the trigger type dropdown to switch between and provide a specific description*/
   const triggerTypesOptions = triggerFactories.map((tf: any) => ({
     label: t(tf.title),
@@ -125,6 +141,62 @@ https://www.apache.org/licenses/LICENSE-2.0). */
   const triggerProperties: Ref<Property<any>[] | undefined> = ref(
     triggerType.value ? getTriggerProperties(triggerType.value) : undefined,
   );
+
+  const isScheduleTrigger = computed(
+    () => triggerType.value === RELATIVE_TIME_TRIGGER_ID,
+  );
+  const filteredTriggerProperties = computed(() =>
+    isScheduleTrigger.value
+      ? (triggerProperties.value?.filter(
+          (p) => p.id !== 'day' && p.id !== 'hour',
+        ) ?? [])
+      : (triggerProperties.value ?? []),
+  );
+
+  const milestoneId: Ref<number | undefined> = ref(intervention.milestoneId);
+  const selectedMilestone = computed(() =>
+    milestoneStore.milestones.find((m) => m.milestoneId === milestoneId.value),
+  );
+  const scheduler: Ref<ObservationSchedule> = ref(intervention.schedule ?? {});
+
+  function openScheduler(schedulerType: string): void {
+    dialog.open(
+      schedulerType === 'relative' ? RelativeScheduler : AbsoluteScheduler,
+      {
+        data: {
+          scheduler: scheduler.value,
+          schedulerType: scheduler.value.type,
+          milestone: selectedMilestone.value,
+        },
+        props: {
+          header:
+            schedulerType === 'relative'
+              ? t('scheduler.relativeDialogTitle')
+              : t('scheduler.dialogTitle'),
+          style: {
+            width: '50vw',
+          },
+          breakpoints: {
+            '960px': '75vw',
+            '640px': '90vw',
+          },
+          modal: true,
+          draggable: false,
+        },
+        onClose: (options) => {
+          if (options?.data) {
+            scheduler.value = options.data;
+          }
+        },
+      },
+    );
+  }
+
+  function removeScheduler(): void {
+    if (scheduler.value) {
+      scheduler.value = {};
+    }
+  }
 
   const removeActions: number[] = [];
 
@@ -192,7 +264,35 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     });
   }
 
+  const minDate = (date: Date): Date => {
+    date.setHours(0, 0, 0);
+    return date;
+  };
+
+  const maxDate = (date: Date): Date => {
+    date.setHours(23, 59, 59);
+    return date;
+  };
+
   function save(): void {
+    if (isScheduleTrigger.value && isObjectEmpty(scheduler.value)) {
+      if (studyStore.study.plannedStart && studyStore.study.plannedEnd) {
+        scheduler.value = {
+          type: ScheduleType.Event,
+          dtstart: minDate(
+            new Date(studyStore.study.plannedStart),
+          ).toISOString(),
+          dtend: maxDate(new Date(studyStore.study.plannedEnd)).toISOString(),
+        };
+      } else {
+        const date = new Date();
+        scheduler.value = {
+          dtstart: minDate(date).toISOString(),
+          dtend: maxDate(date).toISOString(),
+        };
+      }
+    }
+
     checkErrors();
     if (errors.value.length > 0) {
       scrollToFirstError();
@@ -251,7 +351,8 @@ https://www.apache.org/licenses/LICENSE-2.0). */
                   parseInt(id),
                 )
               : [],
-            schedule: intervention.schedule,
+            schedule: scheduler.value,
+            milestoneId: milestoneId.value,
           } as Intervention;
 
           if (triggerProperties.value) {
@@ -428,36 +529,56 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       <div
         class="section-group col-span-8 col-start-0 mt-4 grid grid-cols-2 items-end lg:grid-cols-3"
       >
-        <h5 class="col-span-2">{{ $t('intervention.props.trigger') }}*</h5>
-        <div class="col-span-3 col-start-3" :class="{ 'text-end': !editable }">
-          <div class="col-span-3">
-            <div v-if="!editable" class="inline font-bold">
-              {{ $t('intervention.dialog.label.triggerType') }}
-            </div>
-            <Dropdown
-              v-model="triggerType"
-              :options="triggerTypesOptions"
-              class="dropdown-btn col-span-1 w-full"
-              option-label="label"
-              option-value="value"
-              required
-              :disabled="!editable"
-              :placeholder="$t('intervention.placeholder.trigger')"
-              @change="setTriggerConfig(triggerType)"
-            />
-          </div>
-        </div>
-        <div class="col-span-6">
+        <div
+          v-if="milestoneStore.milestones.length > 0"
+          class="col-span-2 col-start-1 mb-4 lg:col-span-3 lg:col-start-1"
+        >
+          <h5 class="mb-1">{{ $t('milestone.singular') }}</h5>
+          <Dropdown
+            v-model="milestoneId"
+            :options="milestoneStore.milestones"
+            option-label="name"
+            option-value="milestoneId"
+            show-clear
+            :disabled="!editable"
+            :placeholder="
+              $t('scheduler.dialog.relativeSchedule.milestone.placeholder')
+            "
+          />
+          <h5 class="col-span-2">{{ $t('intervention.props.trigger') }}*</h5>
           <div
-            v-if="getError(ListComponentsComponentTypeEnum.Trigger)"
-            class="error error-label col-span-8 mb-4"
+            class="col-span-3 col-start-3"
+            :class="{ 'text-end': !editable }"
           >
-            {{ getError(ListComponentsComponentTypeEnum.Trigger) }}
+            <div class="col-span-3">
+              <div v-if="!editable" class="inline font-bold">
+                {{ $t('intervention.dialog.label.triggerType') }}
+              </div>
+              <Dropdown
+                v-model="triggerType"
+                :options="triggerTypesOptions"
+                class="dropdown-btn col-span-1 w-full"
+                option-label="label"
+                option-value="value"
+                required
+                :disabled="!editable"
+                :placeholder="$t('intervention.placeholder.trigger')"
+                @change="setTriggerConfig(triggerType)"
+              />
+            </div>
+          </div>
+          <div class="col-span-6">
+            <div
+              v-if="getError(ListComponentsComponentTypeEnum.Trigger)"
+              class="error error-label col-span-8 mb-4"
+            >
+              {{ getError(ListComponentsComponentTypeEnum.Trigger) }}
+            </div>
           </div>
         </div>
         <div
           v-if="triggerType"
-          class="section-content col-span-2 mt-2.5 grid grid-cols-2 rounded p-5 lg:col-span-3 lg:grid-cols-3"
+          class="section-content col-span-2 col-start-1 mt-2.5 grid grid-cols-2 rounded p-5 lg:col-span-3 lg:grid-cols-3"
         >
           <div
             v-if="triggerType"
@@ -478,10 +599,10 @@ https://www.apache.org/licenses/LICENSE-2.0). */
               {{ triggerJsonError }}
             </div>
 
-            <div v-if="triggerProperties">
+            <div v-if="filteredTriggerProperties.length">
               <PropertyInputs
                 :editable="editable"
-                :property-list="triggerProperties"
+                :property-list="filteredTriggerProperties"
                 :context="{
                   studyId: studyStore.studyId,
                   groupId: studyGroupId,
@@ -490,6 +611,32 @@ https://www.apache.org/licenses/LICENSE-2.0). */
                 @on-error="propertyError($event)"
               />
             </div>
+
+            <SchedulerInfoBlock
+              v-if="isScheduleTrigger"
+              :scheduler="scheduler"
+              :editable="editable"
+              :milestone="selectedMilestone"
+              class="mb-2"
+              @open-dialog="openScheduler($event)"
+              @remove-scheduler="removeScheduler"
+            />
+            <info-warning-error-section
+              v-else-if="milestoneId"
+              :is-warning="true"
+              :error-message="
+                $t(
+                  'scheduler.dialog.relativeSchedule.milestone.noEffectOnTrigger',
+                  {
+                    triggerName: $t(
+                      'intervention.factory.trigger.relativeTime.title',
+                    ),
+                  },
+                )
+              "
+              :error-label="$t('global.labels.warning')"
+              class="col-span-8 mb-2"
+            />
           </div>
         </div>
       </div>

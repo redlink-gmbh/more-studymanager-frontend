@@ -1667,7 +1667,7 @@ paths:
         '404':
           description: not found
         '409':
-          description: milestone could not be deleted because it is still referenced by existing participant milestones
+          description: milestone could not be deleted because it is still referenced by an active participant milestone or by an observation
         '500':
           description: Error
 
@@ -2631,6 +2631,8 @@ components:
           items:
             $ref: '#/components/schemas/IdReference'
           uniqueItems: true
+        milestoneId:
+          $ref: '#/components/schemas/IdReference'
         created:
           type: string
           format: date-time
@@ -2846,6 +2848,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Intervention'
+        milestones:
+          type: array
+          items:
+            $ref: '#/components/schemas/Milestone'
         participants:
           type: array
           items:
@@ -2871,6 +2877,22 @@ components:
           items:
             type: integer
           uniqueItems: true
+        milestones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParticipantMilestoneInfo'
+
+    ParticipantMilestoneInfo:
+      type: object
+      properties:
+        milestoneId:
+          $ref: '#/components/schemas/Id'
+        dateTime:
+          type: string
+          format: date-time
+      required:
+        - milestoneId
+        - dateTime
 
     IntegrationInfo:
       type: object
