@@ -264,6 +264,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
                     created: intervention.created,
                     modified: intervention.modified,
                     hasError: hasDeletedObservations,
+                    milestoneId: intervention.milestoneId,
                   };
                 });
               },
