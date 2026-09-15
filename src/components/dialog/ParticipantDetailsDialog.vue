@@ -18,6 +18,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
   import DataTable from 'primevue/datatable';
   import Column from 'primevue/column';
   import { DataHealthTableItem } from '../../models/DataHeaqlthTableItem';
+  import ObservationSyncButton from '../ObservationSyncButton.vue';
 
   const studyStore = useStudyStore();
   const { t, d } = useI18n();
@@ -237,6 +238,20 @@ https://www.apache.org/licenses/LICENSE-2.0). */
           </template>
         </Column>
       </template>
+
+      <Column
+        :header="$t('participants.dialog.resync.columnHeader')"
+        body-class="!p-0 text-center"
+      >
+        <template #body="{ data }: { data: any }">
+          <ObservationSyncButton
+            v-if="!(data as any).upcoming"
+            :study-id="studyId"
+            :participant-id="participant.participantId ?? 0"
+            :observation-id="(data as any).observationId"
+          />
+        </template>
+      </Column>
     </DataTable>
 
     <div v-else>
