@@ -108,6 +108,13 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     }
   }
 
+  function isSyncEnabled(healthState: string): boolean {
+    return (
+      healthState === OccurredObservationStateEnum.Missing ||
+      healthState === OccurredObservationStateEnum.Incomplete
+    );
+  }
+
   function mapInformationToTable(): DataHealthTableItem[] {
     const upcomingTimelineEvents = participantObservationsInTimeline.value
       ?.filter((item) => new Date(item.start as string).getTime() >= Date.now())
@@ -249,6 +256,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
             :study-id="studyId"
             :participant-id="participant.participantId ?? 0"
             :observation-id="(data as any).observationId"
+            :enabled="isSyncEnabled((data as any).healthState)"
           />
         </template>
       </Column>
