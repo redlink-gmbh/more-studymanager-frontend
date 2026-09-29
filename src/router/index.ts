@@ -115,6 +115,6 @@ const routes = [
 
 export const Router = createRouter({
   scrollBehavior: () => ({ left: 0, top: 0 }),
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 });

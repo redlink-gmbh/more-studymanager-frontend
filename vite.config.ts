@@ -9,9 +9,13 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
+    // Built with a placeholder so one image can be served under any prefix;
+    // docker/nginx/10-base-path.sh rewrites it at container start. Dev server
+    // keeps serving at the root.
+    base: command === 'build' ? '/__BASE_PATH__/' : '/',
     plugins: [
       vue(),
       tailwindcss(),
