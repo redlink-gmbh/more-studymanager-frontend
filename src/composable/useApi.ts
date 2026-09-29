@@ -29,7 +29,7 @@ import {
 } from '@gs';
 
 const apiConfig = {
-  basePath: '/api/v1',
+  basePath: `${import.meta.env.BASE_URL}api/v1`,
   baseOptions: {
     'Content-Type': 'application/json',
   },

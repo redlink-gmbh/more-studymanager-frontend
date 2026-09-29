@@ -17,6 +17,8 @@ RUN npm run package:quick
 FROM nginx:stable-alpine as production-stage
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 COPY docker/nginx/*.conf.template /etc/nginx/templates/
+COPY docker/nginx/10-base-path.sh /docker-entrypoint.d/10-base-path.sh
+RUN chmod +x /docker-entrypoint.d/10-base-path.sh
 EXPOSE 80
 
 ARG BACKEND_URL=https://studymanager.platform-test.umm.redlink.io/
