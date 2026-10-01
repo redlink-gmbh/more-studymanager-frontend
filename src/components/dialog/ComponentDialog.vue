@@ -75,6 +75,7 @@ Licensed under the Apache License, Version 2.0. */
     studyStore.study.status === StudyStatus.Paused ||
     studyStore.study.status === StudyStatus.PausedPreview;
   const isGoal = componentType === 'goalTemplate';
+  const studyWide = factory?.studyWide === true;
 
   const title = ref(component.title);
   const purpose = ref(component.purpose);
@@ -222,7 +223,7 @@ Licensed under the Apache License, Version 2.0. */
   };
 
   function save(props: any): void {
-    if (!hasSimpleScheduler && isObjectEmpty(scheduler.value)) {
+    if (!hasSimpleScheduler && !studyWide && isObjectEmpty(scheduler.value)) {
       if (studyStore.study.plannedStart && studyStore.study.plannedEnd) {
         scheduler.value = {
           type: ScheduleType.Event,
@@ -252,14 +253,14 @@ Licensed under the Apache License, Version 2.0. */
           : [],
         type: component.type,
         properties: props,
-        schedule: scheduler.value,
+        ...(studyWide ? {} : { schedule: scheduler.value }),
         studyGroupId: studyGroupId.value,
         hidden: hidden.value,
         reminder: reminder.value,
         milestoneId: milestoneId.value,
       };
 
-      if (!isObjectEmpty(scheduler.value)) {
+      if (studyWide || !isObjectEmpty(scheduler.value)) {
         dialogRef.value.close(returnComponent);
       }
     } else if (componentType === 'goalTemplate') {
@@ -477,46 +478,65 @@ Licensed under the Apache License, Version 2.0. */
         />
       </div>
       <template v-else>
-        <div
-          v-if="
-            componentType === 'observation' &&
-            milestoneStore.milestones.length > 0
-          "
-          class="col-span-8 col-start-0 mb-2"
-        >
-          <h5 class="mb-1">{{ $t('milestone.singular') }}</h5>
-          <Dropdown
-            v-model="milestoneId"
-            :options="milestoneStore.milestones"
-            option-label="name"
-            option-value="milestoneId"
-            show-clear
-            :disabled="!editable"
-            :placeholder="
-              $t('scheduler.dialog.relativeSchedule.milestone.placeholder')
+        <template v-if="!studyWide">
+          <div
+            v-if="
+              componentType === 'observation' &&
+              milestoneStore.milestones.length > 0
             "
+            class="col-span-8 col-start-0 mb-2"
+          >
+            <h5 class="mb-1">{{ $t('milestone.singular') }}</h5>
+            <Dropdown
+              v-model="milestoneId"
+              :options="milestoneStore.milestones"
+              option-label="name"
+              option-value="milestoneId"
+              show-clear
+              :disabled="!editable"
+              :placeholder="
+                $t('scheduler.dialog.relativeSchedule.milestone.placeholder')
+              "
+            />
+          </div>
+          <SchedulerInfoBlock
+            :scheduler="scheduler"
+            :editable="editable"
+            :error="
+              getError('scheduler') ? (getError('scheduler') as string) : ''
+            "
+            :milestone="selectedMilestone"
+            class="mb-2"
+            @open-dialog="openScheduler($event)"
+            @remove-scheduler="removeScheduler"
           />
+          <info-warning-error-section
+            v-if="milestoneId && scheduler.type === ScheduleType.Event"
+            :is-warning="true"
+            :error-message="
+              $t('scheduler.dialog.absoluteSchedule.milestoneWarning')
+            "
+            :error-label="$t('global.labels.warning')"
+            class="col-span-8 mb-2"
+          />
+        </template>
+        <div v-else class="col-span-8 col-start-0 mb-2">
+          <h5 class="mb-1">{{ $t('scheduler.singular') }}</h5>
+          <div
+            class="col-span-8 rounded-md px-6 py-4 italic"
+            style="background-color: var(--surface-50)"
+          >
+            {{ $t('scheduler.studyWide') }}
+            <template
+              v-if="
+                studyStore.study.plannedStart && studyStore.study.plannedEnd
+              "
+            >
+              ({{ $d(new Date(studyStore.study.plannedStart), 'long') }} &ndash;
+              {{ $d(new Date(studyStore.study.plannedEnd), 'long') }})
+            </template>
+          </div>
         </div>
-        <SchedulerInfoBlock
-          :scheduler="scheduler"
-          :editable="editable"
-          :error="
-            getError('scheduler') ? (getError('scheduler') as string) : ''
-          "
-          :milestone="selectedMilestone"
-          class="mb-2"
-          @open-dialog="openScheduler($event)"
-          @remove-scheduler="removeScheduler"
-        />
-        <info-warning-error-section
-          v-if="milestoneId && scheduler.type === ScheduleType.Event"
-          :is-warning="true"
-          :error-message="
-            $t('scheduler.dialog.absoluteSchedule.milestoneWarning')
-          "
-          :error-label="$t('global.labels.warning')"
-          class="col-span-8 mb-2"
-        />
       </template>
 
       <div

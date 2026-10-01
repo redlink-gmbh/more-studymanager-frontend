@@ -1285,6 +1285,7 @@
     },
     "relativeDialogTitle": "Manage relative schedule",
     "singular": "Scheduler",
+    "studyWide": "Active for the entire study duration",
     "type": {
       "Event": "Absolut Event",
       "RelativeEvent": "Relative Event"
