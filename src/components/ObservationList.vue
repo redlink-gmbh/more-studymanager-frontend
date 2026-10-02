@@ -42,6 +42,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
   import { timeToHourMinuteString } from '../utils/dateUtils';
   import { extractCurrentLimeDomain } from '../utils/limeSurveyUtils';
   import DropdownPanelWithSearch from '@/components/shared/DropdownPanelWithSearch.vue';
+  import { useStudyStore } from '@/stores/studyStore';
 
   const loader = useLoader();
   const { observationsApi } = useObservationsApi();
@@ -51,6 +52,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
 
   const observationList: Ref<MoreObservationListTableRow[]> = ref([]);
   const dialog = useDialog();
+  const studyStore = useStudyStore();
 
   const props = defineProps({
     studyId: { type: Number, required: true },
@@ -276,6 +278,8 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       .listObservations(props.studyId)
       .then((response: AxiosResponse) => {
         return response.data.map((observation: Observation) => {
+          const studyWide =
+            factoryForType(observation.type)?.studyWide === true;
           return {
             studyId: observation.studyId,
             observationId: observation.observationId,
@@ -293,11 +297,17 @@ https://www.apache.org/licenses/LICENSE-2.0). */
             typeLabel: getObservationTypeString(observation.type as string),
             properties: observation.properties,
             schedule: observation.schedule,
-            scheduleType: observation.schedule?.type
-              ? t(`scheduler.type.${observation.schedule?.type}`)
-              : '',
-            scheduleStart: getScheduleDate(observation.schedule, 'dtstart'),
-            scheduleEnd: getScheduleDate(observation.schedule, 'dtend'),
+            scheduleType: studyWide
+              ? t('scheduler.studyWide')
+              : observation.schedule?.type
+                ? t(`scheduler.type.${observation.schedule?.type}`)
+                : '',
+            scheduleStart: studyWide
+              ? studyDate(studyStore.study.plannedStart)
+              : getScheduleDate(observation.schedule, 'dtstart'),
+            scheduleEnd: studyWide
+              ? studyDate(studyStore.study.plannedEnd)
+              : getScheduleDate(observation.schedule, 'dtend'),
             created: observation.created,
             modified: observation.modified,
             hidden: observation.hidden,
@@ -311,6 +321,10 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       .catch((e: AxiosError) =>
         handleIndividualError(e, 'cannot list observations'),
       );
+  }
+
+  function studyDate(date?: string): string | undefined {
+    return date ? d(new Date(date), 'long') : undefined;
   }
 
   function getScheduleHasRepetition(

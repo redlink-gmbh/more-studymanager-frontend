@@ -1285,6 +1285,7 @@
     },
     "relativeDialogTitle": "Relativen Zeitplan verwalten",
     "singular": "Planer",
+    "studyWide": "Für die gesamte Studiendauer aktiv",
     "type": {
       "Event": "Absoluter Zeitplan",
       "RelativeEvent": "Relativer Zeitplan"
