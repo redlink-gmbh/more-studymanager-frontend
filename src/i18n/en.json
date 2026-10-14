@@ -571,6 +571,10 @@
         "steps": {
           "title": "Steps (Apple Health / Health Connect)",
           "description": "This observation enables you to collect participants' step count data from Apple Health on iOS or Health Connect on Android."
+        },
+        "activity": {
+          "title": "Activity (Apple Health / Health Connect)",
+          "description": "Collects participants' activity data via Apple Health (iOS) or Health Connect (Android). Unlike Garmin, only recorded workouts are captured, not general daily activity."
         }
       }
     },

@@ -571,6 +571,10 @@
         "steps": {
           "title": "Schritte (Apple Health / Health Connect)",
           "description": "Diese Observation ermöglicht es, die Schrittanzahl der Teilnehmenden über Apple Health unter iOS oder Health Connect unter Android zu erfassen."
+        },
+        "activity": {
+          "title": "Aktivität (Apple Health / Health Connect)",
+          "description": "Erfasst Aktivitätsdaten der Teilnehmenden über Apple Health (iOS) oder Health Connect (Android). Anders als bei Garmin werden nur aufgezeichnete Workouts erfasst, keine allgemeine Tagesaktivität."
         }
       }
     },
