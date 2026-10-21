@@ -571,6 +571,43 @@
         "steps": {
           "title": "Schritte (Apple Health / Health Connect)",
           "description": "Diese Observation ermöglicht es, die Schrittanzahl der Teilnehmenden über Apple Health unter iOS oder Health Connect unter Android zu erfassen."
+        },
+        "activity": {
+          "title": "Aktivität (Apple Health / Health Connect",
+          "description": "Diese Observation ermöglicht es, Aktivitätsdaten der Teilnehmenden über Apple Health unter iOS oder Health Connect unter Android zu erfassen."
+        }
+      },
+      "info": {
+        "title": "Info-Element",
+        "description": "Mit dieser Observation kannst du Informationselemente an die Teilnehmer:innen senden.",
+        "configProps": {
+          "messagesName": "Nachrichten",
+          "messagesDesc": "Konfiguriere deine Nachrichten hier. Diese Nachrichten werden den Teilnehmer:innen gesendet."
+        },
+        "form": {
+          "message": "Nachricht {index}",
+          "addMessage": "Nachricht hinzufügen",
+          "removeMessage": "Nachricht entfernen",
+          "text": "Text (Markdown)",
+          "textRequired": "Bitte gib einen Text ein (max. 20.000 Zeichen).",
+          "priority": "Priorität",
+          "priorities": {
+            "LOW": "Niedrig",
+            "NORMAL": "Normal",
+            "HIGH": "Hoch",
+            "URGENT": "Dringend"
+          },
+          "attachments": "Anhänge",
+          "addAttachments": "Dateien wählen",
+          "pendingUpload": "wird beim Speichern hochgeladen",
+          "sentAt": "Gesendet am {date}",
+          "publishAt": "Veröffentlicht am {date}",
+          "noMessages": "Noch keine Nachrichten vorhanden.",
+          "fileTooLarge": "Die Datei {name} ist größer als 10 MB und kann nicht hochgeladen werden.",
+          "uploadFailed": "Die Datei {name} konnte nicht hochgeladen werden.",
+          "downloadFailed": "Die Datei konnte nicht heruntergeladen werden.",
+          "download": "Herunterladen",
+          "noPreview": "Für diesen Dateityp ist keine Vorschau verfügbar."
         }
       }
     },

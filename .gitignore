@@ -12,3 +12,4 @@ src/generated-sources
 tests/coverage
 .env
 .playwright-mcp
+/.claude/protocol

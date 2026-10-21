@@ -571,6 +571,43 @@
         "steps": {
           "title": "Steps (Apple Health / Health Connect)",
           "description": "This observation enables you to collect participants' step count data from Apple Health on iOS or Health Connect on Android."
+        },
+        "activity": {
+          "title": "Activity (Apple Health / Health Connect)",
+          "description": "This observation enables you to collect participants' activity data from Apple Health on iOS or Health Connect on Android."
+        }
+      },
+      "info": {
+        "title": "Info Item",
+        "description": "This observation enables you to send information items to the participants.",
+        "configProps": {
+          "messagesName": "Messages",
+          "messagesDesc": "Configure your messages here. These messages will be sent to the participants."
+        },
+        "form": {
+          "message": "Message {index}",
+          "addMessage": "Add message",
+          "removeMessage": "Remove message",
+          "text": "Text (Markdown)",
+          "textRequired": "Please enter a text (max. 20,000 characters).",
+          "priority": "Priority",
+          "priorities": {
+            "LOW": "Low",
+            "NORMAL": "Normal",
+            "HIGH": "High",
+            "URGENT": "Urgent"
+          },
+          "attachments": "Attachments",
+          "addAttachments": "Choose files",
+          "pendingUpload": "will be uploaded on save",
+          "sentAt": "Sent on {date}",
+          "publishAt": "Published on {date}",
+          "noMessages": "No messages yet.",
+          "fileTooLarge": "The file {name} is larger than 10 MB and cannot be uploaded.",
+          "uploadFailed": "The file {name} could not be uploaded.",
+          "downloadFailed": "The file could not be downloaded.",
+          "download": "Download",
+          "noPreview": "No preview available for this file type."
         }
       }
     },

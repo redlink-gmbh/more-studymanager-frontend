@@ -13,6 +13,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     GroupingProperty,
     IntegerProperty,
     IntegerRangeProperty,
+    MessagesProperty,
     ObservationProperty,
     Property,
     StringListProperty,
@@ -38,6 +39,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
   import ObservationPropertyInput from './ObservationPropertyInput.vue';
   import { Context } from '../../../models/ContextModel';
   import UnknownPropertyElement from '@/components/dialog/shared/UnknownPropertyElement.vue';
+  import MessagesPropertyInput from '@/components/dialog/shared/MessagesPropertyInput.vue';
 
   const props = defineProps({
     propertyList: {
@@ -49,6 +51,11 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       required: true,
     },
     editable: {
+      type: Boolean,
+      default: false,
+    },
+    // new info messages may be added even when the rest is not editable (active study)
+    messagesEditable: {
       type: Boolean,
       default: false,
     },
@@ -201,6 +208,20 @@ https://www.apache.org/licenses/LICENSE-2.0). */
           :property="property"
           :editable="editable"
           :is-part-of-template="isPartOfTemplate(property)"
+          @on-input-change="
+            emit('onPropertyChange', {
+              value: $event.value,
+              index: originalIndex,
+            })
+          "
+        />
+
+        <MessagesPropertyInput
+          v-if="property instanceof MessagesProperty"
+          :property="property"
+          :context="context"
+          :editable="editable || messagesEditable"
+          :can-edit-existing="editable"
           @on-input-change="
             emit('onPropertyChange', {
               value: $event.value,

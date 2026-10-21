@@ -9,4 +9,5 @@
 export interface Context {
   studyId: number;
   groupId: number | undefined;
+  observationId?: number;
 }

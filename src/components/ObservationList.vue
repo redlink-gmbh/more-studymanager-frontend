@@ -43,8 +43,13 @@ https://www.apache.org/licenses/LICENSE-2.0). */
   import { extractCurrentLimeDomain } from '../utils/limeSurveyUtils';
   import DropdownPanelWithSearch from '@/components/shared/DropdownPanelWithSearch.vue';
   import { useStudyStore } from '@/stores/studyStore';
+  import { useToastService } from '@/composable/toastService';
+  import { InfoMessage } from '@/models/InputModels';
+
+  type PendingAttachments = Record<string, File[]> | undefined;
 
   const loader = useLoader();
+  const { showErrorToast } = useToastService();
   const { observationsApi } = useObservationsApi();
   const { componentsApi } = useComponentsApi();
   const { t, d } = useI18n();
@@ -398,7 +403,14 @@ https://www.apache.org/licenses/LICENSE-2.0). */
         deleteObservation(row);
         break;
       case 'clone':
-        openComponentDialog(t('observation.dialog.header.clone'), row, true);
+        openComponentDialog(
+          t('observation.dialog.header.clone'),
+          // info messages and their attachments belong to the original observation
+          row.properties?.messages
+            ? { ...row, properties: { ...row.properties, messages: [] } }
+            : row,
+          true,
+        );
         break;
       case 'edit':
         openEditObservation(row.observationId);
@@ -408,11 +420,51 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     }
   }
 
+  function hasPendingFiles(pending: PendingAttachments): boolean {
+    return Object.values(pending ?? {}).some((files) => files.length > 0);
+  }
+
+  // uploads the files chosen for info messages and adds the returned ids to the messages
+  async function uploadAttachments(
+    observation: Observation,
+    pending: PendingAttachments,
+  ): Promise<void> {
+    const messages: InfoMessage[] = observation.properties?.messages ?? [];
+    for (const message of messages) {
+      for (const file of pending?.[message.id] ?? []) {
+        try {
+          const response = await observationsApi.addObservationAttachment(
+            props.studyId,
+            observation.observationId as number,
+            file,
+          );
+          if (response.data.attachmentId) {
+            message.attachments = [
+              ...(message.attachments ?? []),
+              response.data.attachmentId,
+            ];
+          }
+        } catch {
+          showErrorToast(
+            t('observation.factory.info.form.uploadFailed', {
+              name: file.name,
+            }),
+          );
+        }
+      }
+    }
+  }
+
   async function updateObservation(
     observation: MoreObservationListTableRow,
     fromDialog: boolean = false,
+    pendingAttachments?: PendingAttachments,
   ): Promise<void> {
     const { observationGroupValues, ...newObservation } = observation;
+
+    if (hasPendingFiles(pendingAttachments)) {
+      await uploadAttachments(newObservation, pendingAttachments);
+    }
 
     await observationsApi
       .updateObservation(
@@ -487,23 +539,43 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       },
       onClose: (options) => {
         if (options?.data) {
-          if (options.data?.observationId) {
+          const { pendingAttachments, ...observation } = options.data;
+          if (observation.observationId) {
             if (clone) {
-              createObservation(options.data as Observation);
+              createObservation(observation as Observation, pendingAttachments);
             } else {
-              updateObservation(options.data as Observation, true);
+              updateObservation(
+                observation as Observation,
+                true,
+                pendingAttachments,
+              );
             }
           } else {
-            createObservation(options.data as Observation);
+            createObservation(observation as Observation, pendingAttachments);
           }
         }
       },
     });
   }
 
-  function createObservation(newObservation: Observation): void {
+  function createObservation(
+    newObservation: Observation,
+    pendingAttachments?: PendingAttachments,
+  ): void {
     observationsApi
       .addObservation(props.studyId, newObservation)
+      .then(async (response: AxiosResponse<Observation>) => {
+        // attachments need the observation id, so they are added in a second step
+        if (hasPendingFiles(pendingAttachments)) {
+          const created = response.data;
+          await uploadAttachments(created, pendingAttachments);
+          await observationsApi.updateObservation(
+            props.studyId,
+            created.observationId as number,
+            created,
+          );
+        }
+      })
       .then(listObservations)
       .catch((e: AxiosError) =>
         handleIndividualError(e, 'Cannot create observation'),
