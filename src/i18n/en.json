@@ -582,7 +582,7 @@
         "description": "This observation enables you to send information items to the participants.",
         "configProps": {
           "messagesName": "Messages",
-          "messagesDesc": "Configure your messages here. These messages will be sent to the participants."
+          "messagesDesc": "Configure your list of messages here. These messages will be sent to the participants. You can use Markdown to format your messages for the app."
         },
         "form": {
           "message": "Message {index}",

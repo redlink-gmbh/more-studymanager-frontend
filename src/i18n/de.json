@@ -582,7 +582,7 @@
         "description": "Mit dieser Observation kannst du Informationselemente an die Teilnehmer:innen senden.",
         "configProps": {
           "messagesName": "Nachrichten",
-          "messagesDesc": "Konfiguriere deine Nachrichten hier. Diese Nachrichten werden den Teilnehmer:innen gesendet."
+          "messagesDesc": "Konfiguriere hier deine Nachrichtenliste. Die Nachrichten werden den Teilnehmer:innen gesendet. Du kannst Markdown verwenden, um deine Nachrichten für die App zu formatieren."
         },
         "form": {
           "message": "Nachricht {index}",
