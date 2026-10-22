@@ -12,7 +12,7 @@ import {
   MESSAGE_MAX_LENGTH,
   MessagesProperty,
   Property,
-  UnknownProperty,
+  UnknownProperty
 } from '../../src/models/InputModels';
 
 const json = {
@@ -67,6 +67,43 @@ describe('MessagesProperty', () => {
     expect(stored).toEqual([
       { id: 'msg-0', text: 'hello', attachments: ['a'] },
     ]);
+  });
+
+  it('validates publishAfter', () => {
+    const day = { value: 1, unit: 'DAY' as const };
+    expect(
+      withMessages(
+        { publishAfter: { offset: day } },
+        { publishAfter: { offset: day, time: '09:00' } },
+        { publishAfter: { offset: { value: 0, unit: 'HOUR' } } },
+      ).validate(),
+    ).toBeUndefined();
+    expect(
+      withMessages({
+        publishAt: '2026-10-22T18:00:00Z',
+        publishAfter: { offset: day },
+      }).validate(),
+    ).toBeDefined();
+    expect(
+      withMessages({
+        publishAfter: { offset: { value: -1, unit: 'DAY' } },
+      }).validate(),
+    ).toBeDefined();
+    expect(
+      withMessages({
+        publishAfter: { offset: { value: 1, unit: 'MONTH' } },
+      }).validate(),
+    ).toBeDefined();
+  });
+
+  it('does not share publishAfter with the given value', () => {
+    const stored = [
+      { id: 'msg-0', text: 'hello', publishAfter: { offset: { value: 1 } } },
+    ];
+    const edited = Property.fromJson(json).setValue(stored);
+    edited.value[0].publishAfter.offset.value = 5;
+    edited.value[0].publishAfter.time = '09:00';
+    expect(stored[0].publishAfter).toEqual({ offset: { value: 1 } });
   });
 
   it('keeps pending files out of the saved properties', () => {

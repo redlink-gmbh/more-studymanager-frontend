@@ -7,6 +7,7 @@
  Licensed under the Apache 2.0 license (see https://www.apache.org/licenses/LICENSE-2.0).
  */
 import cron from 'cron-validate';
+import { DurationUnitEnum, RelativeDate } from '@gs';
 
 export class ValidationError extends Error {
   constructor(
@@ -313,7 +314,6 @@ export class StringListProperty extends Property<string[]> {
   }
 }
 
-// shortcut: priorities are hardcoded, the API does not specify them; keep in sync with the backend
 export const MESSAGE_PRIORITIES = ['LOW', 'NORMAL', 'HIGH', 'URGENT'];
 export const MESSAGE_MAX_LENGTH = 20000;
 
@@ -322,12 +322,29 @@ export interface InfoMessage {
   text: string;
   priority?: string;
   publishAt?: string;
+  publishAfter?: RelativeDate;
   attachments?: string[];
   sentAt?: string;
 }
 
+const PUBLISH_AFTER_UNITS: string[] = [
+  DurationUnitEnum.Minute,
+  DurationUnitEnum.Hour,
+  DurationUnitEnum.Day,
+  DurationUnitEnum.Week,
+];
+
+function isValidPublishAfter(m: InfoMessage): boolean {
+  const offset = m.publishAfter?.offset;
+  return (
+    m.publishAt === undefined &&
+    Number.isInteger(offset?.value) &&
+    offset!.value! >= 0 &&
+    PUBLISH_AFTER_UNITS.includes(offset!.unit!)
+  );
+}
+
 export class MessagesProperty extends Property<InfoMessage[]> {
-  // files chosen in the dialog, uploaded on save and keyed by message id
   pendingFiles: Record<string, File[]> = {};
 
   static fromJson(json: any): MessagesProperty {
@@ -341,11 +358,14 @@ export class MessagesProperty extends Property<InfoMessage[]> {
     );
   }
 
-  // copies the messages, otherwise edits leak into the cached factory default or the observation list row
   public setValue(v: InfoMessage[]): MessagesProperty {
     this.value = (v || this.defaultValue || []).map((m) => ({
       ...m,
       attachments: m.attachments && [...m.attachments],
+      publishAfter: m.publishAfter && {
+        ...m.publishAfter,
+        offset: m.publishAfter.offset && { ...m.publishAfter.offset },
+      },
     }));
     return this;
   }
@@ -368,10 +388,12 @@ export class MessagesProperty extends Property<InfoMessage[]> {
       (m) =>
         !m.text?.trim() ||
         m.text.length > MESSAGE_MAX_LENGTH ||
-        (m.priority !== undefined && !MESSAGE_PRIORITIES.includes(m.priority)),
+        (m.priority !== undefined &&
+          !MESSAGE_PRIORITIES.includes(m.priority)) ||
+        (m.publishAfter !== undefined && !isValidPublishAfter(m)),
     );
     return invalid
-      ? `Message text must not be empty or longer than ${MESSAGE_MAX_LENGTH} characters and needs a valid priority`
+      ? `Message text must not be empty or longer than ${MESSAGE_MAX_LENGTH} characters, needs a valid priority and at most one valid publish date`
       : undefined;
   }
 }

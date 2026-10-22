@@ -103,10 +103,10 @@ Licensed under the Apache License, Version 2.0. */
   const messagesProperty = properties.value.find(
     (p) => p instanceof MessagesProperty,
   ) as MessagesProperty | undefined;
-  // info messages can still be added while the study is running
+  // info messages can be added in every state except closed (also active/preview)
   const messagesEditable =
     editable ||
-    (!!messagesProperty && studyStore.study.status === StudyStatus.Active);
+    (!!messagesProperty && studyStore.study.status !== StudyStatus.Closed);
 
   const selectedObservationGroups = ref(
     component.observationGroupIds?.map((id: number) => id.toString()) ?? [],

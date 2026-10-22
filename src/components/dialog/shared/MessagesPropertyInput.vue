@@ -16,9 +16,12 @@ https://www.apache.org/licenses/LICENSE-2.0). */
   import Select from 'primevue/select';
   import Button from 'primevue/button';
   import Dialog from 'primevue/dialog';
+  import SelectButton from 'primevue/selectbutton';
+  import DatePicker from 'primevue/datepicker';
+  import InputNumber from 'primevue/inputnumber';
   import FileUpload, { FileUploadUploaderEvent } from 'primevue/fileupload';
   import { useI18n } from 'vue-i18n';
-  import { ObservationAttachment } from '@gs';
+  import { DurationUnitEnum, ObservationAttachment } from '@gs';
   import { Context } from '@/models/ContextModel';
   import { useObservationsApi } from '@/composable/useApi';
   import { useToastService } from '@/composable/toastService';
@@ -64,6 +67,69 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     label: t(`observation.factory.info.form.priorities.${p}`),
     value: p,
   }));
+
+  type PublishMode = 'immediately' | 'absolute' | 'relative';
+  const publishModeOptions = (
+    ['immediately', 'absolute', 'relative'] as PublishMode[]
+  ).map((mode) => ({
+    label: t(`observation.factory.info.form.publishModes.${mode}`),
+    value: mode,
+  }));
+  const unitOptions = [
+    DurationUnitEnum.Minute,
+    DurationUnitEnum.Hour,
+    DurationUnitEnum.Day,
+    DurationUnitEnum.Week,
+  ].map((unit) => ({
+    label: t(`scheduler.frequency.${unit.toLowerCase()}s`),
+    value: unit,
+  }));
+
+  const publishMode = (message: InfoMessage): PublishMode =>
+    message.publishAfter
+      ? 'relative'
+      : message.publishAt
+        ? 'absolute'
+        : 'immediately';
+
+  function setPublishMode(message: InfoMessage, mode: PublishMode): void {
+    delete message.publishAt;
+    delete message.publishAfter;
+    if (mode === 'absolute') {
+      message.publishAt = new Date().toISOString();
+    } else if (mode === 'relative') {
+      // preset the time, so the picker never shows a time that is not stored
+      message.publishAfter = {
+        offset: { value: 0, unit: DurationUnitEnum.Day },
+        time: toTime(new Date()),
+      };
+    }
+  }
+
+  function setPublishAt(message: InfoMessage, date: unknown): void {
+    if (date instanceof Date) message.publishAt = date.toISOString();
+  }
+
+  const toTime = (date: Date): string =>
+    `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+  const timeToDate = (time?: string): Date | null => {
+    if (!time) return null;
+    const [hours, minutes] = time.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+    return date;
+  };
+
+  // only real dates are stored (HH:mm), partially typed input is ignored
+  function setPublishAfterTime(message: InfoMessage, date: unknown): void {
+    if (!message.publishAfter) return;
+    if (date instanceof Date) {
+      message.publishAfter.time = toTime(date);
+    } else if (!date) {
+      delete message.publishAfter.time;
+    }
+  }
 
   const attachmentInfo = ref<Record<string, ObservationAttachment>>({});
   if (props.context.observationId) {
@@ -118,6 +184,12 @@ https://www.apache.org/licenses/LICENSE-2.0). */
         );
       }
     }
+  }
+
+  function removeAttachment(message: InfoMessage, attachmentId: string): void {
+    message.attachments = message.attachments?.filter(
+      (a) => a !== attachmentId,
+    );
   }
 
   function removeFile(messageId: string, index: number): void {
@@ -205,8 +277,21 @@ https://www.apache.org/licenses/LICENSE-2.0). */
             })
           }}
         </span>
+        <span v-if="message.publishAfter" class="text-sm text-gray-500">
+          {{
+            $t('observation.factory.info.form.publishAfter', {
+              value: message.publishAfter.offset?.value,
+              unit: $t(
+                `scheduler.frequency.${message.publishAfter.offset?.unit?.toLowerCase()}s`,
+              ),
+              time: message.publishAfter.time
+                ? `${$t('observation.factory.info.form.publishAfterAt')} ${message.publishAfter.time}`
+                : '',
+            })
+          }}
+        </span>
         <Button
-          v-if="!existingIds.has(message.id)"
+          v-if="!existingIds.has(message.id) || canEditExisting"
           class="ml-auto"
           icon="pi pi-trash"
           severity="secondary"
@@ -243,6 +328,66 @@ https://www.apache.org/licenses/LICENSE-2.0). */
           option-value="value"
           class="w-full md:w-56"
         />
+        <label>{{ $t('observation.factory.info.form.publishMode') }}</label>
+        <SelectButton
+          :model-value="publishMode(message)"
+          :options="publishModeOptions"
+          option-label="label"
+          option-value="value"
+          :allow-empty="false"
+          @update:model-value="setPublishMode(message, $event)"
+        />
+        <DatePicker
+          v-if="message.publishAt"
+          :model-value="new Date(message.publishAt)"
+          show-time
+          hour-format="24"
+          class="w-full md:w-56"
+          :aria-label="
+            $t('observation.factory.info.form.publishModes.absolute')
+          "
+          @update:model-value="setPublishAt(message, $event)"
+        />
+        <template v-if="message.publishAfter?.offset">
+          <div class="flex flex-wrap items-center gap-2">
+            <InputNumber
+              v-model="message.publishAfter.offset.value"
+              :min="0"
+              :allow-empty="false"
+              show-buttons
+              class="w-32"
+              :aria-label="
+                $t('observation.factory.info.form.publishAfterOffset')
+              "
+            />
+            <Select
+              v-model="message.publishAfter.offset.unit"
+              :options="unitOptions"
+              option-label="label"
+              option-value="value"
+              class="w-36"
+              :aria-label="$t('observation.factory.info.form.publishAfterUnit')"
+            />
+            <span>{{
+              $t('observation.factory.info.form.publishAfterAt')
+            }}</span>
+            <DatePicker
+              :model-value="timeToDate(message.publishAfter.time)"
+              time-only
+              hour-format="24"
+              show-clear
+              class="w-32"
+              :placeholder="
+                $t('observation.factory.info.form.publishAfterTime')
+              "
+              :aria-label="$t('observation.factory.info.form.publishAfterTime')"
+              @update:model-value="setPublishAfterTime(message, $event)"
+            />
+          </div>
+          <small class="text-sm text-gray-500">
+            {{ $t('observation.factory.info.form.relativeHint') }}
+          </small>
+        </template>
       </template>
       <template v-else>
         <p class="whitespace-pre-wrap">{{ message.text }}</p>
@@ -259,7 +404,11 @@ https://www.apache.org/licenses/LICENSE-2.0). */
           {{ $t('observation.factory.info.form.attachments') }}
         </span>
         <ul class="flex flex-col gap-1">
-          <li v-for="attachmentId in message.attachments" :key="attachmentId">
+          <li
+            v-for="attachmentId in message.attachments"
+            :key="attachmentId"
+            class="flex items-center gap-2"
+          >
             <a
               href="#"
               class="text-primary-600 underline"
@@ -268,6 +417,15 @@ https://www.apache.org/licenses/LICENSE-2.0). */
               <span class="pi pi-paperclip mr-1" />
               {{ attachmentInfo[attachmentId]?.filename ?? attachmentId }}
             </a>
+            <Button
+              v-if="canEditExisting"
+              icon="pi pi-times"
+              severity="secondary"
+              text
+              size="small"
+              :aria-label="$t('observation.factory.info.form.removeAttachment')"
+              @click="removeAttachment(message, attachmentId)"
+            />
           </li>
           <li
             v-for="(file, fileIndex) in property.pendingFiles[message.id]"
