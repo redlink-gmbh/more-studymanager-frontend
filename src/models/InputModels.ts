@@ -7,6 +7,7 @@
  Licensed under the Apache 2.0 license (see https://www.apache.org/licenses/LICENSE-2.0).
  */
 import cron from 'cron-validate';
+import { DurationUnitEnum, RelativeDate } from '@gs';
 
 export class ValidationError extends Error {
   constructor(
@@ -52,6 +53,10 @@ export abstract class Property<T> {
         return GroupingProperty.fromJson(value);
       case 'STRINGTEMPLATE':
         return StringTemplateProperty.fromJson(value);
+      case 'OBJECT':
+        return value.id === 'messages'
+          ? MessagesProperty.fromJson(value)
+          : UnknownProperty.fromJson(value);
       default:
         return UnknownProperty.fromJson(value);
     }
@@ -78,8 +83,10 @@ export abstract class Property<T> {
       } else if (item.getType() === 'IntegerRange') {
         const val = item.getValue();
         result[item.id] = {
-          lower: val && val.lower !== undefined ? parseInt(val.lower.toString()) : 0,
-          upper: val && val.upper !== undefined ? parseInt(val.upper.toString()) : 0,
+          lower:
+            val && val.lower !== undefined ? parseInt(val.lower.toString()) : 0,
+          upper:
+            val && val.upper !== undefined ? parseInt(val.upper.toString()) : 0,
         };
       } else {
         result[item.id] = item.getValue();
@@ -307,6 +314,90 @@ export class StringListProperty extends Property<string[]> {
   }
 }
 
+export const MESSAGE_PRIORITIES = ['LOW', 'NORMAL', 'HIGH', 'URGENT'];
+export const MESSAGE_MAX_LENGTH = 20000;
+
+export interface InfoMessage {
+  id: string;
+  text: string;
+  priority?: string;
+  publishAt?: string;
+  publishAfter?: RelativeDate;
+  attachments?: string[];
+  sentAt?: string;
+}
+
+const PUBLISH_AFTER_UNITS: string[] = [
+  DurationUnitEnum.Minute,
+  DurationUnitEnum.Hour,
+  DurationUnitEnum.Day,
+  'WEEK', // ponytail: info messages only, not in the shared Duration enum
+];
+
+function isValidPublishAfter(m: InfoMessage): boolean {
+  const offset = m.publishAfter?.offset;
+  return (
+    m.publishAt === undefined &&
+    Number.isInteger(offset?.value) &&
+    offset!.value! >= 0 &&
+    PUBLISH_AFTER_UNITS.includes(offset!.unit!)
+  );
+}
+
+export class MessagesProperty extends Property<InfoMessage[]> {
+  pendingFiles: Record<string, File[]> = {};
+
+  static fromJson(json: any): MessagesProperty {
+    return new MessagesProperty(
+      json.defaultValue,
+      json.description,
+      json.id,
+      json.immutable,
+      json.name,
+      json.required,
+    );
+  }
+
+  public setValue(v: InfoMessage[]): MessagesProperty {
+    this.value = (v || this.defaultValue || []).map((m) => ({
+      ...m,
+      attachments: m.attachments && [...m.attachments],
+      publishAfter: m.publishAfter && {
+        ...m.publishAfter,
+        offset: m.publishAfter.offset && { ...m.publishAfter.offset },
+      },
+    }));
+    return this;
+  }
+
+  getType():
+    | 'Integer'
+    | 'Object'
+    | 'Array'
+    | 'String'
+    | 'Boolean'
+    | 'Double'
+    | 'StringText'
+    | 'Grouping'
+    | 'IntegerRange' {
+    return 'Object';
+  }
+
+  validate(): string | undefined {
+    const invalid = this.value?.find(
+      (m) =>
+        !m.text?.trim() ||
+        m.text.length > MESSAGE_MAX_LENGTH ||
+        (m.priority !== undefined &&
+          !MESSAGE_PRIORITIES.includes(m.priority)) ||
+        (m.publishAfter !== undefined && !isValidPublishAfter(m)),
+    );
+    return invalid
+      ? `Message text must not be empty or longer than ${MESSAGE_MAX_LENGTH} characters, needs a valid priority and at most one valid publish date`
+      : undefined;
+  }
+}
+
 export class IntegerProperty extends Property<number> {
   min: number;
   max: number;
@@ -364,7 +455,10 @@ export class IntegerProperty extends Property<number> {
   }
 }
 
-export class IntegerRangeProperty extends Property<{ lower: number; upper: number }> {
+export class IntegerRangeProperty extends Property<{
+  lower: number;
+  upper: number;
+}> {
   minLimit?: number;
   maxLimit?: number;
 

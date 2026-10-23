@@ -35,6 +35,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
   import MultiSelect from 'primevue/multiselect';
   import { useObservationGroupStore } from '../../stores/observationGroupStore';
   import { scrollToFirstError } from '../../utils/componentUtils';
+  import { extractCurrentLimeDomain } from '../../utils/limeSurveyUtils';
   import ObservationToggle from '../subComponents/ObservationToggle.vue';
 
   const { handleToastErrors, showErrorToast } = useToastService();
@@ -250,12 +251,6 @@ https://www.apache.org/licenses/LICENSE-2.0). */
 
   function updateProperty(item: PropertyEmit): void {
     properties.value[item.index].value = item.value;
-  }
-  function extractCurrentLimeDomain(): string {
-    const hostnameParts = window.location.hostname.split('.');
-    return hostnameParts.slice(1).join('.')
-      ? `https://lime.${hostnameParts.slice(1).join('.')}/admin/`
-      : 'https://lime.platform-test.umm.redlink.io/';
   }
 </script>
 

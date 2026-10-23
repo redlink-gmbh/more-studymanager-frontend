@@ -7,8 +7,5 @@
  Licensed under the Apache 2.0 license (see https://www.apache.org/licenses/LICENSE-2.0).
  */
 export function extractCurrentLimeDomain(): string {
-  const hostnameParts = window.location.hostname.split('.');
-  return hostnameParts.slice(1).join('.')
-    ? `https://lime.${hostnameParts.slice(1).join('.')}/admin/`
-    : 'https://lime.platform-test.umm.redlink.io/admin';
+  return `${import.meta.env.BASE_URL}api/v1/components/observation/lime-survey-observation/admin`;
 }

@@ -20,7 +20,7 @@ Licensed under the Apache License, Version 2.0. */
   import { useComponentsApi } from '@/composable/useApi';
   import { useStudyStore } from '@/stores/studyStore';
   import { useI18n } from 'vue-i18n';
-  import { Property } from '@/models/InputModels';
+  import { MessagesProperty, Property } from '@/models/InputModels';
   import PropertyInputs from './shared/PropertyInputs.vue';
   import { PropertyEmit } from '@/models/PropertyInputModels';
   import SchedulerInfoBlock from '../subComponents/SchedulerInfoBlock.vue';
@@ -100,6 +100,14 @@ Licensed under the Apache License, Version 2.0. */
       .map((p: Property<any>) => p.setValue(component.properties?.[p.id])) ??
       [],
   );
+  const messagesProperty = properties.value.find(
+    (p) => p instanceof MessagesProperty,
+  ) as MessagesProperty | undefined;
+  // info messages can be added in every state except closed (also active/preview)
+  const messagesEditable =
+    editable ||
+    (!!messagesProperty && studyStore.study.status !== StudyStatus.Closed);
+
   const selectedObservationGroups = ref(
     component.observationGroupIds?.map((id: number) => id.toString()) ?? [],
   );
@@ -258,6 +266,7 @@ Licensed under the Apache License, Version 2.0. */
         hidden: hidden.value,
         reminder: reminder.value,
         milestoneId: milestoneId.value,
+        pendingAttachments: messagesProperty?.pendingFiles,
       };
 
       if (studyWide || !isObjectEmpty(scheduler.value)) {
@@ -598,10 +607,12 @@ Licensed under the Apache License, Version 2.0. */
           <div v-if="properties">
             <PropertyInputs
               :editable="editable"
+              :messages-editable="messagesEditable"
               :property-list="properties"
               :context="{
                 studyId: studyStore.studyId,
                 groupId: studyGroupId,
+                observationId: component.observationId,
               }"
               @on-property-change="updateProperty($event)"
             />
@@ -711,14 +722,15 @@ Licensed under the Apache License, Version 2.0. */
           :class="componentType === 'observation' ? 'w-auto' : 'w-full'"
         >
           <Button class="btn-gray" @click="cancel()">
-            <span v-if="editable">{{ $t('global.labels.cancel') }}</span>
+            <span v-if="messagesEditable">{{
+              $t('global.labels.cancel')
+            }}</span>
             <span v-else>{{ $t('global.labels.close') }}</span>
           </Button>
           <Button
-            v-if="editable"
-            :type="editable ? 'submit' : 'button'"
+            v-if="messagesEditable"
+            type="submit"
             :label="$t('global.labels.save')"
-            :disabled="!editable"
             @click="
               checkRequiredFields();
               scrollToFirstError();

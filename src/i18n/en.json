@@ -571,6 +571,56 @@
         "steps": {
           "title": "Steps (Apple Health / Health Connect)",
           "description": "This observation enables you to collect participants' step count data from Apple Health on iOS or Health Connect on Android."
+        },
+        "activity": {
+          "title": "Activity (Apple Health / Health Connect)",
+          "description": "This observation enables you to collect participants' activity data from Apple Health on iOS or Health Connect on Android."
+        }
+      },
+      "info": {
+        "title": "Info Item",
+        "description": "This observation enables you to send information items to the participants.",
+        "configProps": {
+          "messagesName": "Messages",
+          "messagesDesc": "Configure your list of messages here. These messages will be sent to the participants. You can use Markdown to format your messages for the app."
+        },
+        "form": {
+          "message": "Message {index}",
+          "addMessage": "Add message",
+          "removeMessage": "Remove message",
+          "text": "Text (Markdown)",
+          "textRequired": "Please enter a text (max. 20,000 characters).",
+          "priority": "Priority",
+          "priorities": {
+            "LOW": "Low",
+            "NORMAL": "Normal",
+            "HIGH": "High",
+            "URGENT": "Urgent"
+          },
+          "attachments": "Attachments",
+          "addAttachments": "Choose files",
+          "pendingUpload": "will be uploaded on save",
+          "sentAt": "Sent on {date}",
+          "publishAt": "Published on {date}",
+          "publishMode": "Publish",
+          "publishModes": {
+            "immediately": "Immediately",
+            "absolute": "At date/time",
+            "relative": "Relative to observation start"
+          },
+          "publishAfterOffset": "Offset",
+          "publishAfterUnit": "Unit",
+          "publishAfterAt": "at",
+          "publishAfterTime": "Time (optional)",
+          "publishAfter": "Published {value} {unit} after observation start {time}",
+          "relativeHint": "Counted from the start of the observation's first occurrence. A result before that start is moved to the start.",
+          "removeAttachment": "Remove attachment",
+          "noMessages": "No messages yet.",
+          "fileTooLarge": "The file {name} is larger than 10 MB and cannot be uploaded.",
+          "uploadFailed": "The file {name} could not be uploaded.",
+          "downloadFailed": "The file could not be downloaded.",
+          "download": "Download",
+          "noPreview": "No preview available for this file type."
         }
       }
     },
@@ -1269,6 +1319,7 @@
         "DAY": "Day",
         "HOUR": "Hour",
         "MINUTE": "Minute",
+        "WEEK": "Week",
         "PL-DAY": "day(s)",
         "PL-HOUR": "hour(s)",
         "PL-MINUTE": "minute(s)",
