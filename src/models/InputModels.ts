@@ -331,7 +331,7 @@ const PUBLISH_AFTER_UNITS: string[] = [
   DurationUnitEnum.Minute,
   DurationUnitEnum.Hour,
   DurationUnitEnum.Day,
-  DurationUnitEnum.Week,
+  'WEEK', // ponytail: info messages only, not in the shared Duration enum
 ];
 
 function isValidPublishAfter(m: InfoMessage): boolean {

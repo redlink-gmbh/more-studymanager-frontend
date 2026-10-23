@@ -79,7 +79,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     DurationUnitEnum.Minute,
     DurationUnitEnum.Hour,
     DurationUnitEnum.Day,
-    DurationUnitEnum.Week,
+    'WEEK', // ponytail: info messages only, not in the shared Duration enum
   ].map((unit) => ({
     label: t(`scheduler.frequency.${unit.toLowerCase()}s`),
     value: unit,
