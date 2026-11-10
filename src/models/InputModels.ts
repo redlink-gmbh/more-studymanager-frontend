@@ -777,12 +777,15 @@ export class DataCheckProperty extends Property<QueryObject[]> {
   }
 }
 
+export type QueryDataType = 'string' | 'number' | 'boolean';
+
 export class QueryObjectInner {
   observationId: number | undefined;
   observationType: string;
   observationProperty: string;
   operator: string;
   propertyValue: string | number;
+  queryDataType?: QueryDataType;
   editMode: boolean | undefined;
   error: boolean | undefined;
 
@@ -792,6 +795,7 @@ export class QueryObjectInner {
     observationProperty: string,
     operator: string,
     propertyValue: string | number,
+    queryDataType?: QueryDataType,
     editMode?: boolean,
     error?: boolean,
   ) {
@@ -800,6 +804,7 @@ export class QueryObjectInner {
     this.observationProperty = observationProperty;
     this.operator = operator;
     this.propertyValue = propertyValue;
+    this.queryDataType = queryDataType;
     this.editMode = editMode;
     this.error = error;
   }
@@ -808,9 +813,10 @@ export class QueryObjectInner {
     return new QueryObjectInner(
       json.observationId,
       json.observationType,
-      json.observatoinProperty,
+      json.observationProperty,
       json.operator,
       json.propertyValue,
+      json.queryDataType,
       json.editMode,
       json.error,
     );

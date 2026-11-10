@@ -6,7 +6,7 @@
  Foerderung der wissenschaftlichen Forschung).
  Licensed under the Apache 2.0 license (see https://www.apache.org/licenses/LICENSE-2.0).
  */
-import { QueryObjectInner } from './InputModels';
+import { QueryDataType, QueryObjectInner } from './InputModels';
 
 export interface InterventionTriggerConfig {
   observationId: number | undefined;
@@ -14,6 +14,7 @@ export interface InterventionTriggerConfig {
   observationProperty: string;
   operator: string;
   propertyValue: string | number;
+  queryDataType?: QueryDataType;
   editMode?: boolean;
   error?: boolean;
 }

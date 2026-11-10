@@ -59,6 +59,11 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       editable: true,
     },
     {
+      field: 'queryDataType',
+      header: t('intervention.dialog.label.triggerConditionDataType'),
+      editable: true,
+    },
+    {
       field: 'operator',
       header: t('intervention.dialog.label.triggerConditionOperator'),
       editable: true,
