@@ -12,11 +12,12 @@ import {
   operatorsForQueryDataType,
   queryDataTypeFromMeasurement,
 } from '../../src/utils/queryDataTypeUtils';
+import { QueryDataType } from '../../src/models/InputModels';
 
 describe('queryDataTypeFromMeasurement', () => {
   it('maps measurement types to query data types', () => {
-    expect(queryDataTypeFromMeasurement('DOUBLE')).toBe('number');
-    expect(queryDataTypeFromMeasurement('INTEGER')).toBe('number');
+    expect(queryDataTypeFromMeasurement('DOUBLE')).toBe('double');
+    expect(queryDataTypeFromMeasurement('INTEGER')).toBe('long');
     expect(queryDataTypeFromMeasurement('BOOLEAN')).toBe('boolean');
     expect(queryDataTypeFromMeasurement('STRING')).toBe('string');
     expect(queryDataTypeFromMeasurement(undefined)).toBe('string');
@@ -24,28 +25,35 @@ describe('queryDataTypeFromMeasurement', () => {
 });
 
 describe('operatorsForQueryDataType', () => {
-  const values = (t: 'string' | 'number' | 'boolean'): unknown[] =>
+  const values = (t: QueryDataType): unknown[] =>
     operatorsForQueryDataType(t).map((o) => o.value);
 
-  it('offers comparison operators only for numbers', () => {
-    expect(values('number')).toEqual(['<', '>', '<=', '>=', '=', '!=']);
+  it('offers comparison operators for long, only ranges for double', () => {
+    expect(values('long')).toEqual(['<', '>', '<=', '>=', '=', '!=']);
+    expect(values('double')).toEqual(['<', '>', '<=', '>=']);
     expect(values('string')).toEqual(['=', '!=']);
     expect(values('boolean')).toEqual(['=', '!=']);
   });
 });
 
 describe('isValidQueryNumber', () => {
-  it('accepts dot-decimal numbers', () => {
-    expect(isValidQueryNumber('13')).toBe(true);
-    expect(isValidQueryNumber('13.5')).toBe(true);
-    expect(isValidQueryNumber('-2')).toBe(true);
-    expect(isValidQueryNumber(23)).toBe(true);
+  it('accepts dot-decimal numbers for double', () => {
+    expect(isValidQueryNumber('13', 'double')).toBe(true);
+    expect(isValidQueryNumber('13.5', 'double')).toBe(true);
+    expect(isValidQueryNumber('-2', 'double')).toBe(false);
+    expect(isValidQueryNumber(23, 'double')).toBe(true);
+  });
+
+  it('accepts only non-negative whole numbers for long', () => {
+    expect(isValidQueryNumber('13', 'long')).toBe(true);
+    expect(isValidQueryNumber(-2, 'long')).toBe(false);
+    expect(isValidQueryNumber('13.5', 'long')).toBe(false);
   });
 
   it('rejects comma decimals, text and empty values', () => {
-    expect(isValidQueryNumber('13,5')).toBe(false);
-    expect(isValidQueryNumber('abc')).toBe(false);
-    expect(isValidQueryNumber('')).toBe(false);
-    expect(isValidQueryNumber(undefined)).toBe(false);
+    expect(isValidQueryNumber('13,5', 'double')).toBe(false);
+    expect(isValidQueryNumber('abc', 'long')).toBe(false);
+    expect(isValidQueryNumber('', 'double')).toBe(false);
+    expect(isValidQueryNumber(undefined, 'long')).toBe(false);
   });
 });

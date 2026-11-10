@@ -296,9 +296,21 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     const returnTrigger: QueryObjectInner = trigger;
     returnTrigger.queryDataType = resolveDataType(trigger);
 
-    if (returnTrigger.queryDataType === 'number') {
-      if (!isValidQueryNumber(returnTrigger.propertyValue)) {
-        valueError.value = t('intervention.error.invalidNumber');
+    if (
+      returnTrigger.queryDataType === 'long' ||
+      returnTrigger.queryDataType === 'double'
+    ) {
+      if (
+        !isValidQueryNumber(
+          returnTrigger.propertyValue,
+          returnTrigger.queryDataType,
+        )
+      ) {
+        valueError.value = t(
+          returnTrigger.queryDataType === 'long'
+            ? 'intervention.error.invalidWholeNumber'
+            : 'intervention.error.invalidNumber',
+        );
         return;
       }
       returnTrigger.propertyValue = Number(returnTrigger.propertyValue);
@@ -440,6 +452,17 @@ https://www.apache.org/licenses/LICENSE-2.0). */
             option-value="value"
           />
 
+          <!-- without fraction digits InputNumber blocks typing , and . -->
+          <InputNumber
+            v-else-if="
+              column.field === 'propertyValue' &&
+              resolveDataType(data) === 'long'
+            "
+            v-model="(data as any)[field]"
+            :use-grouping="false"
+            :min="0"
+            :placeholder="$t('intervention.dialog.placeholder.enterNumber')"
+          />
           <InputNumber
             v-else-if="
               getOperator(data) &&
@@ -447,6 +470,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
               (data as any)['observationType'] !== 'gps-mobile-observation'
             "
             v-model="(data as any)[field]"
+            :min="0"
             :placeholder="$t('intervention.dialog.placeholder.enterNumber')"
           />
           <InputText

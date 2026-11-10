@@ -777,7 +777,7 @@ export class DataCheckProperty extends Property<QueryObject[]> {
   }
 }
 
-export type QueryDataType = 'string' | 'number' | 'boolean';
+export type QueryDataType = 'string' | 'long' | 'double' | 'boolean';
 
 export class QueryObjectInner {
   observationId: number | undefined;

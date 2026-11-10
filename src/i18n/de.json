@@ -240,7 +240,8 @@
         "chooseObservation": "Datenerhebung auswählen",
         "dataType": {
           "boolean": "Boolean",
-          "number": "Zahl",
+          "double": "Dezimalzahl",
+          "long": "Ganzzahl",
           "string": "Text"
         },
         "interventionTitle": "Interventionstitel",
@@ -255,7 +256,7 @@
         "windowInSeconds": "Zeitfenster rückwärts vom Triggerzeitpunkt (in Sekunden) "
       },
       "hint": {
-        "queryDataType": "Wählen Sie den Datentyp passend zur LimeSurvey-Antwort der entsprechenden Frage, z. B. Zahl für Scores. Kombinieren Sie Bedingungen mit \"submitted = true\" (Boolean), damit leere Antworten nicht auslösen."
+        "queryDataType": "Wählen Sie den Datentyp passend zur LimeSurvey-Antwort der entsprechenden Frage, z. B. Ganzzahl für Scores. Dezimalzahlen können nur mit <, >, <= oder >= verglichen werden. Kombinieren Sie Bedingungen mit \"submitted = true\" (Boolean), damit leere Antworten nicht auslösen."
       },
       "msg": {
         "delete": "Eine gelöschte Intervention kann nicht wiederhergestllt werden! Sind Sie sicher, dass sie diese Intervention löschen wollen?"
@@ -276,6 +277,7 @@
       "emptyTriggerConditions": "Bitte fügen Sie mindesetens eine Auslöserkondition zu ihrem Trigger hinzu.",
       "interventionRowIsOpen": "Bitte speichern Sie alle Konfigurationszeilen, bevor Sie die Intervention speichern.",
       "invalidNumber": "Bitte geben Sie eine gültige Zahl ein. Verwenden Sie einen Punkt als Dezimaltrennzeichen (z. B. 13.5).",
+      "invalidWholeNumber": "Bitte geben Sie eine Ganzzahl ein (z. B. 13).",
       "triggerProp": "Ein Trigger-Property hat einen Fehler.",
       "actionProp": "Ein Action-Property hat einen Fehler.",
       "observationDeleted": "Die verlinkte Datenerhebung (ID: {observationId}, Type: {observationType}) wurde gelöscht und kann nicht mehr referenziert werden. Bitte verlinke eine andere Datenerhebung, entferne diese Aktion oder lösche die Intervention komplett. Beachte, dass eine Intervention stets mindestens eine Aktion enthalten muss."
