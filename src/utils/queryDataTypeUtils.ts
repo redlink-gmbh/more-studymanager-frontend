@@ -49,11 +49,32 @@ export function operatorsForQueryDataType(
   return equalityOperators;
 }
 
-// dot as decimal separator only, matches what the backend can parse as Long / Double
+// comma or dot as decimal separator, no thousands separators; normalized to dot by toQueryNumber before sending
 export function isValidQueryNumber(
   value: unknown,
   type: 'long' | 'double',
 ): boolean {
-  const pattern = type === 'long' ? /^\d+$/ : /^\d+(\.\d+)?$/;
+  const pattern = type === 'long' ? /^\d+$/ : /^\d+([.,]\d+)?$/;
   return pattern.test(String(value ?? '').trim());
+}
+
+// numbers are stored with dot, shown with the decimal separator of the UI language
+export function formatQueryValue(
+  value: string | number | undefined,
+  locale: string,
+): string {
+  return typeof value === 'number'
+    ? value.toLocaleString(locale, {
+        useGrouping: false,
+        maximumFractionDigits: 20,
+      })
+    : (value ?? '');
+}
+
+export function toQueryNumber(value: unknown): number {
+  return Number(
+    String(value ?? '')
+      .trim()
+      .replace(',', '.'),
+  );
 }

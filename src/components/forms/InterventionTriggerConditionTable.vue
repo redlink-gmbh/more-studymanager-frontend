@@ -41,13 +41,15 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     isValidQueryNumber,
     operatorsForQueryDataType,
     queryDataTypeFromMeasurement,
+    toQueryNumber,
+    formatQueryValue,
   } from '../../utils/queryDataTypeUtils';
 
   const { observationsApi } = useObservationsApi();
   const { componentsApi } = useComponentsApi();
   const { handleIndividualError } = useErrorHandling();
 
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const props = defineProps({
     columns: {
@@ -313,7 +315,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
         );
         return;
       }
-      returnTrigger.propertyValue = Number(returnTrigger.propertyValue);
+      returnTrigger.propertyValue = toQueryNumber(returnTrigger.propertyValue);
     } else if (returnTrigger.queryDataType === 'boolean') {
       returnTrigger.propertyValue = String(returnTrigger.propertyValue);
     }
@@ -382,7 +384,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
             }}
           </span>
           <span v-else>
-            {{ (data as any)[field] }}
+            {{ formatQueryValue((data as any)[field], locale) }}
           </span>
         </template>
         <template #editor="{ data, field }: { data: any; field: any }">
@@ -473,10 +475,12 @@ https://www.apache.org/licenses/LICENSE-2.0). */
             :min="0"
             :placeholder="$t('intervention.dialog.placeholder.enterNumber')"
           />
+          <!-- not mutated on open, so a cancelled edit keeps the stored number -->
           <InputText
             v-else
-            v-model="(data as any)[field]"
+            :model-value="formatQueryValue((data as any)[field], locale)"
             :placeholder="$t('intervention.dialog.placeholder.enterValue')"
+            @update:model-value="(data as any)[field] = $event"
           />
         </template>
       </Column>

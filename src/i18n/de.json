@@ -276,7 +276,7 @@
       "addTriggerTypeConfig": "Der Trigger ist erforderlich, um die Bedingugn für die Intervention zu definieren. Bitte fügen Sie einen Trigger mit Konfiguration hinzu.",
       "emptyTriggerConditions": "Bitte fügen Sie mindesetens eine Auslöserkondition zu ihrem Trigger hinzu.",
       "interventionRowIsOpen": "Bitte speichern Sie alle Konfigurationszeilen, bevor Sie die Intervention speichern.",
-      "invalidNumber": "Bitte geben Sie eine gültige Zahl ein. Verwenden Sie einen Punkt als Dezimaltrennzeichen (z. B. 13.5).",
+      "invalidNumber": "Bitte geben Sie eine gültige Zahl ein. Als Dezimaltrennzeichen sind Komma oder Punkt erlaubt (z. B. 13,5), Tausendertrennzeichen nicht.",
       "invalidWholeNumber": "Bitte geben Sie eine Ganzzahl ein (z. B. 13).",
       "triggerProp": "Ein Trigger-Property hat einen Fehler.",
       "actionProp": "Ein Action-Property hat einen Fehler.",

@@ -276,7 +276,7 @@
       "addTriggerTypeConfig": "The trigger is required. Please add a trigger and its config.",
       "emptyTriggerConditions": "Please save at least one trigger condition to your trigger.",
       "interventionRowIsOpen": "Please save all trigger conditions before saving the intervention.",
-      "invalidNumber": "Please enter a valid number. Use a dot as decimal separator (e.g. 13.5).",
+      "invalidNumber": "Please enter a valid number. Use a comma or dot as decimal separator (e.g. 13.5), no thousands separators.",
       "invalidWholeNumber": "Please enter a whole number (e.g. 13).",
       "triggerProp": "A trigger property contains an error.",
       "actionProp": "An action property contains an error.",

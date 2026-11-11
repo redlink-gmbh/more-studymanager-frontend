@@ -8,9 +8,11 @@
  */
 import { describe, expect, it } from 'vitest';
 import {
+  formatQueryValue,
   isValidQueryNumber,
   operatorsForQueryDataType,
   queryDataTypeFromMeasurement,
+  toQueryNumber,
 } from '../../src/utils/queryDataTypeUtils';
 import { QueryDataType } from '../../src/models/InputModels';
 
@@ -50,10 +52,34 @@ describe('isValidQueryNumber', () => {
     expect(isValidQueryNumber('13.5', 'long')).toBe(false);
   });
 
-  it('rejects comma decimals, text and empty values', () => {
-    expect(isValidQueryNumber('13,5', 'double')).toBe(false);
+  it('accepts comma decimals for double only', () => {
+    expect(isValidQueryNumber('13,5', 'double')).toBe(true);
+    expect(isValidQueryNumber('13,5', 'long')).toBe(false);
+  });
+
+  it('rejects thousands separators, text and empty values', () => {
+    expect(isValidQueryNumber('1.234,5', 'double')).toBe(false);
+    expect(isValidQueryNumber('1,234.5', 'double')).toBe(false);
     expect(isValidQueryNumber('abc', 'long')).toBe(false);
     expect(isValidQueryNumber('', 'double')).toBe(false);
     expect(isValidQueryNumber(undefined, 'long')).toBe(false);
+  });
+});
+
+describe('formatQueryValue', () => {
+  it('shows numbers with the decimal separator of the locale', () => {
+    expect(formatQueryValue(13.5, 'de')).toBe('13,5');
+    expect(formatQueryValue(13.5, 'en')).toBe('13.5');
+    expect(formatQueryValue(1234.12345, 'de')).toBe('1234,12345');
+    expect(formatQueryValue('13.5', 'de')).toBe('13.5');
+    expect(formatQueryValue(undefined, 'de')).toBe('');
+  });
+});
+
+describe('toQueryNumber', () => {
+  it('normalizes comma and dot decimals to a number', () => {
+    expect(toQueryNumber('13,5')).toBe(13.5);
+    expect(toQueryNumber(' 13.5 ')).toBe(13.5);
+    expect(toQueryNumber(23)).toBe(23);
   });
 });
