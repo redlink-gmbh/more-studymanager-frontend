@@ -34,14 +34,22 @@ https://www.apache.org/licenses/LICENSE-2.0). */
   } from '../../models/InterventionTriggerModel';
   import { AxiosError, AxiosResponse } from 'axios';
   import { useErrorHandling } from '../../composable/useErrorHandling';
-  import { QueryObjectInner } from '../../models/InputModels';
+  import { QueryDataType, QueryObjectInner } from '../../models/InputModels';
   import { useI18n } from 'vue-i18n';
+  import {
+    QUERY_DATA_TYPES,
+    isValidQueryNumber,
+    operatorsForQueryDataType,
+    queryDataTypeFromMeasurement,
+    toQueryNumber,
+    formatQueryValue,
+  } from '../../utils/queryDataTypeUtils';
 
   const { observationsApi } = useObservationsApi();
   const { componentsApi } = useComponentsApi();
   const { handleIndividualError } = useErrorHandling();
 
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const props = defineProps({
     columns: {
@@ -123,18 +131,16 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     });
   });
 
-  const numericOperator: MoreTableChoice[] = [
-    { label: '<', value: '<' },
-    { label: '>', value: '>' },
-    { label: '<=', value: '<=' },
-    { label: '>=', value: '>=' },
-    { label: '=', value: '=' },
-    { label: '!=', value: '!=' },
-  ];
+  const valueError: Ref<string> = ref('');
 
-  const stringOperator: MoreTableChoice[] = [
-    { label: '=', value: '=' },
-    { label: '!=', value: '!=' },
+  const dataTypeOptions: MoreTableChoice[] = QUERY_DATA_TYPES.map((type) => ({
+    label: t(`intervention.dialog.label.dataType.${type}`),
+    value: type,
+  }));
+
+  const booleanOptions: MoreTableChoice[] = [
+    { label: 'true', value: 'true' },
+    { label: 'false', value: 'false' },
   ];
 
   async function getFactories(): Promise<ComponentFactory[]> {
@@ -168,14 +174,38 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     return [];
   }
 
+  // lime survey answers are untyped strings, so only there the user chooses how values are compared
+  function isDataTypeEditable(trigger: InterventionTriggerConfig): boolean {
+    return trigger.observationType === 'lime-survey-observation';
+  }
+
+  function resolveDataType(trigger: InterventionTriggerConfig): QueryDataType {
+    return isDataTypeEditable(trigger)
+      ? (trigger.queryDataType ?? 'string')
+      : queryDataTypeFromMeasurement(getOperator(trigger)?.type);
+  }
+
   function getOperatorOptions(
     trigger: InterventionTriggerConfig,
   ): MoreTableChoice[] {
-    const operator: ComponentFactoryMeasurementsInner = getOperator(trigger);
-    return (operator && operator.type === 'DOUBLE') ||
-      (operator && operator.type === 'INTEGER')
-      ? numericOperator
-      : stringOperator || [];
+    return operatorsForQueryDataType(resolveDataType(trigger));
+  }
+
+  function applyDataType(trigger: InterventionTriggerConfig): void {
+    trigger.queryDataType = resolveDataType(trigger);
+    const operators = getOperatorOptions(trigger);
+    if (!operators.some((o) => o.value === trigger.operator)) {
+      trigger.operator = operators[0].value as string;
+    }
+  }
+
+  function changeQueryDataType(
+    trigger: InterventionTriggerConfig,
+    type: QueryDataType,
+  ): void {
+    trigger.queryDataType = type;
+    applyDataType(trigger);
+    trigger.propertyValue = '';
   }
 
   function getOperator(
@@ -206,12 +236,10 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       const propertyOptions: ComponentFactoryMeasurementsInner[] =
         getPropertyOptions(trigger);
 
-      trigger.observationProperty = propertyOptions[0].id || '';
-      trigger.operator = propertyOptions[0].id
-        ? propertyOptions[0].type === 'DOUBLE'
-          ? (numericOperator[0].value as string)
-          : (stringOperator[0].value as string)
-        : (stringOperator[0].value as string);
+      trigger.observationProperty = propertyOptions[0]?.id || '';
+      trigger.queryDataType = undefined;
+      trigger.operator = '';
+      applyDataType(trigger);
 
       trigger.propertyValue = '';
     }
@@ -254,6 +282,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
   }
 
   function cancel(trigger: InterventionTriggerConfig, index: number): void {
+    valueError.value = '';
     rowOpenError.value = '';
     emit('onRowOpen', rowOpenError.value);
     emit('onToggleRowEdit', {
@@ -267,15 +296,30 @@ https://www.apache.org/licenses/LICENSE-2.0). */
 
   function save(trigger: QueryObjectInner, index: number): void {
     const returnTrigger: QueryObjectInner = trigger;
+    returnTrigger.queryDataType = resolveDataType(trigger);
 
     if (
-      getPropertyOptions(trigger).find(
-        (cfmi: ComponentFactoryMeasurementsInner) =>
-          cfmi.id === trigger.observationProperty,
-      )?.type === 'DOUBLE'
+      returnTrigger.queryDataType === 'long' ||
+      returnTrigger.queryDataType === 'double'
     ) {
-      returnTrigger.propertyValue = Number(returnTrigger.propertyValue);
+      if (
+        !isValidQueryNumber(
+          returnTrigger.propertyValue,
+          returnTrigger.queryDataType,
+        )
+      ) {
+        valueError.value = t(
+          returnTrigger.queryDataType === 'long'
+            ? 'intervention.error.invalidWholeNumber'
+            : 'intervention.error.invalidNumber',
+        );
+        return;
+      }
+      returnTrigger.propertyValue = toQueryNumber(returnTrigger.propertyValue);
+    } else if (returnTrigger.queryDataType === 'boolean') {
+      returnTrigger.propertyValue = String(returnTrigger.propertyValue);
     }
+    valueError.value = '';
     rowOpenError.value = '';
     emit('onRowOpen', rowOpenError.value);
     emit('onUpdateRowData', {
@@ -330,8 +374,17 @@ https://www.apache.org/licenses/LICENSE-2.0). */
               {{ getObservationTitle((data as any)[field]) }}
             </span>
           </span>
+          <span v-else-if="field === 'queryDataType'">
+            {{
+              (data as any)['observationId'] === undefined
+                ? '-'
+                : $t(
+                    `intervention.dialog.label.dataType.${resolveDataType(data)}`,
+                  )
+            }}
+          </span>
           <span v-else>
-            {{ (data as any)[field] }}
+            {{ formatQueryValue((data as any)[field], locale) }}
           </span>
         </template>
         <template #editor="{ data, field }: { data: any; field: any }">
@@ -358,7 +411,27 @@ https://www.apache.org/licenses/LICENSE-2.0). */
             :options="getPropertyOptions(data)"
             option-label="id"
             option-value="id"
+            @change="applyDataType(data)"
           />
+
+          <div
+            v-else-if="column.field === 'queryDataType'"
+            class="flex items-center gap-2"
+          >
+            <Dropdown
+              :model-value="resolveDataType(data)"
+              :options="dataTypeOptions"
+              option-label="label"
+              option-value="value"
+              :disabled="!isDataTypeEditable(data)"
+              @update:model-value="changeQueryDataType(data, $event)"
+            />
+            <span
+              v-if="isDataTypeEditable(data)"
+              v-tooltip.bottom="$t('intervention.dialog.hint.queryDataType')"
+              class="pi pi-info-circle color-primary"
+            ></span>
+          </div>
 
           <Dropdown
             v-else-if="
@@ -370,6 +443,28 @@ https://www.apache.org/licenses/LICENSE-2.0). */
             option-value="value"
           />
 
+          <Dropdown
+            v-else-if="
+              column.field === 'propertyValue' &&
+              resolveDataType(data) === 'boolean'
+            "
+            v-model="(data as any)[field]"
+            :options="booleanOptions"
+            option-label="label"
+            option-value="value"
+          />
+
+          <!-- without fraction digits InputNumber blocks typing , and . -->
+          <InputNumber
+            v-else-if="
+              column.field === 'propertyValue' &&
+              resolveDataType(data) === 'long'
+            "
+            v-model="(data as any)[field]"
+            :use-grouping="false"
+            :min="0"
+            :placeholder="$t('intervention.dialog.placeholder.enterNumber')"
+          />
           <InputNumber
             v-else-if="
               getOperator(data) &&
@@ -377,12 +472,15 @@ https://www.apache.org/licenses/LICENSE-2.0). */
               (data as any)['observationType'] !== 'gps-mobile-observation'
             "
             v-model="(data as any)[field]"
+            :min="0"
             :placeholder="$t('intervention.dialog.placeholder.enterNumber')"
           />
+          <!-- not mutated on open, so a cancelled edit keeps the stored number -->
           <InputText
             v-else
-            v-model="(data as any)[field]"
+            :model-value="formatQueryValue((data as any)[field], locale)"
             :placeholder="$t('intervention.dialog.placeholder.enterValue')"
+            @update:model-value="(data as any)[field] = $event"
           />
         </template>
       </Column>
@@ -447,6 +545,9 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       </Column>
     </DataTable>
 
+    <div v-if="valueError" class="error my-4">
+      {{ valueError }}
+    </div>
     <div v-if="rowOpenError" class="error my-4">
       {{ rowOpenError }}
     </div>

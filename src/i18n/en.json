@@ -238,7 +238,14 @@
       "label": {
         "addTriggerGroup": "Add trigger group",
         "chooseObservation": "Choose observation",
+        "dataType": {
+          "boolean": "Boolean",
+          "double": "Decimal number",
+          "long": "Whole number",
+          "string": "Text"
+        },
         "interventionTitle": "Intervention title",
+        "triggerConditionDataType": "Data type",
         "triggerConditionObservationProperty": "Observation Property",
         "triggerConditionOperator": "Operator",
         "triggerConditionPropertyValue": "Property Value",
@@ -247,6 +254,9 @@
         "triggerType": "Trigger-Type",
         "window": "Window",
         "windowInSeconds": "Observation period in seconds"
+      },
+      "hint": {
+        "queryDataType": "Choose the data type that matches the LimeSurvey answer of the corresponding question, e.g. Whole number for scores. Decimal numbers can only be compared with <, >, <= or >=. Combine conditions with \"submitted = true\" (Boolean) so empty responses do not match."
       },
       "msg": {
         "delete": "Deletion of an intervention can’t be revoked! Are you sure you want to delete following intervention:"
@@ -266,6 +276,8 @@
       "addTriggerTypeConfig": "The trigger is required. Please add a trigger and its config.",
       "emptyTriggerConditions": "Please save at least one trigger condition to your trigger.",
       "interventionRowIsOpen": "Please save all trigger conditions before saving the intervention.",
+      "invalidNumber": "Please enter a valid number. Use a comma or dot as decimal separator (e.g. 13.5), no thousands separators.",
+      "invalidWholeNumber": "Please enter a whole number (e.g. 13).",
       "triggerProp": "A trigger property contains an error.",
       "actionProp": "An action property contains an error.",
       "observationDeleted": "The linked observation (ID: {observationId}, Type: {observationType}) has been deleted and cannot be referenced. Please link a different data collection, remove this action or delete the intervention completely. Keep in mind that an intervention always requires at least one action."
