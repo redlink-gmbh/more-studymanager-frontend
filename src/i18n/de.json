@@ -387,7 +387,10 @@
       "name": "Namen des Meilensteins eingeben"
     },
     "plural": "Meilensteine",
-    "singular": "Meilenstein"
+    "singular": "Meilenstein",
+    "info": {
+      "onlyWithRelativeScheduler": "Ein Meilenstein kann nur bei einem relativen Zeitplan ausgewählt werden."
+    }
   },
   "monitoring": {
     "charts": {

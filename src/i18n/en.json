@@ -387,7 +387,10 @@
       "name": "Enter a milestone name"
     },
     "plural": "Milestones",
-    "singular": "Milestone"
+    "singular": "Milestone",
+    "info": {
+      "onlyWithRelativeScheduler": "A milestone can only be selected for a relative schedule."
+    }
   },
   "monitoring": {
     "charts": {
