@@ -21,7 +21,7 @@
     "clean": "rm -r -f node_modules package-lock.json dist src/generated-sources && npm cache clean --force"
   },
   "engines": {
-    "node": "22.14.0",
+    "node": "22.23.5",
     "npm": "11.2.0"
   },
   "dependencies": {
