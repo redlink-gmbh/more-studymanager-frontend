@@ -12,6 +12,7 @@ https://www.apache.org/licenses/LICENSE-2.0). */
   import DynamicDialog from 'primevue/dynamicdialog';
   import Button from 'primevue/button';
   import InputText from 'primevue/inputtext';
+  import Checkbox from 'primevue/checkbox';
   import OrderList from 'primevue/orderlist';
   import { useMilestoneStore } from '@/stores/milestoneStore';
   import DeleteMoreTableRowDialog from './dialog/DeleteMoreTableRowDialog.vue';
@@ -37,12 +38,22 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     props.studyStatus === StudyStatus.PausedPreview;
 
   const newMilestoneName = ref('');
+  const newMilestoneEssential = ref(false);
 
   function addMilestone(): void {
     const name = newMilestoneName.value.trim();
     if (!name) return;
-    milestoneStore.createMilestone(props.studyId, name);
+    milestoneStore.createMilestone(
+      props.studyId,
+      name,
+      newMilestoneEssential.value,
+    );
     newMilestoneName.value = '';
+    newMilestoneEssential.value = false;
+  }
+
+  function setEssential(milestone: Milestone, essential: boolean): void {
+    milestoneStore.updateMilestone({ ...milestone, essential });
   }
 
   const editingId = ref<number | undefined>(undefined);
@@ -107,6 +118,16 @@ https://www.apache.org/licenses/LICENSE-2.0). */
           @keyup.enter="addMilestone"
         />
       </div>
+      <div class="flex items-center gap-2 pb-2">
+        <Checkbox
+          v-model="newMilestoneEssential"
+          input-id="new-milestone-essential"
+          binary
+        />
+        <label for="new-milestone-essential" class="cursor-pointer">{{
+          t('milestone.essential')
+        }}</label>
+      </div>
       <Button
         type="button"
         icon="pi pi-plus"
@@ -163,6 +184,23 @@ https://www.apache.org/licenses/LICENSE-2.0). */
           <div v-else class="flex flex-1 items-center justify-between">
             <span>{{ option.name }}</span>
             <div class="flex items-center gap-1">
+              <div
+                class="mr-2 flex items-center gap-2"
+                @click.stop
+                @keydown.stop
+              >
+                <Checkbox
+                  :model-value="option.essential ?? false"
+                  :input-id="`milestone-essential-${option.milestoneId}`"
+                  binary
+                  @update:model-value="setEssential(option, $event)"
+                />
+                <label
+                  :for="`milestone-essential-${option.milestoneId}`"
+                  class="cursor-pointer text-sm"
+                  >{{ t('milestone.essentialShort') }}</label
+                >
+              </div>
               <Button
                 type="button"
                 icon="pi pi-pencil"
@@ -188,6 +226,9 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       >
         <span class="mr-2 text-sm text-gray-400">{{ index + 1 }}</span
         >{{ milestone.name }}
+        <span v-if="milestone.essential" class="ml-2 text-sm text-gray-500"
+          >({{ t('milestone.essentialShort') }})</span
+        >
       </li>
     </ul>
     <DynamicDialog />

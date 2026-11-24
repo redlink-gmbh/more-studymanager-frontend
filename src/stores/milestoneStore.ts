@@ -34,9 +34,13 @@ export const useMilestoneStore = defineStore('milestone', () => {
       });
   }
 
-  async function createMilestone(studyId: number, name: string): Promise<void> {
+  async function createMilestone(
+    studyId: number,
+    name: string,
+    essential = false,
+  ): Promise<void> {
     await milestonesApi
-      .createMilestone(studyId, { name })
+      .createMilestone(studyId, { name, essential })
       .then((response) => milestones.value.push(response.data))
       .catch((e: AxiosError) =>
         handleIndividualError(e, 'cannot create milestone'),
