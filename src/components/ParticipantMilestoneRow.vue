@@ -5,7 +5,7 @@ Oesterreichische Vereinigung zur Foerderung der wissenschaftlichen Forschung).
 Licensed under the Apache 2.0 license (see
 https://www.apache.org/licenses/LICENSE-2.0). */
 <script setup lang="ts">
-  import { PropType, ref, watch } from 'vue';
+  import { computed, PropType, ref, watch } from 'vue';
   import { Milestone, ParticipantMilestone } from '@gs';
   import { useI18n } from 'vue-i18n';
   import { useToast } from 'primevue/usetoast';
@@ -44,6 +44,10 @@ https://www.apache.org/licenses/LICENSE-2.0). */
       default: undefined,
     },
   });
+
+  const essentialMissing = computed(
+    () => !!props.milestone.essential && !props.existing,
+  );
 
   const dateValue = ref<Date | undefined>(
     props.existing?.dateTime ? new Date(props.existing.dateTime) : undefined,
@@ -154,11 +158,19 @@ https://www.apache.org/licenses/LICENSE-2.0). */
 </script>
 
 <template>
-  <div class="flex items-end gap-3">
+  <div
+    class="flex items-end gap-3 rounded-md p-2"
+    :class="{ 'essential-missing bg-(--p-error-50)': essentialMissing }"
+  >
     <div class="flex min-w-0 flex-1 flex-col gap-1">
-      <label class="text-xs font-bold text-gray-400 uppercase">{{
-        milestone.name
-      }}</label>
+      <label
+        class="text-xs font-bold uppercase"
+        :class="essentialMissing ? 'text-gray-700' : 'text-gray-400'"
+        >{{ milestone.name }}</label
+      >
+      <p v-if="essentialMissing" class="text-(--p-error-700)">
+        {{ t('participants.milestones.essentialMissing') }}
+      </p>
       <div class="flex items-center gap-2">
         <span class="w-6 shrink-0 text-right text-sm text-gray-400">{{
           index + 1
@@ -197,3 +209,9 @@ https://www.apache.org/licenses/LICENSE-2.0). */
     />
   </div>
 </template>
+
+<style scoped>
+  .essential-missing :deep(.p-inputtext) {
+    border-color: var(--p-error-400);
+  }
+</style>

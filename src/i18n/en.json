@@ -388,6 +388,8 @@
     },
     "plural": "Milestones",
     "singular": "Milestone",
+    "essential": "Required for correct study configuration",
+    "essentialShort": "Required",
     "info": {
       "onlyWithRelativeScheduler": "A milestone can only be selected for a relative schedule."
     }
@@ -1041,6 +1043,7 @@
       "saveFailed": "Failed to save milestone date.",
       "deleted": "Milestone date removed successfully",
       "deleteFailed": "Failed to remove milestone date.",
+      "essentialMissing": "Required milestone, date missing",
       "placeholder": {
         "dateTime": "Choose date",
         "time": "Time (optional)"

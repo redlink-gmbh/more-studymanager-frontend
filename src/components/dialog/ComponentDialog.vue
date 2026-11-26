@@ -126,7 +126,11 @@ Licensed under the Apache License, Version 2.0. */
     component.schedule ? component.schedule : {},
   );
 
-  const isRelativeEvent: Ref<boolean> = computed(() => scheduler?.value?.type === 'RelativeEvent')
+  const isRelativeEvent: Ref<boolean> = computed(
+    () =>
+      scheduler?.value?.type === 'RelativeEvent',
+  );
+  const isEmptyScheduler: Ref<boolean> = computed(() => Object.keys(scheduler.value).length === 0)
 
   const milestoneId: Ref<number | undefined> = ref(component.milestoneId);
   const selectedMilestone = computed(() =>
@@ -498,8 +502,11 @@ Licensed under the Apache License, Version 2.0. */
             class="col-span-8 col-start-0 mb-2"
           >
             <h5 class="mb-1">{{ $t('milestone.singular') }}</h5>
+            <div v-if="isEmptyScheduler || !isRelativeEvent" class="mb-1">
+              {{ $t('milestone.info.onlyWithRelativeScheduler') }}
+            </div>
             <Dropdown
-              v-if="isRelativeEvent"
+              v-if="isRelativeEvent || isEmptyScheduler"
               v-model="milestoneId"
               :options="milestoneStore.milestones"
               option-label="name"
@@ -510,7 +517,6 @@ Licensed under the Apache License, Version 2.0. */
                 $t('scheduler.dialog.relativeSchedule.milestone.placeholder')
               "
             />
-            <div v-else>{{ $t('milestone.info.onlyWithRelativeScheduler')}}</div>
           </div>
           <SchedulerInfoBlock
             :scheduler="scheduler"

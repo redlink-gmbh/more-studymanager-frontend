@@ -388,6 +388,8 @@
     },
     "plural": "Meilensteine",
     "singular": "Meilenstein",
+    "essential": "Notwendig für korrekte Studienkonfiguration",
+    "essentialShort": "Notwendig",
     "info": {
       "onlyWithRelativeScheduler": "Ein Meilenstein kann nur bei einem relativen Zeitplan ausgewählt werden."
     }
@@ -1041,6 +1043,7 @@
       "saveFailed": "Speichern des Meilenstein-Datums fehlgeschlagen.",
       "deleted": "Meilenstein-Datum erfolgreich entfernt",
       "deleteFailed": "Entfernen des Meilenstein-Datums fehlgeschlagen.",
+      "essentialMissing": "Notwendiger Meilenstein, Datum fehlt",
       "placeholder": {
         "dateTime": "Datum wählen",
         "time": "Uhrzeit (optional)"
